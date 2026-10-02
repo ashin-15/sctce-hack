@@ -10,7 +10,7 @@ Sakshi ("Evidence That Only You Can See") is a privacy-first Android app for har
 
 ## Completed deliverables
 
-- [Main report](research/sentiment-emotion-local-ai-android-design.md): all sections 1-23 populated. Section 23 reconstructs 58 source-register keys, covering all 56 keys cited in the body, including previously unlisted C1-C3 and T1-T5. Entries separate current primary-page verification, historical source inspection, local diagnostics and unresolved rights/device evidence.
+- [Main report](research/sentiment-emotion-local-ai-android-design.md): all sections 1-23 populated. Section 23 reconstructs 60 source-register keys, covering all 58 keys cited in the body, including previously unlisted C1-C3 and T1-T5. Entries separate current primary-page verification, historical source inspection, local diagnostics and unresolved rights/device evidence.
 - Sections 1-22 reviewed for recommendation structure, task/runtime boundaries, source traceability and experiment claims. Added supporting WHY/WHAT/HOW/MODEL/RUNTIME/DATA/ANDROID/LIMITATIONS contracts; repaired merged prose and restored canonical product/model/API names.
 - Reconciled persisted text anchors with `data/sakshi-event-schema.json`: half-open Unicode code-point ranges. Kotlin UTF-16 conversion remains an explicit UI/tokenizer boundary with surrogate checks. The shared schema was not changed; the illustrative analysis result still requires a validated event adapter.
 - [Visual artifact](.lavish/sakshi-sentiment-emotion-architecture.html): architecture, decisions, evidence-status distinctions, model/runtime comparisons and synthetic diagnostic examples. It follows the existing Sakshi review-artifact style and keeps phone/quality limitations visible.
@@ -61,6 +61,8 @@ The 64-token padded anger comparison (0.570579 versus 0.722891 unpadded) and ear
 
 ## Decisions that must survive editing
 
+- User review confirmed offline/private processing, English/Malayalam/Hindi priority (including Manglish/Hinglish and code mixing), other languages as future scope, and physical-device resource validation during implementation/testing.
+- Duplicate/gap policy is decided in report section 8: suppress representation updates without erasing repeated occurrences; distinguish historic/summary context; make uncertain duplicates reviewable; show coverage gaps; allow supported user-selected imports without fabricating missing history; rebuild associations and counts after correction.
 - Emotion is independent and optional; it never gates preservation or behaviour review.
 - Behaviour is the primary safety-related signal. The six-label Jigsaw baseline lacks comprehensive control, stalking, blackmail and sexual-harassment coverage.
 - Intensity is `null` in MVP; raw sigmoid scores are neither calibrated probabilities nor intensity.
@@ -81,7 +83,7 @@ The documentation handoff is complete, not a claim that the app or model pack is
 5. Implement/audit vault encryption, nonce/key lifecycle, backup/recovery, logs, correction/deletion propagation and explicit export. Hashes alone cannot establish authenticity or admissibility.
 6. Resolve release-specific model/dataset/code rights and refresh mutable primary APIs/source details. Gated Gemma assets, HateXplain license discrepancy, NRC commercial rights and some dataset terms remain unqualified.
 
-No Android implementation, model training, representative quality/calibration experiment, private-data upload or Laya integration was performed in this completion.
+No Android implementation, model training, representative quality/calibration experiment, private-data upload or Laya integration was performed in this completion. The user ended the Lavish review after submitting four decisions, all incorporated into the report, artifact and operating contract. Do not reopen that review session uninvited.
 
 ## File map and investigation provenance
 

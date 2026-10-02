@@ -9,7 +9,7 @@ This file is the compact operating contract for coding and research agents.
 ## Core Rules
 
 - **Android-first.** Prefer Kotlin + Jetpack Compose and Android-supported APIs.
-- **Local-first AI.** Sensitive evidence stays on-device by default.
+- **Offline local AI.** Sensitive evidence and inference remain on-device. Model provisioning is a separate explicit preparation step; there is no cloud inference fallback.
 - **Human-in-the-loop.** AI findings are suggestions; the user confirms, rejects, or edits them.
 - **Evidence-linked.** AI claims must trace back to actual source evidence.
 - **Originals preserved.** Never overwrite source evidence during preprocessing.
@@ -87,7 +87,7 @@ Record dataset source, language, modality, labels, license, context, limitations
 
 ## Multilingual
 
-Research and test English, Malayalam, Hindi, Tamil, Telugu, Kannada, Bengali, Marathi, Hinglish, Romanized Indic text, and code-mixed/slang text.
+Current priority: English, Malayalam and Hindi, including Manglish, Hinglish, native scripts, Romanized text, slang and code mixing involving these languages. User decision on 2 October 2026: other languages are future scope.
 
 Report per-language performance. Prefer explicit uncertainty over overconfident unsupported results.
 

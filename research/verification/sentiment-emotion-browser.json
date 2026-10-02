@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-02T11:16:52.147Z",
+  "checked_at": "2026-10-02T11:28:42.334Z",
   "artifact": ".lavish/sakshi-sentiment-emotion-architecture.html",
   "method": "Standalone headless Chromium CDP; in-app browser tool unavailable",
   "checks": [
@@ -32,9 +32,9 @@
   "pageExceptions": 0,
   "remoteRequests": 0,
   "screenshotFiles": [
-    "/tmp/sakshi-sentiment-browser-YQB0oB/sentiment-dark-1440.png",
-    "/tmp/sakshi-sentiment-browser-YQB0oB/sentiment-light-1440.png",
-    "/tmp/sakshi-sentiment-browser-YQB0oB/sentiment-dark-390.png",
-    "/tmp/sakshi-sentiment-browser-YQB0oB/sentiment-light-390.png"
+    "/tmp/sakshi-sentiment-browser-85MO2Q/sentiment-dark-1440.png",
+    "/tmp/sakshi-sentiment-browser-85MO2Q/sentiment-light-1440.png",
+    "/tmp/sakshi-sentiment-browser-85MO2Q/sentiment-dark-390.png",
+    "/tmp/sakshi-sentiment-browser-85MO2Q/sentiment-light-390.png"
   ]
 }

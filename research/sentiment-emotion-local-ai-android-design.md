@@ -29,6 +29,13 @@ Every recommendation distinguishes:
 - **Design:** proposed engineering decision/target, not measured performance.
 - **Unknown:** no applicable artifact, license, measurement or target-language evidence established.
 
+### User review decisions, 2 October 2026
+
+- Offline processing and strong privacy/security are product requirements. Evidence and inference stay on-device; no cloud fallback. Explicit user export and separately authorized asset provisioning remain distinct workflows. Security properties still require implementation and testing, rather than being established by the design alone.
+- Physical Android parity, latency, memory, battery and thermal checks belong to implementation/testing. They are not prerequisites for completing this research report and are not claimed as completed measurements.
+- Prioritize **English, Malayalam and Hindi**, including Manglish, Hinglish and code-mixed/slang variants involving these languages. Other languages are future scope. Current English diagnostic packs do not become qualified Malayalam/Hindi models through this scope decision.
+- Decide duplicate-notification and missing-coverage handling before Android implementation. The concrete policy and required replay/device tests are recorded in section 8 below.
+
 ## 2. Proposal context and where emotion belongs
 
 Primary product context: local `Harassment_Pattern_Guard.pptx.pdf`, rendered-text extraction inspected page by page. The proposal says Sakshi detects cross-platform harassment patterns locally, produces evidence-linked incident notes, preserves encrypted immutable originals with SHA-256 integrity metadata, shows timelines/escalation, allows corrections, and generates user-confirmed reports. Its target users include domestic-abuse survivors, cyberbullying victims and students. [P1]
@@ -383,6 +390,26 @@ Required states: not_evaluated, unsupported_language, extraction_uncertain, cont
 
 Persist text anchors as half-open **Unicode code-point** ranges `[start, end)` on the identified immutable derivative, matching `data/sakshi-event-schema.json` (`span.kind="text"`, `span.unit="unicode_code_points"`). This text-signals sketch is a proposed analysis result, not an already validated event-schema payload; an explicit adapter must construct and validate canonical events. Kotlin `String`/Compose APIs use UTF-16 code-unit indices internally. Convert only at the UI/tokenizer boundary with `text.offsetByCodePoints(0, codePointIndex)`; reverse with `text.codePointCount(0, utf16Index)` after checking a boundary does not split a surrogate pair. Validate `0 <= start <= end <= text.codePointCount(0, text.length)` and round-trip both ends. A supplementary emoji occupies one code point but two UTF-16 units; combining/ZWJ sequences contain multiple code points and are not single grapheme offsets. UTF-8 bytes, tokenizer offsets, OCR polygons and audio milliseconds remain separate coordinate systems. Every view transformation needs explicit many-to-many source-span maps and a derivative identity, not index equality. Whole-message classifiers anchor the analyzed region without claiming a learned rationale span. Exact LLM quote matching establishes presence, not interpretation entailment.
 
+### Duplicate notifications and capture gaps: decided design policy
+
+**Verified platform facts:** Android's notification key identifies a notification record, not a chat message. The listener exposes currently active notifications after connection; that snapshot is not a missing-history API. MessagingStyle also carries explicitly historic context. These APIs do not establish app-specific delivery completeness or stable message identity. [R14-R15]
+
+**Design decisions:** adopt the conservative representation policy in [notification intelligence, section 7](notification-intelligence-layer.md) and the distinct-event rules in [temporal patterns](temporal-harassment-patterns.md). Keep each authorized artifact intact; suppress duplicate analysis/representation, not actual repeated contact.
+
+| Situation | Decided behaviour | Counting and uncertainty |
+| --- | --- | --- |
+| Same notification scope and unchanged content snapshot | Compare bounded content fingerprints within profile/package/key/generation. Exclude collector time and ranking-only fields; skip redundant inference. Use per-install HMAC and bounded transient state, not an archive of all notifications. | No added message/contact. A key is not a message ID; missing removal or expired state leaves identity uncertain. |
+| Structured array changes from `[A]` to `[A,B]` | Diff ordered occurrences; mark A as repeated context and B as newly exposed candidate. Historic entries stay context. | `[A,A]` retains both occurrences; identical text is never globally merged. App-provided timestamps are source claims. |
+| Summary overlaps child notifications | Prefer structured child observations; link the summary as another representation when supported. | Summary-only text has unknown per-chat/message count. Never convert an unread total into unseen events. |
+| Removal/repost or reconnect | Advance/reset collector generation conservatively; use an active snapshot only under the user's acquisition consent. Tag reconnect observations separately from live arrivals. | Removal is not proof of chat deletion; reconnect cannot fill the unobserved interval or prove a new contact. |
+| Same export imported twice; screenshot plus export | Reuse an exact selected artifact digest for storage/inference idempotency while preserving provenance. Keep source-record identities; cross-artifact event merging requires a supported association or user review. | Equal file hashes identify representations, not real-world message occurrences. Possible duplicates remain reviewable, not asserted as distinct contact. |
+| Process death, listener disconnect, queue overflow, redaction or omitted previews | Record a coverage reason and best-known interval; unknown start/end remain unknown. Queue overflow records lost observations, not an invented number of messages. | Shade the timeline gap; disable unsupported no-contact and comparable-rate claims. Manual review and selected imports remain available. |
+| User supplies evidence for a gap or corrects a duplicate | Preserve the imported original, source-time interval and later `available_at`; rebuild versioned associations/patterns using the new review state. | A gap is narrowed only where supplied evidence supports it. Do not retroactively claim earlier detection or complete coverage. |
+
+**Implementation acceptance:** replay unchanged repost, ranking-only update, `[A] -> [A,B]`, `[A,A]`, same wording at different times, summary/child overlap, key reuse after missing removal, reconnect with cache expiry, repeated import, screenshot/export association, queue overflow and late evidence. Count updates must be idempotent; real repeated occurrences must survive deduplication; uncertain duplicates must not silently inflate confirmed counts. Record unresolved identity/count uncertainty rather than selecting a convenient estimate. A rejection/correction must rebuild derived counts and invalidate stale explanations.
+
+These are frozen design rules for this handoff, not results from a real Android prototype. Implementation/testing must verify actual notification payloads, lifecycle delivery, source-time precision and group/history behaviour on the selected messaging apps, Android versions and devices. Supported user-mediated import may supply missing evidence; omitted, disappearing or redacted content is never reconstructed through a bypass.
+
 ### Persistence entities
 
 ```text
@@ -578,6 +605,8 @@ Retrieval latency **unknown on target phones**; budget/token count/design arithm
 
 ## 13. Multilingual & Code-Mixed Strategy and evasive text
 
+**Current scope:** English, Malayalam and Hindi are the implementation/evaluation priorities, including Manglish, Hinglish and their code-mixed/slang slices. Tamil, Telugu, Kannada, Bengali, Marathi and additional languages below are a future research inventory, not MVP support promises. Preserve unsupported imports and allow manual review while each target-language model is being qualified.
+
 **No English checkpoint receives unsupported Indic input and returns a confident safe result in production.** Native script, Latin transliteration, code mixing, slang and language uncertainty are separate qualification slices. Interface language isn't message language. Short texts often defeat language ID; ASCII isn't English.
 
 | Language/slice | Candidate representation/data | Implementation/support policy |
@@ -714,7 +743,7 @@ The workspace's `data/labeled_data.csv` was not treated as a verified emotion/in
 
 Use pinned emotion/toxicity checkpoints as experimental review suggestions. Do not train or advertise a universal safety classifier from invented examples. Prepared synthetic fixtures demonstrate invariants, not real-world accuracy.
 
-The first pilot annotation target is **300 English message/context units, 200 Malayalam/Manglish units and 60 short sequences** with roles and capture gaps, reviewed by native speakers. These are proposed counts, not collected data or evidence of release adequacy. Other languages remain unsupported until qualified. Include hard negatives and enough rare-category positives to report intervals; keep synthetic and consented genuine sources separate.
+The existing first pilot targets **300 English message/context units, 200 Malayalam/Manglish units and 60 short sequences** with roles and capture gaps, reviewed by native speakers. Following the user review, add a separate Hindi/Hinglish pilot whose size is determined by annotation capacity, rare-category coverage and uncertainty intervals before training. No Hindi examples have been collected or qualified here. These are proposed plans, not collected data or evidence of release adequacy. Other languages are future scope. Include hard negatives and enough rare-category positives to report intervals; keep synthetic and consented genuine sources separate.
 
 Record source, license/consent, real/synthetic origin, language/script/code mix, claimed speaker/target, adjacent context, emotion labels, behaviour rubric, quote/report/negation status, source mappings, timestamps/gaps, and annotation disagreement. Intensity needs its own annotation rubric. Annotators may answer unknown. Use blind independent annotation and adjudication with safeguards for annotator well-being.
 
@@ -820,6 +849,8 @@ Proposed protocol: 30 process-cold repetitions, 10 warmups plus 200 warm inferen
 **Expected latency remains unknown on target phones.** The published MobileBERT 62 ms Pixel 4 result and Arm Qwen 2B 6.782 s 128-input/128-output workload are source-specific anchors. Initial design targets are text pair/router p95 below 250 ms at 128 tokens on a selected midrange device and incremental AI working set below 300 MiB during text review. They may require one session at a time and must be measured. Foreground LLM work needs finite output and tested cancellation; no generic latency/RAM guarantee. [E2][M10][R9]
 
 ## 18. Privacy / Security
+
+The user confirmed offline operation and strong privacy/security as product requirements. Local processing is mandatory during evidence analysis; network provisioning and explicit reviewed export are separate user-authorized activities. No cloud inference fallback or content-rich telemetry is permitted. Encryption, key recovery, backup exclusions and compromised-device limitations must be demonstrated during implementation/testing; this report is not a security certification.
 
 - A network-free variant omits INTERNET permission and imports/bundles assets. An explicit model-download variant separates network provisioning from inference and never uploads evidence.
 - ML Kit documents local input/output processing alongside SDK metrics/model/compatibility traffic. Disclose this; a strict zero-network build needs an audited native OCR alternative. Do not copy content telemetry from example codelabs. [R12]
@@ -1059,6 +1090,8 @@ The missing register was reconstructed on **2 October 2026** from the saved inve
 - **R11:** [ComponentCallbacks2](https://developer.android.com/reference/android/content/ComponentCallbacks2), [low-memory-killer guidance](https://developer.android.com/topic/performance/issues/lmk). **Live API; History LMK.** Running/complete/moderate trim levels are not delivered since API 34; do not depend on them for native session safety.
 - **R12:** [ML Kit terms and privacy disclosures](https://developers.google.com/ml-kit/terms). **History.** Local processing and SDK traffic are separate properties; the strict offline variant still needs network/log audit.
 - **R13:** [Android Keystore](https://developer.android.com/privacy-and-security/keystore), [backup configuration](https://developer.android.com/identity/data/autobackup). **Design references, not a verified Sakshi implementation.** Key wrapping, nonce policy, backup exclusion and lock/recovery need implementation and device tests.
+- **R14:** [StatusBarNotification key](https://developer.android.com/reference/android/service/notification/StatusBarNotification#getKey()), [NotificationListenerService active snapshots](https://developer.android.com/reference/android/service/notification/NotificationListenerService#getActiveNotifications()). **Live.** Notification-record identity and outstanding-notification snapshots; neither is a complete message-history contract. Section 8 counting/reconciliation rules are Sakshi design decisions, not guaranteed messenger behaviour.
+- **R15:** [MessagingStyle historic context](https://developer.android.com/reference/android/app/Notification.MessagingStyle#addHistoricMessage(android.app.Notification.MessagingStyle.Message)). **Live.** Historic context must be distinguished from newly exposed message candidates. App-specific arrays, truncation and repeated-occurrence ambiguity require device tests.
 
 ### Datasets, text robustness and calibration
 

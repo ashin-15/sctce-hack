@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-02T11:23:53.852375+00:00",
+  "checked_at": "2026-10-02T11:29:36.804502+00:00",
   "scope": "HANDOFF.md research/design completion only",
   "report_checks": {
     "numbered_sections": [
@@ -69,6 +69,8 @@
       "R11",
       "R12",
       "R13",
+      "R14",
+      "R15",
       "R2",
       "R3",
       "R4",
@@ -86,7 +88,7 @@
       "U2",
       "U3"
     ],
-    "registered_citation_keys": 58,
+    "registered_citation_keys": 60,
     "unresolved_keys": [],
     "json_examples_parsed": 1,
     "relative_source_links_exist": true,
@@ -108,12 +110,13 @@
     "exit_code": 0
   },
   "file_sha256": {
-    "research/sentiment-emotion-local-ai-android-design.md": "92b293610ad0412a650c8ced3374a1758c68fd6dd0e766db4e5a93c8355529ce",
-    ".lavish/sakshi-sentiment-emotion-architecture.html": "94763819ac7988ed73645091079605ddf838f2830c08515ac337a2346b4c8b49",
+    "research/sentiment-emotion-local-ai-android-design.md": "9def351c15959da5e994208a9274883ff77cf5a7841f915cec37cb74fa13f37c",
+    ".lavish/sakshi-sentiment-emotion-architecture.html": "ce16e8915efec8061f98aaadc859e1ba2db750c85ae168ca2ee5b903090bff57",
     "research/verification/README.md": "ff1c69228911435c5f32a9fcd9c933cb22d62a1265f68f2c92bf83723f9bd72a",
     "research/verification/sentiment-emotion-browser-check.mjs": "d37e9741760957bb0c99d7e6bb3b3b0560e81e70a335cdfa91c5d0aa97efe205",
-    "research/verification/sentiment-emotion-browser.json": "fd0cc96ead4649a18be37b365808020fbad0ba24d12fca796b1f1d866f1aff80",
-    "research/verification/sentiment-emotion-probe.json": "64f9e6888e24eb29813708b8d47de8050e5a88ff767f35e9d8992bdf18f195c9"
+    "research/verification/sentiment-emotion-browser.json": "64f08f2ba04e6e3f29d30edda3f0a825364c66f1ea11b74cb62b92cf2da946f8",
+    "research/verification/sentiment-emotion-probe.json": "64f9e6888e24eb29813708b8d47de8050e5a88ff767f35e9d8992bdf18f195c9",
+    "AGENTS.md": "29614bab71faf1d8563c8411ebc9f9adc30096ffdfae6e9860e097a1087fe500"
   },
   "limitations": [
     "Historical timing/padding results not rerun",
@@ -121,5 +124,20 @@
     "No representative dataset quality or calibration evidence",
     "Kotlin examples are uncompiled design sketches",
     "Historical/mutable source details and release-specific licensing require implementation-time review"
-  ]
+  ],
+  "review_feedback": {
+    "session_ended_by_user": true,
+    "decisions": [
+      "Offline/private evidence processing required, no cloud inference fallback",
+      "English, Malayalam and Hindi priority; other languages future scope",
+      "Physical-device resource checks during implementation/testing",
+      "Conservative duplicate representation, real repetition and visible capture-gap policy recorded in section 8"
+    ],
+    "platform_sources_refreshed": [
+      "StatusBarNotification.getKey",
+      "NotificationListenerService.getActiveNotifications",
+      "Notification.MessagingStyle.addHistoricMessage"
+    ],
+    "device_prototype_performed": false
+  }
 }
