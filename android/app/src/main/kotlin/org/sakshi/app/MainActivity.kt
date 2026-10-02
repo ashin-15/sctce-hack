@@ -14,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import org.sakshi.app.lock.BiometricGate
 import org.sakshi.app.importing.ConsumedIntentTracker
 import org.sakshi.app.lock.LockScreen
@@ -28,6 +30,7 @@ class MainActivity : FragmentActivity() {
     private var unlockNotCompleted by mutableStateOf(false)
     private lateinit var gate: BiometricGate
     private val consumedShares = ConsumedIntentTracker()
+    private var sessionOwner: SessionViewModelStoreOwner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,7 +94,8 @@ class MainActivity : FragmentActivity() {
         LaunchedEffect(unlocked) {
             if (!unlocked) {
                 container.importCoordinator.sessionLocked()
-                viewModelStore.clear()
+                sessionOwner?.clear()
+                sessionOwner = null
             }
         }
         LaunchedEffect(session) { container.importCoordinator.dropIfExpired() }
@@ -112,14 +116,31 @@ class MainActivity : FragmentActivity() {
                 },
                 onRetry = container.session::refresh,
             )
-            is Screen.Session -> SessionHost(
-                services = remember(screen.vault) {
-                    SessionServices(screen.vault, applicationContext, container.dispatchers.io)
-                },
-                container = container,
-                owner = this@MainActivity,
-            )
+            is Screen.Session -> {
+                val owner = remember(screen.vault) {
+                    sessionOwner?.clear()
+                    SessionViewModelStoreOwner().also { sessionOwner = it }
+                }
+                SessionHost(
+                    services = remember(screen.vault) {
+                        SessionServices(screen.vault, applicationContext, container.dispatchers.io)
+                    },
+                    container = container,
+                    owner = owner,
+                )
+            }
         }
+    }
+
+    override fun onDestroy() {
+        sessionOwner?.clear()
+        sessionOwner = null
+        super.onDestroy()
+    }
+
+    private class SessionViewModelStoreOwner : ViewModelStoreOwner {
+        override val viewModelStore: ViewModelStore = ViewModelStore()
+        fun clear() = viewModelStore.clear()
     }
 
     private companion object {

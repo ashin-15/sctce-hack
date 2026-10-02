@@ -16,17 +16,16 @@ class BiometricGate(
     private val onAuthenticated: () -> Unit,
     private val onNotCompleted: () -> Unit,
 ) {
-    private val prompt = BiometricPrompt(
-        activity,
-        ContextCompat.getMainExecutor(activity),
-        object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onAuthenticated()
-
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onNotCompleted()
-        },
-    )
-
     fun authenticate() {
+        val prompt = BiometricPrompt(
+            activity,
+            ContextCompat.getMainExecutor(activity),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onAuthenticated()
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onNotCompleted()
+            },
+        )
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle(activity.getString(R.string.prompt_title))
             .setSubtitle(activity.getString(R.string.prompt_subtitle))
