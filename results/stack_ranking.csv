@@ -1,0 +1,6 @@
+stack,rank,status,reason
+A,,pending,Actual requested native/model components unavailable; not replaced by proxy pipeline
+B,,pending,Actual requested native/model components unavailable; not replaced by proxy pipeline
+C,,pending,Actual requested native/model components unavailable; not replaced by proxy pipeline
+D,,pending,Actual requested native/model components unavailable; not replaced by proxy pipeline
+E,,pending,Actual requested native/model components unavailable; not replaced by proxy pipeline

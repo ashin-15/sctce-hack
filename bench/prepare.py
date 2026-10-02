@@ -48,10 +48,14 @@ def public_audio():
     rng = np.random.default_rng(SEED)
     clips = []
     provenance = []
+    provenance_path = Path('data/audio_provenance.json')
+    expected = {r['config']: r['sha256'] for r in json.loads(provenance_path.read_text(encoding='utf-8'))['sources']} if provenance_path.exists() else {}
     for config, language in [('en_us', 'en'), ('hi_in', 'hi'), ('ml_in', 'ml')]:
         entry = next(x for x in files if x['config'] == config and x['split'] == 'test')
         print(f'Downloading licensed FLEURS test subset {config}: {entry["size"]} bytes', flush=True)
         path = download(entry['url'], CACHE / f'fleurs-{config}-test.parquet', entry['size'])
+        if config in expected and digest(path) != expected[config]:
+            raise RuntimeError('Public parquet ref changed: hash differs from committed provenance; refusing to overwrite ground truth')
         records = pq.read_table(path).to_pylist()
         provenance.append({'config': config, 'url': entry['url'], 'sha256': digest(path),
                            'licence': 'CC-BY-4.0', 'attribution': 'Google FLEURS; Conneau et al., FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech (2022)',
@@ -100,15 +104,11 @@ def public_audio():
 
 def whisper_model():
     repo = 'Systran/faster-whisper-base'
-    info = requests.get(f'https://huggingface.co/api/models/{repo}', timeout=60)
-    info.raise_for_status()
-    revision = info.json()['sha']
+    revision = 'ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66'
     dest = Path('models/faster-whisper-base')
-    names = {entry['rfilename'] for entry in info.json()['siblings']}
-    required = ['config.json', 'model.bin', 'tokenizer.json']
-    required += [name for name in ['vocabulary.json', 'vocabulary.txt'] if name in names]
+    required = ['config.json', 'model.bin', 'tokenizer.json', 'vocabulary.txt']
     for name in required:
         download(f'https://huggingface.co/{repo}/resolve/{revision}/{name}', dest / name)
     dump(dest / 'provenance.json', {'repo': repo, 'revision': revision, 'licence': 'MIT',
-                                  'files': {p.name: digest(p) for p in dest.iterdir() if p.is_file()}})
+                                  'files': {p.name: digest(p) for p in sorted(dest.iterdir()) if p.is_file() and p.name != 'provenance.json'}})
     print(f'Prepared {repo} at {revision}; inference uses local_files_only=True.')

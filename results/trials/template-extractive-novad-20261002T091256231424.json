@@ -1,0 +1,287 @@
+[
+  {
+    "run": 1,
+    "utc": "2026-10-02T09:13:02.713725+00:00",
+    "seconds": 0.004873799625784159,
+    "metrics": {
+      "all": {
+        "json_validity": 1.0,
+        "field_f1": 0.9935064935064936,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 14
+      },
+      "en": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 1
+      },
+      "hi": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 2
+      },
+      "hinglish": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 3
+      },
+      "mixed": {
+        "json_validity": 1.0,
+        "field_f1": 0.9772727272727273,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 4
+      },
+      "ml": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19337855545537813,
+        "samples": 4
+      }
+    },
+    "peak_rss_bytes": 121262080,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 2,
+    "utc": "2026-10-02T09:13:02.720107+00:00",
+    "seconds": 0.006741899996995926,
+    "metrics": {
+      "all": {
+        "json_validity": 1.0,
+        "field_f1": 0.9935064935064936,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 14
+      },
+      "en": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 1
+      },
+      "hi": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 2
+      },
+      "hinglish": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 3
+      },
+      "mixed": {
+        "json_validity": 1.0,
+        "field_f1": 0.9772727272727273,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 4
+      },
+      "ml": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.296014261298946,
+        "samples": 4
+      }
+    },
+    "peak_rss_bytes": 121290752,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 3,
+    "utc": "2026-10-02T09:13:02.725623+00:00",
+    "seconds": 0.004950300324708223,
+    "metrics": {
+      "all": {
+        "json_validity": 1.0,
+        "field_f1": 0.9935064935064936,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 14
+      },
+      "en": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 1
+      },
+      "hi": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 2
+      },
+      "hinglish": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 3
+      },
+      "mixed": {
+        "json_validity": 1.0,
+        "field_f1": 0.9772727272727273,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 4
+      },
+      "ml": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.1968500270907368,
+        "samples": 4
+      }
+    },
+    "peak_rss_bytes": 121303040,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 4,
+    "utc": "2026-10-02T09:13:02.729643+00:00",
+    "seconds": 0.004613399971276522,
+    "metrics": {
+      "all": {
+        "json_validity": 1.0,
+        "field_f1": 0.9935064935064936,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 14
+      },
+      "en": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 1
+      },
+      "hi": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 2
+      },
+      "hinglish": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 3
+      },
+      "mixed": {
+        "json_validity": 1.0,
+        "field_f1": 0.9772727272727273,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 4
+      },
+      "ml": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.19129997651491845,
+        "samples": 4
+      }
+    },
+    "peak_rss_bytes": 121303040,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 5,
+    "utc": "2026-10-02T09:13:02.735654+00:00",
+    "seconds": 0.005736799910664558,
+    "metrics": {
+      "all": {
+        "json_validity": 1.0,
+        "field_f1": 0.9935064935064936,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 14
+      },
+      "en": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 1
+      },
+      "hi": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 2
+      },
+      "hinglish": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 3
+      },
+      "mixed": {
+        "json_validity": 1.0,
+        "field_f1": 0.9772727272727273,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 4
+      },
+      "ml": {
+        "json_validity": 1.0,
+        "field_f1": 1.0,
+        "hallucinated_quote_rate": 0.0,
+        "ms_per_thread": 0.20008574106863566,
+        "samples": 4
+      }
+    },
+    "peak_rss_bytes": 121303040,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  }
+]

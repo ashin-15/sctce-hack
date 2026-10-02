@@ -58,7 +58,7 @@ def host_metadata():
             'seed': SEED, 'temperature': 0, 'clock': 'time.perf_counter',
             'rss_method': 'Windows peak_wset + sampled RSS (5 ms)' if platform.system() == 'Windows' else 'sampled process RSS (5 ms); child native allocations included, short spikes may be missed',
             'p95_method': 'numpy percentile linear interpolation of five batch runs; low sample confidence',
-            'thermal_throttling_events': 'not measured', 'cpu_threads': 'STT 4; others adapter/runtime defaults'}
+            'thermal_throttling_events': 'not measured', 'cpu_threads': 'STT/OCR 4; others adapter/runtime defaults'}
 
 
 class RSS:
@@ -96,6 +96,7 @@ def worker(candidate, component, limit, vad, output, ram_cap):
         adapter = create(candidate, vad)
         load_seconds = time.perf_counter() - start
         adapter.execute(limit)
+        print(f'{candidate}: warmup complete', flush=True)
         trials = []
         final_predictions = []
         for i in range(5):
@@ -108,6 +109,7 @@ def worker(candidate, component, limit, vad, output, ram_cap):
             trials.append({'run': i + 1, 'utc': datetime.now(timezone.utc).isoformat(), 'seconds': elapsed,
                            'metrics': metrics, 'peak_rss_bytes': memory.peak,
                            'device': {k: metadata[k] for k in ['device_model', 'soc_cpu', 'ram_bytes', 'os_version', 'thermal_state']}})
+            print(f'{candidate}: timed run {i + 1}/5 complete ({elapsed:.3f}s)', flush=True)
     artifacts = [{'path': p.as_posix(), 'sha256': digest(p), 'bytes': p.stat().st_size} for p in adapter.artifacts]
     payload = {'candidate': candidate, 'component': component, 'subset_limit': limit, 'vad': vad, 'warmups': 1,
                'timed_runs': 5, 'load_seconds_single_observation': load_seconds, 'peak_rss_bytes': memory.peak,
@@ -151,7 +153,7 @@ def result_rows(payload, path):
                  'device_model': metadata['device_model'], 'soc_cpu': metadata['soc_cpu'], 'ram_bytes': metadata['ram_bytes'],
                  'os_version': metadata['os_version'], 'thermal_state': str(metadata['thermal_state']),
                  'offline_verified': 'yes', 'licence_commercial': payload['licence_commercial'],
-                 'model_sha256': json.dumps(payload['artifacts']), 'metadata_path': str(path)})
+                 'model_sha256': json.dumps(payload['artifacts']), 'metadata_path': (Path('results/metadata') / Path(path).name).as_posix()})
     rows = []
     languages = payload['trials'][0]['metrics']
     for language, metrics in languages.items():
@@ -191,7 +193,7 @@ def run(args):
         dest = Path('results/raw') / f'{candidate}-{"vad" if args.vad else "novad"}-{stamp}.json'
         command = [sys.executable, '-m', 'bench.runner', candidate, args.component, str(args.limit), str(int(args.vad)), str(dest), str(args.ram_cap_gb or 0)]
         print('Benchmarking ' + candidate + ' (1 warmup + 5 runs, offline CPU)', flush=True)
-        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace')
+        result = subprocess.run(command, stderr=subprocess.PIPE, text=True, encoding='utf-8', errors='replace')
         if result.returncode:
             record_blocked(args.component, candidate, result.stderr[-4000:], 'failed')
             print(result.stderr, file=sys.stderr)

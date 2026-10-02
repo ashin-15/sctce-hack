@@ -1,0 +1,175 @@
+run_id,slot,candidate,language,metric,statistic,value,unit,samples,status,reason,measurement_kind,subset_limit,vad,quantization,runtime_versions,git_commit,device_model,soc_cpu,ram_bytes,os_version,thermal_state,offline_verified,licence_commercial,model_sha256,metadata_path
+,classifier,tfidf-logreg,all,,,,,,failed,"Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 211, in <module>
+    worker(sys.argv[1], sys.argv[2], int(sys.argv[3]), bool(int(sys.argv[4])), sys.argv[5], float(sys.argv[6]))
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 96, in worker
+    adapter = create(candidate, vad)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 423, in create
+    return Classifier(candidate)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 67, in __init__
+    dump(artifact, payload)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\data.py"", line 30, in dump
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\__init__.py"", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 406, in _iterencode_dict
+    yield from chunks
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 406, in _iterencode_dict
+    yield from chunks
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type int64 is not JSON serializable
+",unmeasured,,,,,,,,,,,,,,
+,classifier,rules-tfidf-ensemble,all,,,,,,failed,"Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 211, in <module>
+    worker(sys.argv[1], sys.argv[2], int(sys.argv[3]), bool(int(sys.argv[4])), sys.argv[5], float(sys.argv[6]))
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 96, in worker
+    adapter = create(candidate, vad)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 423, in create
+    return Classifier(candidate)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 67, in __init__
+    dump(artifact, payload)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\data.py"", line 30, in dump
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\__init__.py"", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 406, in _iterencode_dict
+    yield from chunks
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 406, in _iterencode_dict
+    yield from chunks
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File ""C:\Users\Lenovo\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\encoder.py"", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type int64 is not JSON serializable
+",unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,all,,,,,,failed,"Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 214, in <module>
+    worker(sys.argv[1], sys.argv[2], int(sys.argv[3]), bool(int(sys.argv[4])), sys.argv[5], float(sys.argv[6]))
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 96, in worker
+    adapter = create(candidate, vad)
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 433, in create
+    return factories[candidate]()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 136, in __init__
+    self.engine = RapidOCR(params={'Global.log_level': 'critical', 'EngineConfig.onnxruntime.intra_op_num_threads': 4})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\main.py"", line 39, in __init__
+    cfg = self._load_config(config_path, params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\main.py"", line 53, in _load_config
+    cfg = ParseParams.update_batch(cfg, params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\utils\parse_parameters.py"", line 46, in update_batch
+    raise ValueError(f""{k} is not a valid key."")
+ValueError: Global.log_level is not a valid key.
+",unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,all,,,,,,failed,"             ^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\main.py"", line 247, in get_rec_res
+    return self.text_rec(rec_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\ch_ppocr_rec\main.py"", line 144, in __call__
+    viser=VisRes(lang_type=self.cfg.lang_type, font_path=self.cfg.font_path),
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\utils\vis_res.py"", line 40, in __init__
+    self.font_path = self.get_font_path(font_path, lang_type)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\utils\vis_res.py"", line 125, in get_font_path
+    DownloadFile.run(input_param)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\utils\download_file.py"", line 40, in run
+    response = cls._make_http_request(input_params.file_url, logger)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\rapidocr\utils\download_file.py"", line 70, in _make_http_request
+    response = requests.get(url, stream=True, timeout=cls.REQUEST_TIMEOUT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\requests\api.py"", line 73, in get
+    return request(""get"", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\requests\api.py"", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\requests\sessions.py"", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\requests\sessions.py"", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\requests\adapters.py"", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\connectionpool.py"", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\connectionpool.py"", line 470, in _make_request
+    self._validate_conn(conn)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\connectionpool.py"", line 1125, in _validate_conn
+    conn.connect()
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\connection.py"", line 827, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\connection.py"", line 239, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\urllib3\util\connection.py"", line 73, in create_connection
+    sock.connect(sa)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 29, in denied
+    raise RuntimeError('Network disabled during benchmark inference; prepare assets first')
+RuntimeError: Network disabled during benchmark inference; prepare assets first
+",unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,hi,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,ml,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
+,stt,faster-whisper-base,all,,,,,,failed,"Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 214, in <module>
+    worker(sys.argv[1], sys.argv[2], int(sys.argv[3]), bool(int(sys.argv[4])), sys.argv[5], float(sys.argv[6]))
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\runner.py"", line 98, in worker
+    adapter.execute(limit)
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 192, in execute
+    text = self.transcribe(row['path'], row['language'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\bench\adapters.py"", line 183, in transcribe
+    segments, _ = self.engine.transcribe(path, language=language, beam_size=1, temperature=0, vad_filter=self.vad, condition_on_previous_text=False)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\faster_whisper\transcribe.py"", line 876, in transcribe
+    audio = decode_audio(audio, sampling_rate=sampling_rate)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""C:\Users\Lenovo\OneDrive\Documents\ASCENT\sctce-hack\.venv\Lib\site-packages\faster_whisper\audio.py"", line 46, in decode_audio
+    with av.open(input_file, mode=""r"", metadata_errors=""ignore"") as container:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""av/container/core.py"", line 479, in av.container.core.open
+    def open(
+    ^^^^^^^^^^
+TypeError: open() got an unexpected keyword argument 'metadata_errors'
+",unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,hi,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,ml,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,

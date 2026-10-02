@@ -10,6 +10,8 @@ def main():
     parser.add_argument('--vad', action='store_true')
     parser.add_argument('--ram-cap-gb', type=float, default=None, help='Laptop process admission/observed RSS guard, NOT Android simulation')
     args = parser.parse_args()
+    if args.limit < 0 or (args.ram_cap_gb is not None and args.ram_cap_gb <= 0):
+        parser.error('limit must be nonnegative and RAM guard must be positive')
     if args.component == 'data':
         from .data import build
         build()

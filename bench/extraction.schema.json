@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["date", "platform", "sender", "threat_type", "quote", "source_ids"],
+  "properties": {
+    "date": {"type": ["string", "null"]},
+    "platform": {"type": ["string", "null"]},
+    "sender": {"type": ["string", "null"]},
+    "threat_type": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["insult", "threat", "sexual_harassment", "caste_religious_slur", "doxxing", "coercive_control"]}
+    },
+    "quote": {"type": "string"},
+    "source_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true}
+  }
+}

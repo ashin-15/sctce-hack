@@ -1,47 +1,49 @@
 # Sakshi offline benchmark harness (partial implementation)
 
-This repository is a runnable starter and an honest execution ledger, NOT a completed evaluation of every requested model. `benchmark.md` lists milestones and gaps. `results/candidate_inventory.csv` tracks the full requested families, STT VAD variants, LLM quant/runtime/output-mode plans and classifier export plans. `pending_adapter` is NOT a legitimate unsupported-model skip. No victim data is used.
+This repository is a runnable starter and an honest execution ledger, NOT a completed evaluation of every requested model. `benchmark.md` lists milestones and gaps. `results/candidate_inventory.csv` tracks the full requested families, STT VAD variants, LLM quant/runtime/output-mode plans and classifier export plans. `pending_adapter` is NOT a legitimate unsupported-model skip. No victim data is used. The 600 text records are orthographic variants of 14 semantic templates across six language categories, not 600 independent semantic examples; production model selection needs a much more diverse adjudicated dataset.
 
 ## Setup
 
 From the repository root, Python 3.12 is recommended:
 
-```sh
-uv venv --python 3.12
-uv pip install --python .venv/Scripts/python.exe --exclude-newer 2026-09-25 -r requirements.txt -r requirements-optional.txt
+```powershell
+$envDir = Join-Path $env:LOCALAPPDATA 'SakshiBench\venv'
+uv venv --python 3.12 $envDir
+$python = Join-Path $envDir 'Scripts\python.exe'
+uv pip sync --python $python --link-mode copy --require-hashes requirements-lock.txt
 ```
 
-Windows commands below use `.venv/Scripts/python.exe`. On Linux/macOS use `.venv/bin/python` and provide Latin/Devanagari/Malayalam TrueType fonts; the current font discovery needs adaptation for non-Windows systems. Core screenshot rendering requires HarfBuzz/FreeType from optional requirements. Binary models, audio and screenshots are deliberately not committed.
+Use a new environment directory outside OneDrive: this host repeatedly denied package replacement inside its synced workspace, even in copy mode. Windows commands below use PowerShell's `$python` variable from setup. On Linux/macOS create a separate virtual environment and provide Latin/Devanagari/Malayalam TrueType fonts; the current font discovery needs adaptation for non-Windows systems. Core screenshot rendering requires HarfBuzz/FreeType from optional requirements. Binary models, audio and screenshots are deliberately not committed.
 
 ## Preparation (network permitted only here)
 
-```sh
-.venv/Scripts/python.exe -m bench prepare-audio
-.venv/Scripts/python.exe -m bench prepare-whisper
-.venv/Scripts/python.exe -m bench data
-.venv/Scripts/python.exe -m bench validate-data
-.venv/Scripts/python.exe -m bench registry
+```powershell
+& $python -m bench prepare-audio
+& $python -m bench prepare-whisper
+& $python -m bench data
+& $python -m bench validate-data
+& $python -m bench registry
 ```
 
-Run preparations sequentially: the download ledger is not concurrency-safe. FLEURS CC-BY-4.0 attribution and transformations are recorded in `data/audio_provenance.json`; manifests retain source transcripts/IDs and hashes. Download cap is 5,000,000,000 bytes for explicitly prepared model/data assets, excluding Python dependencies. Three FLEURS test parquet files are downloaded; sixty paired WAV fixtures concatenate full utterances with no word truncation. Natural code-mixed/harassment speech is not covered. SHA-256 pins the actual retrieved data; the public parquet ref itself is mutable and is not yet resolved to a commit. On a new preparation, compare hashes with committed provenance before comparing benchmark runs.
+Run preparations sequentially: the download ledger is not concurrency-safe. FLEURS CC-BY-4.0 attribution and transformations are recorded in `data/audio_provenance.json`; manifests retain source transcripts/IDs and hashes. Download cap is 5,000,000,000 bytes for explicitly prepared model/data assets, excluding Python dependencies. Three FLEURS test parquet files are downloaded; sixty paired WAV fixtures concatenate full utterances with no word truncation. Natural code-mixed/harassment speech is not covered. SHA-256 pins the actual retrieved data; the public parquet ref itself is mutable and is not yet resolved to a commit. Preparation refuses a parquet hash that differs from committed provenance before regenerating ground truth. Whisper preparation pins the verified upstream commit rather than tracking main.
 
 ## One command per implemented component (inference offline)
 
-```sh
-.venv/Scripts/python.exe -m bench classifier
-.venv/Scripts/python.exe -m bench language
-.venv/Scripts/python.exe -m bench ocr
-.venv/Scripts/python.exe -m bench stt
-.venv/Scripts/python.exe -m bench stt --vad
-.venv/Scripts/python.exe -m bench extraction
-.venv/Scripts/python.exe -m bench linking
-.venv/Scripts/python.exe -m bench storage
-.venv/Scripts/python.exe -m bench integrity
-.venv/Scripts/python.exe -m bench pdf
-.venv/Scripts/python.exe -m bench ingest
-.venv/Scripts/python.exe -m bench stacks
-.venv/Scripts/python.exe -m bench report
-.venv/Scripts/python.exe -m unittest discover -s bench/tests -v
+```powershell
+& $python -m bench classifier
+& $python -m bench language
+& $python -m bench ocr
+& $python -m bench stt
+& $python -m bench stt --vad
+& $python -m bench extraction
+& $python -m bench linking
+& $python -m bench storage
+& $python -m bench integrity
+& $python -m bench pdf
+& $python -m bench ingest
+& $python -m bench stacks
+& $python -m bench report
+& $python -m unittest discover -s bench/tests -v
 ```
 
 `--candidate NAME` selects an implemented candidate. Unimplemented names produce a nonzero exit and a pending entry, never fabricated results. `--limit N` performs an explicitly tagged smoke subset; default is the full applicable held-out set. `--ram-cap-gb 4` is a post-observation RSS guard on the laptop, NOT an OS-enforced cap or Android simulation. Native Android battery-saver/kill/restart tests need a native app and real hardware. Commands append new timestamped runs; report generation selects the latest full run, keeping subsets separate.

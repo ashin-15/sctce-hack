@@ -133,7 +133,16 @@ class OCR:
         self.artifacts = sorted(folder.glob('*.onnx'))
         if len(self.artifacts) < 3:
             raise RuntimeError('Prepare OCR assets first; inference must not download')
-        self.engine = RapidOCR(params={'Global.log_level': 'critical', 'EngineConfig.onnxruntime.intra_op_num_threads': 4})
+        from .data import font_paths
+        fonts = font_paths()
+        if not fonts:
+            raise RuntimeError('Provide a local visualization font; automatic OCR font downloads are forbidden')
+        self.engine = RapidOCR(params={'EngineConfig.onnxruntime.intra_op_num_threads': 4,
+                                       'Global.font_path': str(fonts[0]),
+                                       'Det.model_path': str(folder / 'ch_PP-OCRv4_det_infer.onnx'),
+                                       'Cls.model_path': str(folder / 'ch_ppocr_mobile_v2.0_cls_infer.onnx'),
+                                       'Rec.model_path': str(folder / 'ch_PP-OCRv4_rec_infer.onnx'),
+                                       'Rec.rec_keys_path': str(folder / 'ppocr_keys_v1.txt')})
 
     def execute(self, limit=0):
         rows = [r for r in load('data/screenshots.jsonl') if r['split'] == 'test' and r['language'] not in ['hi', 'ml']]

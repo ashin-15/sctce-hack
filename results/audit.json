@@ -1,0 +1,140 @@
+{
+  "runs": [
+    {
+      "run_id": "Argon2id-laptop-novad-20261002T091332335179",
+      "candidate": "Argon2id-laptop",
+      "component": "storage",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "Ed25519-novad-20261002T091403738770",
+      "candidate": "Ed25519",
+      "component": "integrity",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "faster-whisper-base-novad-20261002T101836304194",
+      "candidate": "faster-whisper-base",
+      "component": "stt",
+      "subset_limit": 1,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "faster-whisper-base-vad-20261002T101903556154",
+      "candidate": "faster-whisper-base",
+      "component": "stt",
+      "subset_limit": 1,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "HMAC-novad-20261002T091355858099",
+      "candidate": "HMAC",
+      "component": "integrity",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "Merkle-tree-novad-20261002T091348722639",
+      "candidate": "Merkle-tree",
+      "component": "integrity",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "RapidOCR-ONNX-novad-20261002T091946896967",
+      "candidate": "RapidOCR-ONNX",
+      "component": "ocr",
+      "subset_limit": 1,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "RapidOCR-ONNX-novad-20261002T103022580482",
+      "candidate": "RapidOCR-ONNX",
+      "component": "ocr",
+      "subset_limit": 1,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "ReportLab-novad-20261002T091703551669",
+      "candidate": "ReportLab",
+      "component": "pdf",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "rules-novad-20261002T090443022997",
+      "candidate": "rules",
+      "component": "classifier",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "rules-novad-20261002T091222649823",
+      "candidate": "rules",
+      "component": "classifier",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "rules-tfidf-ensemble-novad-20261002T091238848908",
+      "candidate": "rules-tfidf-ensemble",
+      "component": "classifier",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "script-heuristic-novad-20261002T091248421026",
+      "candidate": "script-heuristic",
+      "component": "language",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "sender-time-rules-novad-20261002T091303816342",
+      "candidate": "sender-time-rules",
+      "component": "linking",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "SHA256-chain-novad-20261002T091341692967",
+      "candidate": "SHA256-chain",
+      "component": "integrity",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "SQLite-AES-GCM-novad-20261002T091311852943",
+      "candidate": "SQLite-AES-GCM",
+      "component": "storage",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "template-extractive-novad-20261002T091256231424",
+      "candidate": "template-extractive",
+      "component": "extraction",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "tfidf-logreg-novad-20261002T091230863354",
+      "candidate": "tfidf-logreg",
+      "component": "classifier",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "whatsapp-export-novad-20261002T091714138257",
+      "candidate": "whatsapp-export",
+      "component": "ingest",
+      "subset_limit": 0,
+      "protocol_valid": true
+    }
+  ],
+  "validated_runs": 19,
+  "metadata_links_repaired": 0,
+  "note": "Only metadata links repaired; measured numeric CSV values unchanged. Audit validates protocol/completeness, not model quality."
+}
