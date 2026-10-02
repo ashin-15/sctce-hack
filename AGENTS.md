@@ -1,0 +1,3 @@
+# Project verification
+
+Run commands from the repository root. Baseline environment: Python 3.12+ with requirements.txt. Run `python -m unittest discover -s bench/tests -v`. Generate data with `python -m bench data`. Run component commands listed in bench/README.md. Inference must be offline; downloads only in explicit preparation commands. Never fabricate measurements or treat laptop proxies as Android results. Synthetic labels and summaries need native-speaker review before real-world use. Keep benchmark.md updated at milestones. Do not commit audio, model binaries, keys or consented private data.
