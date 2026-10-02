@@ -62,9 +62,11 @@ Do not choose models by size or popularity alone.
 
 ## Laya
 
-Research/integrate:
+Research reference (integration deferred):
 
 `https://github.com/NandhaKishorM/laya`
+
+User decision on 2 October 2026: defer Laya from the current Android implementation plan. Prioritize compact local classifiers, human review, and a separate temporal engine. No validated drop-in Laya Android deployment was established; future reconsideration requires native-runtime parity, task quality, calibration, and device-resource evidence. See `research/laya-source-analysis-and-sakshi-local-ai-architecture.md`.
 
 Verify the actual repository, including architecture, checkpoints, decision types, training/fine-tuning workflow, evaluation, calibration, runtime requirements, mobile feasibility, model format, and license.
 
@@ -159,7 +161,7 @@ Build and validate in this order:
 
 1. Android evidence acquisition.
 2. Local text/OCR/STT pipeline.
-3. Laya/local classifier integration.
+3. Small local classifier integration (Laya deferred).
 4. User review flow.
 5. Temporal pattern engine.
 6. Encrypted evidence vault + integrity metadata.
