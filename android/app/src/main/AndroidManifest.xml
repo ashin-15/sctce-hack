@@ -2,20 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--
-        Sakshi declares no permissions. AndroidX core contributes an app-private
-        signature permission for dynamic receivers; nothing in this build registers
-        a receiver, so it is removed to keep the merged manifest permission-free.
-        Revisit when a library that needs it (for example WorkManager) is added.
-    -->
-    <permission
-        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-        tools:node="remove" />
-    <uses-permission
-        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-        tools:node="remove" />
-
     <application
+        android:name=".SakshiApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/full_backup_content"

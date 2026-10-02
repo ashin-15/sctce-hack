@@ -1,5 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Sakshi</string>
-    <string name="shell_placeholder">Sakshi foundation build. No evidence features are implemented yet.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Before you start</string>
+    <string name="onboarding_does_heading">What Sakshi does</string>
+    <string name="onboarding_does_body">Sakshi keeps evidence that you choose to import. It stores that evidence on this device, encrypted. This version of the app has no permission to use the network.</string>
+    <string name="onboarding_cannot_heading">What Sakshi cannot do</string>
+    <string name="onboarding_cannot_body">It cannot read chats in other apps. It cannot recover deleted messages or view-once messages. It cannot confirm who sent a message.</string>
+    <string name="onboarding_limits_heading">Limits you should know</string>
+    <string name="onboarding_limit_hash">A stored fingerprint (hash) of a file shows that the file has not changed since it was saved. It does not show that the file is genuine.</string>
+    <string name="onboarding_limit_loss">If you uninstall Sakshi, or the device key is lost, the stored data cannot be recovered.</string>
+    <string name="onboarding_limit_unlock">Anyone who can unlock this phone can open Sakshi.</string>
+    <string name="onboarding_limit_export">Files you export are no longer under Sakshi\'s control.</string>
+    <string name="onboarding_acknowledge">I understand</string>
+
+    <!-- Lock -->
+    <string name="lock_title">Sakshi is locked</string>
+    <string name="lock_body">Use your fingerprint, face or screen lock to open it.</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_unlocking">Opening Sakshi</string>
+    <string name="lock_not_completed">Unlock was not completed. You can try again when you are ready.</string>
+    <string name="prompt_title">Unlock Sakshi</string>
+    <string name="prompt_subtitle">Confirm with your fingerprint, face or screen lock</string>
+    <string name="no_lock_title">Screen lock needed</string>
+    <string name="no_lock_body">Sakshi needs a PIN, pattern or password set on this phone before it can store anything. Set one in the phone settings, then return here.</string>
+    <string name="no_lock_open_settings">Open security settings</string>
+    <string name="invalidated_title">Device key no longer valid</string>
+    <string name="invalidated_body">The key that opens Sakshi\'s data on this device was invalidated. This usually happens after the screen lock or the saved fingerprints or faces changed. The stored data can no longer be opened by this app.</string>
+    <string name="failed_title">Sakshi could not open</string>
+    <string name="failed_key_body">The device key could not be used. Try again. If this keeps happening, restart the phone.</string>
+    <string name="failed_storage_body">Sakshi\'s storage could not be opened. Try again.</string>
+    <string name="failed_retry">Try again</string>
+
+    <!-- Cases -->
+    <string name="action_lock">Lock</string>
+    <string name="cases_empty">No cases yet. Create a case to start.</string>
+    <string name="cases_new">New case</string>
+    <string name="cases_archived_heading">Archived (%1$d)</string>
+    <string name="cases_archived_expand">Show archived cases</string>
+    <string name="cases_archived_collapse">Hide archived cases</string>
+    <string name="case_created_on">Created %1$s</string>
+    <string name="case_created_unknown">Creation date unknown</string>
+    <string name="case_options">Options for case %1$s</string>
+    <string name="case_rename">Rename</string>
+    <string name="case_archive">Archive</string>
+    <string name="case_unarchive">Move back to active</string>
+    <string name="case_delete">Delete</string>
+    <plurals name="evidence_count">
+        <item quantity="one">%1$d evidence item</item>
+        <item quantity="other">%1$d evidence items</item>
+    </plurals>
+
+    <string name="dialog_new_title">New case</string>
+    <string name="dialog_rename_title">Rename case</string>
+    <string name="dialog_title_label">Case title</string>
+    <string name="dialog_title_counter">%1$d of %2$d</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_create">Create</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete_title">Delete this case?</string>
+    <plurals name="dialog_delete_body">
+        <item quantity="one">This removes the case and its %1$d evidence item from this device. This cannot be undone.</item>
+        <item quantity="other">This removes the case and its %1$d evidence items from this device. This cannot be undone.</item>
+    </plurals>
+
+    <string name="message_title_blank">Enter a title for the case.</string>
+    <string name="message_title_too_long">The title is too long. The limit is %1$d.</string>
+    <string name="message_save_failed">The change could not be saved. Try again.</string>
 </resources>

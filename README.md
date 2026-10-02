@@ -25,7 +25,7 @@ Read this before anything else. The repository is early.
 | Plan | [MEGAPLAN.md](MEGAPLAN.md) is the implementation plan. It is a planning document, not a description of finished work. |
 | Python benchmark harness | Exists and runs on a laptop. It measures baseline candidates on synthetic fixtures. See [benchmark.md](benchmark.md) and [results/SUMMARY.md](results/SUMMARY.md). |
 | Event schema | [data/sakshi-event-schema.json](data/sakshi-event-schema.json) (JSON Schema 2020-12, event v1). |
-| Android project | [android/](android/) is at slice 1 only: a Gradle skeleton, a placeholder app shell that declares zero permissions, and two pure-Kotlin JVM modules. |
+| Android project | [android/](android/) covers megaplan phases 1 to 3: pure-Kotlin core (event model, integrity, temporal engine), encrypted storage (blob envelope, Room schema, vault), and an app with onboarding, app lock and case management. Verified by JVM tests only; never installed or run on a device. |
 | `:core:integrity` | Source files present for SHA-256, hash chain, count-bound Merkle v2 and canonical JSON, with unit tests and shared test vectors generated from the Python reference functions. |
 | `:core:model` | Typed event model, code-point spans, epistemic status, schema adapter and event validator. 42 JVM unit tests pass, including validation against the event schema. Library code only; nothing in the app uses it yet. |
 | Evidence features | None work yet. There is no import, vault, OCR, speech-to-text, review screen, temporal engine, report or export in the app. |
@@ -74,7 +74,7 @@ This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
 | 1 | Acquisition | The user shares, picks, pastes or types evidence. Optional notification observation is a later, opt-in phase and is never required. | Planned |
 | 2 | Validation | Incoming URIs, names and MIME types are treated as untrusted claims. Limits are enforced while streaming. | Planned |
 | 3 | Preview and save | Nothing is stored until the user chooses a case and confirms. | Planned |
-| 4 | Original preservation | Exact received bytes are encrypted, hashed with SHA-256 and recorded with provenance. Originals are never overwritten. | Planned. SHA-256, hash chain and Merkle primitives exist as library code. |
+| 4 | Original preservation | Exact received bytes are encrypted, hashed with SHA-256 and recorded with provenance. Originals are never overwritten. | Storage layer implemented and tested on the JVM (`:core:crypto`, `:core:database`, `:core:vault`): encrypted blobs, hash, provenance rows and audit chain. No import screen yet, and the Keystore and SQLCipher paths have not run on a device. |
 | 5 | Derivatives | Parsed text, OCR and transcripts are separate versioned records. They never replace the original. | Planned |
 | 6 | Events | Each source message becomes an event under the event schema. | Planned. The typed model and validator exist as tested library code; no event is created by the app yet. |
 | 7 | Suggested findings | Rules-assisted highlighting first. A neural classifier only after licensed, native-reviewed data exists. | Planned |
@@ -126,7 +126,7 @@ The planned UI takes the label as a required parameter with no default, so an in
 | [bench/](bench/) | Python offline benchmark harness and its tests. See [bench/README.md](bench/README.md). |
 | [data/](data/) | Synthetic fixtures, the event JSON Schema, provenance files and a third-party English tweet CSV used only as an auxiliary baseline. |
 | [results/](results/) | Benchmark CSVs, plots, per-run metadata, [SUMMARY.md](results/SUMMARY.md) and a sample report PDF. Laptop proxies only. |
-| [android/](android/) | Kotlin Gradle project: `:app`, `:core:model`, `:core:integrity`, shared `testfixtures/`. See [android/README.md](android/README.md). |
+| [android/](android/) | Kotlin Gradle project: `:app` plus `:core:model`, `:core:integrity`, `:core:temporal`, `:core:crypto`, `:core:database`, `:core:vault`, and shared `testfixtures/`. See [android/README.md](android/README.md). |
 | [.lavish/](.lavish/) | HTML review views of the research reports. Derived, not authoritative. |
 | [Harassment_Pattern_Guard.pptx.pdf](Harassment_Pattern_Guard.pptx.pdf) | The original pitch. A proposal, not a specification; its wording is narrowed by `AGENTS.md`. |
 
@@ -134,7 +134,11 @@ Android modules today:
 
 | Module | Kind | Contents |
 |---|---|---|
-| `:app` | Android | Launcher activity with a placeholder screen. Declares no permissions. |
+| `:core:temporal` | Kotlin/JVM | Deterministic temporal pattern engine. |
+| `:core:crypto` | Kotlin/JVM | Chunked AES-256-GCM blob envelope, key wrapping interface. |
+| `:core:database` | Android library | Room schema, insert-only triggers, DAOs, SQLCipher open path. |
+| `:core:vault` | Android library | Keystore wrapper, blob store, audit chain, case and evidence repositories. |
+| `:app` | Android | Onboarding, biometric or device-credential lock, case list. Only system permission: `USE_BIOMETRIC`. |
 | `:core:model` | Kotlin/JVM | Event contract for the schema, code-point spans, schema adapter, invariant checks. |
 | `:core:integrity` | Kotlin/JVM | SHA-256, hash chain, count-bound Merkle v2, RFC 8785 canonical JSON. |
 
@@ -149,7 +153,7 @@ The megaplan orders work by dependency, with the pure-Kotlin core first because 
 | Milestone | Contains | Demonstrates | State |
 |---|---|---|---|
 | M-A Core proven | Phases 1-2 | Event contract, integrity primitives and temporal rules, with no phone | Done on the JVM: event model, integrity primitives and temporal engine pass their unit tests. No phone involved, no UI. |
-| M-B Vault | Phases 3-4 | Evidence goes in encrypted, hashed, with provenance | Not started |
+| M-B Vault | Phases 3-4 | Evidence goes in encrypted, hashed, with provenance | In progress. Phase 3 (encrypted storage, app lock, cases) passes JVM tests but has not run on a device; phase 4 (import) not started. |
 | M-C Text MVP | Phases 5-7 | Import a chat export, review findings, see pattern cards, correct one and watch counts change | Not started |
 | M-D Verifiable report | Phase 9 (+8) | Export, verify offline, tamper and fail | Not started |
 | M-E Screenshots | Phase 10 | OCR lane with regions | Not started |
@@ -165,7 +169,7 @@ Run from `android/`. Gradle needs JDK 21 (the default JDK on the development hos
 ```sh
 cd android
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
-./gradlew :core:model:test :core:integrity:test :core:temporal:test :app:assembleDebug
+./gradlew test :app:assembleDebug
 ./gradlew :app:lintDebug
 ```
 
@@ -202,7 +206,7 @@ python -m bench data
 Stated as design intent. Most of this is planned, not built.
 
 - Local only. Evidence and inference stay on the device. There is no backend and no cloud inference fallback.
-- The MVP release build is planned to declare no `INTERNET` permission. The current placeholder app declares no permissions at all.
+- The MVP release build is planned to declare no `INTERNET` permission. The current app declares only `USE_BIOMETRIC` (with the library's legacy `USE_FINGERPRINT`), and a build check fails if any other permission appears.
 - The planned vault uses the Android Keystore, AES-GCM for blobs, and Room over SQLCipher for structured data. The SQLCipher and Keystore choices still need validation on a device.
 - Backups and device transfer are to be excluded for evidence and derivatives.
 - Hashes support integrity checking. A hash shows that bytes are unchanged since Sakshi stored them. It does not prove authenticity, who sent something, truth, legal admissibility or trusted time.
