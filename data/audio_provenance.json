@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "config": "en_us",
+      "url": "https://huggingface.co/datasets/google/fleurs/resolve/refs%2Fconvert%2Fparquet/en_us/test/0000.parquet",
+      "sha256": "6428a4d04d3aac29e16b45e039bb1470a8bd7aa334cf92f7984c9c520d1f234d",
+      "licence": "CC-BY-4.0",
+      "attribution": "Google FLEURS; Conneau et al., FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech (2022)",
+      "card": "https://huggingface.co/datasets/google/fleurs",
+      "split": "test"
+    },
+    {
+      "config": "hi_in",
+      "url": "https://huggingface.co/datasets/google/fleurs/resolve/refs%2Fconvert%2Fparquet/hi_in/test/0000.parquet",
+      "sha256": "8a0be26c5584c1478233a6f47fb90275c713f72565327ea1da76c9f1cd5dd38b",
+      "licence": "CC-BY-4.0",
+      "attribution": "Google FLEURS; Conneau et al., FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech (2022)",
+      "card": "https://huggingface.co/datasets/google/fleurs",
+      "split": "test"
+    },
+    {
+      "config": "ml_in",
+      "url": "https://huggingface.co/datasets/google/fleurs/resolve/refs%2Fconvert%2Fparquet/ml_in/test/0000.parquet",
+      "sha256": "8b609c11b4ac862f6376a4b4887d59a75791fbc5cffc5bcf3431edb56ced5bf5",
+      "licence": "CC-BY-4.0",
+      "attribution": "Google FLEURS; Conneau et al., FLEURS: Few-shot Learning Evaluation of Universal Representations of Speech (2022)",
+      "card": "https://huggingface.co/datasets/google/fleurs",
+      "split": "test"
+    }
+  ],
+  "seed": 1729,
+  "coverage_gap": "Hinglish/Manglish and harassment-domain speech unavailable in FLEURS; not fabricated. Noise is synthetic white noise, not realistic environmental audio.",
+  "validation": {
+    "clips": 60,
+    "all_10_to_120_s": true
+  }
+}

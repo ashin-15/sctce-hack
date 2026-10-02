@@ -1,0 +1,167 @@
+[
+  {
+    "run": 1,
+    "utc": "2026-10-02T10:19:21.453297+00:00",
+    "seconds": 3.3601649003103375,
+    "metrics": {
+      "all": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3163294981332552,
+        "samples": 1
+      },
+      "en": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3163294981332552,
+        "samples": 1
+      },
+      "en:original_recording": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3163294981332552,
+        "samples": 1
+      }
+    },
+    "peak_rss_bytes": 412938240,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 2,
+    "utc": "2026-10-02T10:19:24.607775+00:00",
+    "seconds": 3.154530900064856,
+    "metrics": {
+      "all": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2966344886579353,
+        "samples": 1
+      },
+      "en": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2966344886579353,
+        "samples": 1
+      },
+      "en:original_recording": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2966344886579353,
+        "samples": 1
+      }
+    },
+    "peak_rss_bytes": 412938240,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 3,
+    "utc": "2026-10-02T10:19:28.279852+00:00",
+    "seconds": 3.672096500173211,
+    "metrics": {
+      "all": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3454995738469403,
+        "samples": 1
+      },
+      "en": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3454995738469403,
+        "samples": 1
+      },
+      "en:original_recording": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3454995738469403,
+        "samples": 1
+      }
+    },
+    "peak_rss_bytes": 412938240,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 4,
+    "utc": "2026-10-02T10:19:31.955486+00:00",
+    "seconds": 3.6752228997647762,
+    "metrics": {
+      "all": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3460550567868984,
+        "samples": 1
+      },
+      "en": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3460550567868984,
+        "samples": 1
+      },
+      "en:original_recording": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.3460550567868984,
+        "samples": 1
+      }
+    },
+    "peak_rss_bytes": 412938240,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 5,
+    "utc": "2026-10-02T10:19:34.753220+00:00",
+    "seconds": 2.7969240001402795,
+    "metrics": {
+      "all": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2628424715966861,
+        "samples": 1
+      },
+      "en": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2628424715966861,
+        "samples": 1
+      },
+      "en:original_recording": {
+        "cer": 0.00980392156862745,
+        "wer": 0.05263157894736842,
+        "real_time_factor": 0.2628424715966861,
+        "samples": 1
+      }
+    },
+    "peak_rss_bytes": 412938240,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  }
+]

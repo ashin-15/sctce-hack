@@ -1,0 +1,181 @@
+[
+  {
+    "id": "case-040",
+    "fields": {
+      "date": "2025-01-02",
+      "platform": "whatsapp",
+      "sender": "user_01",
+      "threat_type": [
+        "insult"
+      ],
+      "quote": "Tum jaise bewakoof ko yahan koi nahi chahta. 😟"
+    },
+    "summary": "Source case-040 records a message from user_01. The recorded date is 2025-01-02. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-041",
+    "fields": {
+      "date": "2025-01-06",
+      "platform": "instagram",
+      "sender": "user_00",
+      "threat_type": [
+        "sexual_harassment"
+      ],
+      "quote": "तुम्हारे मना करने के बाद भी मैं अश्लील संदेश भेजूँगा। ..."
+    },
+    "summary": "Source case-041 records a message from user_00. The recorded date is 2025-01-06. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-042",
+    "fields": {
+      "date": "2025-01-07",
+      "platform": "whatsapp",
+      "sender": "user_01",
+      "threat_type": [
+        "caste_religious_slur"
+      ],
+      "quote": "People of your caste are dirty and should be excluded.!"
+    },
+    "summary": "Source case-042 records a message from user_01. The recorded date is 2025-01-07. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-043",
+    "fields": {
+      "date": "2025-01-09",
+      "platform": "instagram",
+      "sender": "user_03",
+      "threat_type": [
+        "doxxing"
+      ],
+      "quote": "Main tumhara private address bina permission publish karunga."
+    },
+    "summary": "Source case-043 records a message from user_03. The recorded date is 2025-01-09. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-044",
+    "fields": {
+      "date": "2025-01-10",
+      "platform": "whatsapp",
+      "sender": "user_04",
+      "threat_type": [
+        "coercive_control"
+      ],
+      "quote": "Password do and stop seeing friends warna punishment.?"
+    },
+    "summary": "Source case-044 records a message from user_04. The recorded date is 2025-01-10. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-045",
+    "fields": {
+      "date": "2025-01-13",
+      "platform": "instagram",
+      "sender": "user_02",
+      "threat_type": [],
+      "quote": "എന്റെ വിലാസം പങ്കിടരുത്; എനിക്ക് സ്വകാര്യത വേണം.\n"
+    },
+    "summary": "Source case-045 records a message from user_02. The recorded date is 2025-01-13. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-046",
+    "fields": {
+      "date": "2025-01-14",
+      "platform": "whatsapp",
+      "sender": "user_03",
+      "threat_type": [
+        "doxxing"
+      ],
+      "quote": "I  will  hurt  you  aur  private  address  publish  karunga."
+    },
+    "summary": "Source case-046 records a message from user_03. The recorded date is 2025-01-14. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-086",
+    "fields": {
+      "date": "2025-01-02",
+      "platform": "whatsapp",
+      "sender": "user_01",
+      "threat_type": [
+        "insult"
+      ],
+      "quote": "Tum jaise bewakoof ko yahan koi nahi chahta.!"
+    },
+    "summary": "Source case-086 records a message from user_01. The recorded date is 2025-01-02. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-087",
+    "fields": {
+      "date": "2025-01-06",
+      "platform": "instagram",
+      "sender": "user_00",
+      "threat_type": [
+        "sexual_harassment"
+      ],
+      "quote": "तुम्हारे मना करने के बाद भी मैं अश्लील संदेश भेजूँगा।"
+    },
+    "summary": "Source case-087 records a message from user_00. The recorded date is 2025-01-06. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-088",
+    "fields": {
+      "date": "2025-01-06",
+      "platform": "whatsapp",
+      "sender": "user_00",
+      "threat_type": [
+        "sexual_harassment"
+      ],
+      "quote": "നിർത്താൻ പറഞ്ഞാലും ഞാൻ അശ്ലീല സന്ദേശങ്ങൾ അയയ്ക്കും.?"
+    },
+    "summary": "Source case-088 records a message from user_00. The recorded date is 2025-01-06. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-089",
+    "fields": {
+      "date": "2025-01-08",
+      "platform": "instagram",
+      "sender": "user_02",
+      "threat_type": [
+        "caste_religious_slur"
+      ],
+      "quote": "നിന്റെ മതം നിന്നെ താഴ്ന്നവനാക്കുന്നു; ഇവിടെ നിനക്ക് ഇടമില്ല.\n"
+    },
+    "summary": "Source case-089 records a message from user_02. The recorded date is 2025-01-08. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-090",
+    "fields": {
+      "date": "2025-01-10",
+      "platform": "whatsapp",
+      "sender": "user_04",
+      "threat_type": [
+        "coercive_control"
+      ],
+      "quote": "Password  do  and  stop  seeing  friends  warna  punishment."
+    },
+    "summary": "Source case-090 records a message from user_04. The recorded date is 2025-01-10. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-091",
+    "fields": {
+      "date": "2025-01-13",
+      "platform": "instagram",
+      "sender": "user_02",
+      "threat_type": [],
+      "quote": "എന്റെ വിലാസം പങ്കിടരുത്; എനിക്ക് സ്വകാര്യത വേണം. 😟"
+    },
+    "summary": "Source case-091 records a message from user_02. The recorded date is 2025-01-13. User review is required before any complaint is exported."
+  },
+  {
+    "id": "case-092",
+    "fields": {
+      "date": "2025-01-14",
+      "platform": "whatsapp",
+      "sender": "user_03",
+      "threat_type": [
+        "threat",
+        "doxxing"
+      ],
+      "quote": "I will hurt you aur private address publish karunga. ..."
+    },
+    "summary": "Source case-092 records a message from user_03. The recorded date is 2025-01-14. User review is required before any complaint is exported."
+  }
+]

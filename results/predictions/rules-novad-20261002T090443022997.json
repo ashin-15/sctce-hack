@@ -1,0 +1,1677 @@
+[
+  {
+    "id": "t00-2-0",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-1",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-2",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-3",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-4",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-5",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t00-2-6",
+    "language": "hinglish",
+    "challenge": "misspelling",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-0",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-1",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-2",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-3",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-4",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-5",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t01-2-6",
+    "language": "hinglish",
+    "challenge": "misspelling",
+    "truth": [
+      "insult"
+    ],
+    "scores": [
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "insult"
+    ]
+  },
+  {
+    "id": "t03-5-0",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t03-5-1",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t03-5-2",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t03-5-3",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t03-5-4",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t03-5-5",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t03-5-6",
+    "language": "mixed",
+    "challenge": "veiled_threat",
+    "truth": [
+      "threat"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "threat"
+    ]
+  },
+  {
+    "id": "t05-1-0",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-1",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-2",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-3",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-4",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-5",
+    "language": "hi",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-1-6",
+    "language": "hi",
+    "challenge": "misspelling",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-0",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-1",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-2",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-3",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-4",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-5",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t05-3-6",
+    "language": "ml",
+    "challenge": "misspelling",
+    "truth": [
+      "sexual_harassment"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "sexual_harassment"
+    ]
+  },
+  {
+    "id": "t06-0-0",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t06-0-1",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t06-0-2",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t06-0-3",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t06-0-4",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t06-0-5",
+    "language": "en",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t06-0-6",
+    "language": "en",
+    "challenge": "misspelling",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-0",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-1",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-2",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-3",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-4",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-5",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t07-3-6",
+    "language": "ml",
+    "challenge": "misspelling",
+    "truth": [
+      "caste_religious_slur"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02,
+      0.02
+    ],
+    "predicted": [
+      "caste_religious_slur"
+    ]
+  },
+  {
+    "id": "t08-2-0",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-1",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-2",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-3",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-4",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-5",
+    "language": "hinglish",
+    "challenge": "standard",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t08-2-6",
+    "language": "hinglish",
+    "challenge": "misspelling",
+    "truth": [
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t09-5-0",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-1",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-2",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-3",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-4",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-5",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t09-5-6",
+    "language": "mixed",
+    "challenge": "misspelling",
+    "truth": [
+      "coercive_control"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98
+    ],
+    "predicted": [
+      "coercive_control"
+    ]
+  },
+  {
+    "id": "t10-4-0",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-1",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-2",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-3",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-4",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-5",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t10-4-6",
+    "language": "manglish",
+    "challenge": "victim_distress",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-0",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-1",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-2",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-3",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-4",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-5",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t12-3-6",
+    "language": "ml",
+    "challenge": "misspelling",
+    "truth": [],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02
+    ],
+    "predicted": []
+  },
+  {
+    "id": "t13-3-0",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-1",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-2",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-3",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-4",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-5",
+    "language": "ml",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-3-6",
+    "language": "ml",
+    "challenge": "misspelling",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-0",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-1",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-2",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-3",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-4",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "doxxing"
+    ]
+  },
+  {
+    "id": "t13-5-5",
+    "language": "mixed",
+    "challenge": "standard",
+    "truth": [
+      "threat",
+      "doxxing"
+    ],
+    "scores": [
+      0.02,
+      0.98,
+      0.02,
+      0.02,
+      0.98,
+      0.02
+    ],
+    "predicted": [
+      "threat",
+      "doxxing"
+    ]
+  }
+]

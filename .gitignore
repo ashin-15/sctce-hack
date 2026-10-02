@@ -1,0 +1,10 @@
+.venv/
+.venv-bench/
+__pycache__/
+*.pyc
+.cache/
+models/
+data/audio/
+data/screenshots/
+results/raw/
+results/*.sqlite*
