@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-10-02T11:51:13.445Z",
+  "artifact": ".lavish/sakshi-temporal-patterns.html",
+  "method": "Standalone headless Chromium CDP; in-app browser tool unavailable",
+  "checks": [
+    {
+      "width": 1440,
+      "theme": "dark",
+      "pageOverflow": false,
+      "svgTextOverflow": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "pageOverflow": false,
+      "svgTextOverflow": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "pageOverflow": false,
+      "svgTextOverflow": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "pageOverflow": false,
+      "svgTextOverflow": false
+    }
+  ],
+  "filterThemeDetailsAnchorsReplay": "passed",
+  "replayStatesPerViewportTheme": 21,
+  "pageExceptions": 0,
+  "remoteRequests": 0,
+  "screenshotFiles": [
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-1440.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-1440-header.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-1440-replay.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-1440.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-1440-header.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-1440-replay.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-390.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-390-header.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-dark-390-replay.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-390.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-390-header.png",
+    "/tmp/sakshi-temporal-browser-i6QiLy/temporal-light-390-replay.png"
+  ]
+}

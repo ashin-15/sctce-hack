@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-02T11:49:40.384861+00:00",
+  "schema": "Draft 2020-12 with date-time FormatChecker",
+  "schema_valid": true,
+  "synthetic_example_errors": 0,
+  "malformed_variants_rejected": [
+    "date-time format",
+    "manual tag cannot invent probability",
+    "candidate needs expiry",
+    "duplicate needs canonical target",
+    "unknown time cannot have known bounds",
+    "calibrated probability needs calibration version"
+  ],
+  "style_checks": "passed",
+  "sha256": {
+    "research/temporal-harassment-patterns.md": "180d011cdf429a7f71423ae0489984c5e925633d1fe9c4b349e72c5c522b36dd",
+    "data/sakshi-event-schema.json": "2cc0c5886f87e383394ea3b101ab603586c4a37623e0c39c07b535fce1ab1026",
+    ".lavish/sakshi-temporal-patterns.html": "f6799b8dfd213b853e43de596c8fc6eb207e4eac4a552ad44183639d5e01dcc0"
+  },
+  "limits": [
+    "Does not check cross-record/application invariants in section 6.4",
+    "Fixture all-zero hash is not verified source integrity",
+    "Does not establish temporal-engine or Android acceptance"
+  ]
+}

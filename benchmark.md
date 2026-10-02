@@ -55,3 +55,11 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Fixed CSV links to point to committed metadata rather than ignored raw output; the publication audit checks five finite timed runs, one warmup, predictions and device fields. Link repairs do not change measured numeric values.
 - The CSVs preserve dependency versions, source/data/model hashes and dirty-source status of the original runs. Initial measurements were taken during development; future full runs should use the committed source version. Battery consumption and thermal state are not inferred from laptop timings.
 - Ingestion permissions/effort/policy notes are documentation assessments, not native feasibility tests. Natural Hinglish/Manglish audio, native-speaker label/font review, realistic multi-message linking fixtures, neural/LLM/export adapters and Android energy/lifecycle validation remain open.
+
+## Temporal-patterns research verification - 2 October 2026
+
+- Completed the temporal research handoff: primary-source metric cross-checks, event-schema/example validation and a desktop/390px browser check in dark/light themes. Reproduction commands and receipts are in `research/verification/temporal-patterns-README.md`.
+- All 84 synthetic replay combinations passed; filtering, theme/disclosure controls, navigation targets and page/SVG bounds passed, with no runtime exceptions or remote requests. Fixed the suggested "recurrence" search returning no algorithm rows.
+- Draft 2020-12 schema validation passed with date-time checks; the synthetic example had zero errors and six malformed variants were rejected. Cross-record application invariants are still engineering work.
+- Repository suite: 20 tests run, 19 passed and one optional faster-whisper decoder test skipped because the runtime is absent. No inference dependencies or existing measured results changed.
+- This milestone establishes artifact verification only. No temporal engine, Android runtime, detection-quality, latency, RAM, battery or real-evidence benchmark was executed. Android evidence acquisition remains the first engineering milestone; temporal implementation and its acceptance tests are specified in report sections 14 and 13.4.

@@ -6,6 +6,8 @@
 
 **Deliverables:** this report; `data/sakshi-event-schema.json` (JSON Schema Draft 2020-12); `.lavish/sakshi-temporal-patterns.html` (reviewable visual overview).
 
+**Completion checks (2 October 2026):** the flagged S2/S4/S5 metric tables and S12 institution abstract were checked again against primary sources. Schema/example validation, malformed-record checks and desktop/390px browser interactions are reproducible through `research/verification/temporal-patterns-README.md`. These checks validate the research artifacts, not Android deployment or harassment-detection quality. Android evidence acquisition remains the first engineering milestone; section 14 defines the later temporal-engine slice and section 13.4 its required tests.
+
 ## 1. Recommendation and scope
 
 Build a **deterministic, provenance-aware temporal engine** over user-selected evidence and permitted notification observations. Combine it with a small local context-aware classifier and, optionally, a bounded foreground LLM explanation. Laya is deferred under the current project decision. No cloud inference, background scraping, automatic reporting, legal conclusions or individual violence predictions are required.
@@ -61,7 +63,7 @@ Important conflicting detail: the preprint narrative says flattened-context mode
 
 **Temporal Properties of Cyberbullying on Instagram, 2020:** descriptive and burst analysis studies differences in number, timing and frequency within social-media sessions [S3]. It supports inspecting time structure, not a universal “more than N messages = harassment” threshold. Public comment pile-ons differ from private one-to-one repeated contact.
 
-**TGBully, WWW 2021:** combines comment semantics, user-language history, topic similarity, time gaps and temporal graph interactions for session-level cyberbullying [S4]. Its full-training Instagram table reports recall 82.57 ± 3.10, F1 80.97 ± 2.03 and AUC 92.91 ± 1.30, versus HAN F1 76.99 ± 1.99. On Vine, TGBully F1 is 69.35 ± 2.04. These are different dataset results, not a combined accuracy guarantee.
+**TGBully, WWW 2021:** combines comment semantics, user-language history, topic similarity, time gaps and temporal graph interactions for session-level cyberbullying [S4]. Its full-training Instagram table reports recall 82.57 ± 3.10, micro F1 80.97 ± 2.03 and AUC 92.91 ± 1.30, versus HAN micro F1 76.99 ± 1.99. On Vine, TGBully micro F1 is 69.35 ± 2.04. These are means and standard deviations over five repeats, not confidence intervals or a combined accuracy guarantee.
 
 Its random 80/10/10 **session split assumes cross-session independence**; it does not establish generalization to unseen people/relationships. Its inputs include historical platform comments that a local Android evidence app does not possess. The released environment is Python 3.6/Keras 2.2/TensorFlow-GPU 1.12, not a drop-in mobile runtime. Preserve the useful ideas (time gaps, actor history scoped to consented evidence, sequence structure), not the data-acquisition assumptions or old deployment stack.
 
@@ -96,7 +98,7 @@ Licensing conflict is material: the inspected Hub tag says CC BY-SA 4.0, while t
 
 **Police-narrative text mining, Crime Science 2024:** rule-based extraction of 48 behaviours from 406,196 NSW domestic/family violence reports [S11]. This demonstrates scalable extraction of documented behavioural markers, including threats and contact-related behaviour. Police narrative style, selection/recording bias and institutional access differ sharply from mobile chat excerpts. The study does not validate causal intent or a general smartphone coercive-control classifier.
 
-**DCAP, Digital Investigation 2026:** hybrid rules+BERT with cumulative behavioural profiling and human review. The author-institution abstract reports 0.85 macro F1 and 92.8% reduction in target review volume on a **simulated 8,451-message case**, initialized on synthetic data and stress-tested by injecting 200 real-world toxic samples [S12]. This is highly relevant architectural prior art, but synthetic/injected-toxic evaluation does not establish real-world longitudinal coercive-control accuracy. Full independent replication, model artifacts and Android benchmarks were not verified here.
+**DCAP, Digital Investigation 2026:** hybrid rules+BERT with cumulative behavioural profiling and human review. The author-institution abstract reports 0.85 macro F1 in comparative experiments following synthetic initialization and a stress-test injecting 200 real-world toxic samples. Separately, its **simulated 8,451-message case** demonstrates a 92.8% reduction in target review volume [S12]. This is highly relevant architectural prior art, but synthetic/injected-toxic evaluation does not establish real-world longitudinal coercive-control accuracy. Full independent replication, model artifacts and Android benchmarks were not verified here.
 
 **Lifetime toxicity patterns, Scientific Reports 2025:** nearly 500 million Reddit/Wikipedia comments over fourteen years, with model-derived and community-vote proxies; trends vary by era and platform [S13]. It supports monitoring concept/base-rate drift rather than assuming a stable universal behavioural trajectory. It does not justify downloading a sender's outside history or applying population-level trends to an individual case.
 
@@ -661,7 +663,7 @@ All consulted 2 October 2026. Exact version/metric scopes are retained above; no
 ### Domain research and evaluation
 
 - [S1] CAD official paper/repository/version correction and dataset license: https://aclanthology.org/2021.naacl-main.182/ ; https://github.com/dongpng/cad_naacl2021 ; https://zenodo.org/records/4881008
-- [S2] Graphically Speaking final ACL abstract and inspected preprint v1 results: https://aclanthology.org/2025.acl-long.894/ ; https://arxiv.org/html/2504.01902 ; author code/data constraints: https://github.com/celia-nouri/ConversationALD/
+- [S2] Graphically Speaking final ACL abstract and inspected preprint v1 results: https://aclanthology.org/2025.acl-long.894/ ; https://arxiv.org/html/2504.01902v1 ; author code/data constraints: https://github.com/celia-nouri/ConversationALD/
 - [S3] Temporal Properties of Cyberbullying on Instagram, research abstract and related hierarchical temporal work: https://par.nsf.gov/biblio/10196267-temporal-properties-cyberbullying-instagram
 - [S4] TGBully original paper and released environment: https://arxiv.org/html/2011.00449v2 ; https://github.com/gesy17/TGBully
 - [S5] Conversations Gone Awry, But Then? 2025 evaluation, tables, proxy labels and recovery metric: https://arxiv.org/html/2507.19470
