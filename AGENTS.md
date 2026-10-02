@@ -9,7 +9,7 @@ This file is the compact operating contract for coding and research agents.
 ## Core Rules
 
 - **Android-first.** Prefer Kotlin + Jetpack Compose and Android-supported APIs.
-- **Local-first AI.** Sensitive evidence stays on-device by default.
+- **Offline local AI.** Sensitive evidence and inference remain on-device. Model provisioning is a separate explicit preparation step; there is no cloud inference fallback.
 - **Human-in-the-loop.** AI findings are suggestions; the user confirms, rejects, or edits them.
 - **Evidence-linked.** AI claims must trace back to actual source evidence.
 - **Originals preserved.** Never overwrite source evidence during preprocessing.
@@ -62,9 +62,11 @@ Do not choose models by size or popularity alone.
 
 ## Laya
 
-Research/integrate:
+Research reference (integration deferred):
 
 `https://github.com/NandhaKishorM/laya`
+
+User decision on 2 October 2026: defer Laya from the current Android implementation plan. Prioritize compact local classifiers, human review, and a separate temporal engine. No validated drop-in Laya Android deployment was established; future reconsideration requires native-runtime parity, task quality, calibration, and device-resource evidence. See `research/laya-source-analysis-and-sakshi-local-ai-architecture.md`.
 
 Verify the actual repository, including architecture, checkpoints, decision types, training/fine-tuning workflow, evaluation, calibration, runtime requirements, mobile feasibility, model format, and license.
 
@@ -85,7 +87,7 @@ Record dataset source, language, modality, labels, license, context, limitations
 
 ## Multilingual
 
-Research and test English, Malayalam, Hindi, Tamil, Telugu, Kannada, Bengali, Marathi, Hinglish, Romanized Indic text, and code-mixed/slang text.
+Current priority: English, Malayalam and Hindi, including Manglish, Hinglish, native scripts, Romanized text, slang and code mixing involving these languages. User decision on 2 October 2026: other languages are future scope.
 
 Report per-language performance. Prefer explicit uncertainty over overconfident unsupported results.
 
@@ -159,7 +161,7 @@ Build and validate in this order:
 
 1. Android evidence acquisition.
 2. Local text/OCR/STT pipeline.
-3. Laya/local classifier integration.
+3. Small local classifier integration (Laya deferred).
 4. User review flow.
 5. Temporal pattern engine.
 6. Encrypted evidence vault + integrity metadata.
