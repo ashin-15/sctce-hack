@@ -1,0 +1,23 @@
+{
+  "seed": 1729,
+  "source": "synthetic authored fixtures; no victim data",
+  "validation": {
+    "text": 600,
+    "screenshots": 168,
+    "extraction": 100,
+    "splits": {
+      "train": 420,
+      "val": 90,
+      "test": 90
+    },
+    "split_note": "600 messages: 420/90/90 (70/15/15), all variants grouped. Parallel translations span splits: residual semantic-template leakage, synthetic sanity checks only.",
+    "labels_review": "pending_native_speaker_review",
+    "audio": "run explicit public-audio preparation"
+  },
+  "files": {
+    "audio.jsonl": "ccd2f3903ec518d3b7f410ebd953a7648af7a767001d34a1e69aea6ae30a3874",
+    "extraction.jsonl": "43d08e95dfcd156f4d508cef1144aa81b37a60b80b260363a3a58606594b6799",
+    "screenshots.jsonl": "e7c515be6496c1872d798323415b9c28fc5b820bbfa0c60bb5b52f4da5bb664e",
+    "text.jsonl": "036529b29209d2c529183788ee9f826c88b1b90f056b839ce866c448a813547c"
+  }
+}
