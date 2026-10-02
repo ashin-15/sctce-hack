@@ -124,3 +124,46 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Measured, two runs of three timed imports each after one warm-up (megaplan asks for five repeats, so treat as indicative): importing a 32 MiB stream end to end (encrypt, hash, fsync, database transaction, audit row) ran at 107.4, 128.3, 143.1 MiB/s in run one and 122.6, 112.5, 125.2 MiB/s in run two. Full authenticated verify of 32 MiB took 0.711 s in run one. Random 4 KiB reads averaged 337 and 422 microseconds. First-ever vault open including Keystore key creation took 641 and 701 ms. Appending 1,000 audit rows took 4.11 and 4.95 ms per row; each append is its own transaction.
 - The app installs and cold-launches without a crash (584 ms, one run, debug build) and its window carries `FLAG_SECURE`.
 - Still unverified: the biometric prompt and the unlock path with a user present, the not-authenticated and key-invalidated paths, lock on background, screen rendering, backup and device-transfer exclusion (V-09), behaviour on a 16 KB page device, lower-RAM devices, and any battery or thermal effect. No release-build measurement was taken.
+
+## Android phases 4 to 9 groundwork: import, text processing, event storage, export bundle - 2 October 2026
+
+- Added `:acquisition:importer` (share intents, picker results, pasted text, manual notes, per-type streaming limits), `:processing:text` (script and language hints, rules cue engine with code-point spans, label mapping, WhatsApp text-export parser), `:export:bundle` (bundle writer, offline verifier and command-line tool), an event store and actor registry in `:core:vault`, and import screens in the app (share target, case detail, preview with explicit save, paste, manual note).
+- JVM tests: 555 passed, 0 failed (model 42, integrity 28, temporal 56, crypto 33, database 34, vault 93, importer 80, text 52, bundle 47, app 90). Device tests on the SM-S928B: 21 in `:core:vault` and 4 in `:acquisition:importer` passed, synthetic data, debug build.
+- Text processing parity: the Kotlin cue engine and language hints equal the Python reference (`bench/adapters.py` `RULES` and `Language.identify`) on all 600 synthetic fixtures. Rules differ from the fixture gold labels on 19 of 600 rows (en 9, mixed 7, hi 1, hinglish 1, manglish 1, ml 0). This is a fixture regression figure on 14 templates, not accuracy. Cue matching has no context: negated and quoted phrases match, which tests document. No real export file from any locale was parsed.
+- Event storage round trip is exact for 200 generated events and timelines A-F, and the temporal engine returns the same result on reloaded events. Fixed during this work: a cancelled import could leave an encrypted file without a database row; region locators and missing hashes could not be stored without loss (schema version 1 changed in place, no migration, unreleased).
+- Measured on the SM-S928B (Android 16, SM8650, charging, battery 100 percent, thermal status 0, debug build, one run each, so indicative only): saving events one transaction each took 20.3 and 22.1 ms per event over 1,000 events; batch saving took 423 ms for 1,000 and 3,961 ms for 10,000 events; loading the latest revisions took 368 to 458 ms for 1,000 and 3,720 ms for 10,000.
+- Export bundle: 47 JVM tests including 18 tamper cases. Only a software P-256 signer was exercised; signing with the device Keystore is not implemented or tested. A bundle re-signed with another key verifies with a different key id, so the key id must be compared out of band.
+- On the device, a text share sent with `am start` to the share target reached the main activity without a crash. Not verified: a share of a file from another app (whether the read grant survives forwarding), the pickers, the unlock flow with a user present, lock on background and the two-minute picker grace window, rotation and process death during import, and every screen's rendering. The pre-Android 13 intent path ran only under Robolectric.
+
+## Android foundation completion and connected verification - 2 October 2026
+
+- Completed the full Android evidence, review, temporal pattern and export flow across all modules:
+  - `:core:vault`: added single-event latest and revision loaders, sender claims queries and observation, typed decision history per event, atomic person creation with sender assignment, boundary clearing, actor renaming, and export audit action logging.
+  - `:core:temporal`: added zoned pattern explanation rendering and typed facts view for localization.
+  - `:processing:analysis`: added single-pass code-point body and quote slicing (`EventText`), a `TextAnalyser` interface, and on-demand case pattern analysis with supporting event snippets and zoned explanations.
+  - `:export:report`: added zoned pattern sentence formatting, Android Keystore ECDSA P-256 signing, PDF rendering, export audit records, and export error discriminators.
+  - `:app`: implemented the entire UI screen hierarchy: Onboarding, Biometric/Device Lock, Case List and Management, Evidence Acquisition (ShareTargetActivity, system pickers, paste text, manual notes), Analysis Prompts, Timeline (with coverage gap markers, filters and message bodies), Event Review (accept, reject with reason, uncertain, custom user tags, direction, wantedness, boundary markers, and typed decision history), Who Is Who (actor list, sender claims, atomic person creation), Patterns (temporal cards with supporting events), and Report Export (selection, exact on-screen preview matching PDF, Keystore-signed PDF/zip export, key ID display, and secure private sharing via FileProvider with cache cleanup on leave/lock/unlock).
+- JVM test suite verification: all 837 tests passed, 0 failures, 0 errors, 0 skipped.
+  - `acquisition/importer`: 84
+  - `app`: 227
+  - `core/crypto`: 33
+  - `core/database`: 34
+  - `core/integrity`: 28
+  - `core/model`: 42
+  - `core/temporal`: 62
+  - `core/vault`: 142
+  - `export/bundle`: 47
+  - `export/report`: 38
+  - `processing/analysis`: 48
+  - `processing/text`: 52
+- Connected Android test suite verification on Samsung Galaxy S24 Ultra (SM-S928B, Android 16, API 36):
+  - 33 tests passed, 0 failures, 0 errors, 0 skipped (`core:vault`: 22, `acquisition:importer`: 4, `processing:analysis`: 2, `export:report`: 5).
+  - Verified on hardware: encrypted event storage, revision assembly, audit chaining, content-provider stream importing, text analysis and derivative generation, on-device Keystore report signing, and PDF report creation.
+- Android Lint and manifest verification:
+  - `:app:lintDebug`: passed with 0 errors.
+  - `:app:verifyManifestPermissions`: passed. Strictly bound permissions: `USE_BIOMETRIC`, `USE_FINGERPRINT`, and dynamic receiver permission. No `INTERNET` permission in release or debug manifest.
+- Resolved temporary workarounds:
+  - Eliminated `BodySlices.kt` in favour of library-level `EventText(vault).bodiesOf(...)`.
+  - Replaced ad-hoc JSON parsing in `HistoryRows` with typed `DecisionTargetKind` and `DecisionChange`.
+  - Replaced ViewModel coroutine deadlocks in `ReportViewModelTest`.
+

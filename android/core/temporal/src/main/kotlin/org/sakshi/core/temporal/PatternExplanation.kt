@@ -1,9 +1,12 @@
 package org.sakshi.core.temporal
 
 import java.time.Duration
-import org.sakshi.core.model.BoundaryMarker
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import org.sakshi.core.model.CategoryLabel
-import org.sakshi.core.model.CommunicationStatus
 
 private const val HOURS_PER_DAY: Long = 24
 private const val MINUTES_PER_HOUR: Long = 60
@@ -11,90 +14,99 @@ private const val MINUTES_PER_HOUR: Long = 60
 /** Observed statement, optional bounded interpretation and plain-language limitations. */
 public data class Explanation(val observed: String, val interpretation: String?, val limitations: List<String>)
 
-/** Template wording built only from a record's typed measurements. */
+/** Template wording built only from a record's typed measurements, through [PatternFacts]. */
 public object PatternExplanation {
-    public fun render(record: PatternRecord, labels: (ActorScope) -> String): Explanation {
-        val who = labels(record.actorScope)
-        val rendered =
-            when (val m = record.measurements) {
-                is Measurements.RepeatedContact -> repeated(m, who)
-                is Measurements.RecurrenceAfterBoundary -> recurrence(m, record.status, who)
-                is Measurements.WordingTransition -> transition(m, record, who)
-                is Measurements.DensityChange -> density(m, who)
-            }
-        return Explanation(
-            observed = rendered.first,
-            interpretation = rendered.second,
-            limitations = record.limitations.sorted().map { limitationSentence(it) },
-        )
-    }
+    private const val MINUTES_PATTERN: String = "yyyy-MM-dd HH:mm xxx"
+    private const val SECONDS_PATTERN: String = "yyyy-MM-dd HH:mm:ss xxx"
 
-    private fun repeated(m: Measurements.RepeatedContact, who: String): Pair<String, String?> {
-        val lead = "${countText(m.total)} distinct retained incoming ${observations(m.total)} ${linkingVerb(m.total)}"
-        val observed =
-            if (m.firstAt != null && m.lastAt != null) {
-                "$lead linked to $who between ${m.firstAt} and ${m.lastAt}, " +
-                    "across ${plural(m.uniqueDays.toLong(), "calendar day")} and ${plural(m.episodes.toLong(), "episode")}."
-            } else {
-                "$lead linked to $who. Their times are not established."
-            }
-        val interpretation = "This may indicate repeated unwanted contact.".takeIf { m.allMarkedUnwanted }
-        return observed to interpretation
-    }
+    /** The typed facts [render] words, for callers that localise the sentences themselves. */
+    public fun facts(record: PatternRecord): PatternFacts = FactsBuilder.of(record)
 
-    private fun recurrence(
-        m: Measurements.RecurrenceAfterBoundary,
-        status: AssessmentStatus,
-        who: String,
-    ): Pair<String, String?> {
-        val phrase = boundaryPhrase(m.marker, m.communication)
-        val at = m.boundaryAt?.let { " at $it" }.orEmpty()
-        val observed =
-            if (m.afterBoundary.upper == 0) {
-                "No retained incoming observation linked to $who was found after $phrase$at in the selected records."
-            } else {
-                "${countText(m.afterBoundary)} distinct retained incoming ${observations(m.afterBoundary)} " +
-                    "${linkingVerb(m.afterBoundary)} linked to $who after $phrase$at."
-            }
-        val reportable =
-            (status == AssessmentStatus.SUPPORTED_DESCRIPTION || status == AssessmentStatus.CANDIDATE) &&
-                m.afterBoundary.lower >= 1
-        val interpretation =
-            when {
-                !reportable -> null
-                m.allMarkedUnwanted -> "This may indicate repeated unwanted contact after that boundary."
-                else -> "This may indicate repeated contact after that boundary."
-            }
-        return observed to interpretation
-    }
+    /** Times appear as UTC instants such as `2026-09-24T15:35:00Z`. */
+    public fun render(record: PatternRecord, labels: (ActorScope) -> String): Explanation =
+        render(facts(record), labels(record.actorScope)) { it.toString() }
 
-    private fun transition(
-        m: Measurements.WordingTransition,
+    /**
+     * Times appear in [zone] as `yyyy-MM-dd HH:mm` and the offset, for example `2026-09-24 21:05 +05:30`; seconds
+     * are added only when the instant has some. [locale] picks the formatter's locale; digits stay as they are.
+     */
+    public fun render(
         record: PatternRecord,
-        who: String,
-    ): Pair<String, String?> {
-        val adjective = if (Limitation.UNREVIEWED_TAGS in record.limitations) "suggested" else "reviewed"
-        val observed =
-            "The selected sequence linked to $who moves from a $adjective ${labelName(m.earlier)} tag " +
-                "at ${m.earlierAt} to a $adjective ${labelName(m.later)} tag at ${m.laterAt}. " +
-                "The interval between the two records is ${durationText(m.gap)}."
-        return observed to "This may be a change in wording."
+        labels: (ActorScope) -> String,
+        zone: ZoneId = ZoneOffset.UTC,
+        locale: Locale = Locale.ROOT,
+    ): Explanation = render(facts(record), labels(record.actorScope), zonedTime(zone, locale))
+
+    /** The wording of [facts] for a sender called [who], with every time written by [formatTime]. */
+    public fun render(facts: PatternFacts, who: String, formatTime: (Instant) -> String): Explanation {
+        val rendered =
+            when (facts) {
+                is PatternFacts.RepeatedContact -> repeated(facts, who, formatTime)
+                is PatternFacts.RecurrenceAfterBoundary -> recurrence(facts, who, formatTime)
+                is PatternFacts.WordingTransition -> transition(facts, who, formatTime)
+                is PatternFacts.DensityChange -> density(facts, who, formatTime)
+            }
+        return Explanation(rendered, interpretation(facts.interpretation), facts.limitations.map { limitationSentence(it) })
     }
 
-    private fun density(m: Measurements.DensityChange, who: String): Pair<String, String?> =
-        "${countText(m.current)} retained incoming ${observations(m.current)} " +
-            "linked to $who in the period starting ${m.currentBinStart}, compared with " +
-            "${countText(m.previous)} in the preceding period starting ${m.previousBinStart}." to null
+    private fun zonedTime(zone: ZoneId, locale: Locale): (Instant) -> String {
+        val minutes = DateTimeFormatter.ofPattern(MINUTES_PATTERN, locale)
+        val seconds = DateTimeFormatter.ofPattern(SECONDS_PATTERN, locale)
+        return { instant ->
+            val local = instant.atZone(zone)
+            (if (local.second == 0) minutes else seconds).format(local)
+        }
+    }
 
-    private fun boundaryPhrase(marker: BoundaryMarker, communication: CommunicationStatus): String =
-        when {
-            marker == BoundaryMarker.LIMITED_CONTACT -> "your limited-contact note"
-            marker == BoundaryMarker.DO_NOT_CONTACT &&
-                communication == CommunicationStatus.SUPPORTED_BY_SELECTED_EVIDENCE ->
-                "your selected stop-contact message"
-            marker == BoundaryMarker.DO_NOT_CONTACT && communication == CommunicationStatus.USER_REPORTED ->
-                "the stop request you reported"
-            else -> "your disengagement note"
+    private fun repeated(f: PatternFacts.RepeatedContact, who: String, time: (Instant) -> String): String {
+        val lead = "${countText(f.total)} distinct retained incoming ${observations(f.total)} ${linkingVerb(f.total)}"
+        return if (f.firstAt != null && f.lastAt != null) {
+            "$lead linked to $who between ${time(f.firstAt)} and ${time(f.lastAt)}, " +
+                "across ${plural(f.uniqueDays.toLong(), "calendar day")} and ${plural(f.episodes.toLong(), "episode")}."
+        } else {
+            "$lead linked to $who. Their times are not established."
+        }
+    }
+
+    private fun recurrence(f: PatternFacts.RecurrenceAfterBoundary, who: String, time: (Instant) -> String): String {
+        val phrase = boundaryText(f.boundary)
+        val at = f.boundaryAt?.let { " at ${time(it)}" }.orEmpty()
+        return if (f.afterBoundary.upper == 0) {
+            "No retained incoming observation linked to $who was found after $phrase$at in the selected records."
+        } else {
+            "${countText(f.afterBoundary)} distinct retained incoming ${observations(f.afterBoundary)} " +
+                "${linkingVerb(f.afterBoundary)} linked to $who after $phrase$at."
+        }
+    }
+
+    private fun transition(f: PatternFacts.WordingTransition, who: String, time: (Instant) -> String): String {
+        val adjective = f.tags.name.lowercase()
+        return "The selected sequence linked to $who moves from a $adjective ${labelName(f.earlier)} tag " +
+            "at ${time(f.earlierAt)} to a $adjective ${labelName(f.later)} tag at ${time(f.laterAt)}. " +
+            "The interval between the two records is ${durationText(f.gap)}."
+    }
+
+    private fun density(f: PatternFacts.DensityChange, who: String, time: (Instant) -> String): String =
+        "${countText(f.current)} retained incoming ${observations(f.current)} " +
+            "linked to $who in the period starting ${time(f.currentBinStart)}, compared with " +
+            "${countText(f.previous)} in the preceding period starting ${time(f.previousBinStart)}."
+
+    private fun interpretation(kind: Interpretation?): String? =
+        when (kind) {
+            null -> null
+            Interpretation.REPEATED_UNWANTED_CONTACT -> "This may indicate repeated unwanted contact."
+            Interpretation.REPEATED_UNWANTED_CONTACT_AFTER_BOUNDARY ->
+                "This may indicate repeated unwanted contact after that boundary."
+            Interpretation.REPEATED_CONTACT_AFTER_BOUNDARY -> "This may indicate repeated contact after that boundary."
+            Interpretation.WORDING_CHANGE -> "This may be a change in wording."
+        }
+
+    private fun boundaryText(phrase: BoundaryPhrase): String =
+        when (phrase) {
+            BoundaryPhrase.LIMITED_CONTACT_NOTE -> "your limited-contact note"
+            BoundaryPhrase.STOP_CONTACT_MESSAGE -> "your selected stop-contact message"
+            BoundaryPhrase.STOP_REQUEST_REPORTED -> "the stop request you reported"
+            BoundaryPhrase.DISENGAGEMENT_NOTE -> "your disengagement note"
         }
 
     private fun observations(bounds: CountBounds): String =

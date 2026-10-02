@@ -1,101 +1,144 @@
-# Handoff: Sakshi sentiment/emotion local-AI design
+# Handoff: Sakshi Android implementation
 
 **Date:** 2 October 2026
-**Status:** Research report and visual review deliverables completed. Android implementation and release qualification remain separate work.
-**Scope:** "Sentiment / Emotion Analysis Integrated with Local AI for Sakshi Android". This completion covers this handoff only; the sibling handoffs remain separate.
+**Branch:** `android-foundation` (tracks `origin/android-foundation`)
+**Status:** Foundation implementation complete. All 837 JVM tests across all 12 modules pass (0 failures, 0 errors, 0 skipped), Android Lint passes with 0 errors, manifest permissions strictly verified, and 33 connected Android tests pass on the attached Samsung SM-S928B. All UI workarounds are migrated to the library APIs. Ready for owner review and manual on-device flow checks.
 
-## Enduring objective
+This file replaces the earlier research handoff (sentiment and emotion design). That document is still in git history at commit `7a18ef2`; its decisions that still bind this work are carried in `AGENTS.md` and in `MEGAPLAN.md` section 2.
 
-Sakshi ("Evidence That Only You Can See") is a privacy-first Android app for harassment-evidence preservation, local pattern detection, human review and user-controlled reporting. Sensitive evidence stays on-device. AI findings are suggestions linked to source evidence, never legal/clinical verdicts. Laya remains **deferred** as recorded in `AGENTS.md`.
+## Read these first
 
-## Completed deliverables
+1. `AGENTS.md` - binding product and engineering rules, including the do-not-build list.
+2. `MEGAPLAN.md` - the implementation plan. Sections 31 (phases), 35 (decision log) and 37 (validation backlog) are the ones to keep open.
+3. `benchmark.md` - the ledger. Every measurement and every "not verified" statement is recorded there. Update it at each milestone.
+4. `android/README.md` - build and test commands.
 
-- [Main report](research/sentiment-emotion-local-ai-android-design.md): all sections 1-23 populated. Section 23 reconstructs 60 source-register keys, covering all 58 keys cited in the body, including previously unlisted C1-C3 and T1-T5. Entries separate current primary-page verification, historical source inspection, local diagnostics and unresolved rights/device evidence.
-- Sections 1-22 reviewed for recommendation structure, task/runtime boundaries, source traceability and experiment claims. Added supporting WHY/WHAT/HOW/MODEL/RUNTIME/DATA/ANDROID/LIMITATIONS contracts; repaired merged prose and restored canonical product/model/API names.
-- Reconciled persisted text anchors with `data/sakshi-event-schema.json`: half-open Unicode code-point ranges. Kotlin UTF-16 conversion remains an explicit UI/tokenizer boundary with surrogate checks. The shared schema was not changed; the illustrative analysis result still requires a validated event adapter.
-- [Visual artifact](.lavish/sakshi-sentiment-emotion-architecture.html): architecture, decisions, evidence-status distinctions, model/runtime comparisons and synthetic diagnostic examples. It follows the existing Sakshi review-artifact style and keeps phone/quality limitations visible.
-- Durable probes remain [extended emotion probe](research/probes/sakshi-emotion-probe.py) and [earlier AI probe](research/probes/sakshi-ai-probe.py).
+## How the work is being done
 
-## Verification and reproducibility
+- The main session designs, writes briefs, reviews and verifies. Code is written by Sonnet subagents from those briefs. This was the owner's explicit instruction.
+- Each subagent is confined to one module, forbidden to commit, and must report what it did not verify. The main session reruns the build and tests before reporting anything as working.
+- Device tests use synthetic data inside the test package's own sandbox. Nothing else on the phone is read.
+- Style rules in force everywhere: no em dash or en dash, no `@Suppress`, no lint disabling, zero compiler warnings, no `android.util.Log` in main code, British "behaviour", no agent co-author trailer on commits.
+- Commits and pushes happen only when the owner asks.
 
-Run from the repository root. Current receipts and scripts:
+## Git state
 
-- [Offline probe receipt](research/verification/sentiment-emotion-probe.json): 20 synthetic fixtures plus one NFKC view per model, 42 total forwards. Correct shapes, finite outputs, equation and original-preservation assertions passed. Records model/config/tokenizer hashes. The pinned model hashes match section 6.
-- [Browser receipt](research/verification/sentiment-emotion-browser.json) and [browser check](research/verification/sentiment-emotion-browser-check.mjs): actual Chromium at 1440 and 390 pixels in light/dark modes. Checked five fixture selections, filter including zero results, details, navigation and theme. No page/SVG-text overflow, runtime exceptions or remote requests observed.
-- Report checks: numbered sections 1-23, all citation keys resolved, illustrative JSON parses, local links resolve, no em dashes, no preferred reproduction path referencing a temporary-only script.
-- Baseline regression: 20 unittest cases, 19 passed and one optional faster-whisper case skipped. No production code or dependency changes were required.
-- [Final validation record](research/verification/sentiment-emotion-validation.json): report checks, regression result, artifact digests and explicit qualification limits. Reproduction instructions are in [verification notes](research/verification/README.md).
+Committed and pushed:
 
-Local visual review: [Sakshi sentiment/emotion architecture](http://127.0.0.1:4387/session/39e734f716e3b30e). The page uses the existing Sakshi plum/cream/gold design system. Its screenshots were inspected in desktop dark and narrow light views in addition to the automated four-theme/width checks.
+| Commit | Contents |
+|---|---|
+| `3a74118` | Megaplan, root README, Gradle skeleton, `:core:model`, `:core:integrity` |
+| `01b20b4` | `:core:temporal` |
+| `366d666` | `:core:crypto`, `:core:database`, `:core:vault`, app lock and case screens, first device tests |
 
-Current offline reproduction command:
+Ready to commit: the full foundation implementation covering `:acquisition:importer`, `:processing:text`, `:processing:analysis`, `:export:bundle`, `:export:report`, the event store, review coordinator, derivative store and actor registry in `:core:vault`, schema additions in `:core:database`, the design system and entire screen hierarchy (onboarding, lock, cases, import, analysis, timeline, review, who-is-who, patterns, report preview and export).
 
-```bash
-uv run --no-project --offline --with onnxruntime==1.22.1 \
-  --with tokenizers==0.22.0 --with numpy==2.3.3 \
-  python research/probes/sakshi-emotion-probe.py
+## Modules
+
+| Module | Kind | State |
+|---|---|---|
+| `:core:model` | Kotlin/JVM | Typed event contract for `data/sakshi-event-schema.json`, code-point spans, invariants (42 tests) |
+| `:core:integrity` | Kotlin/JVM | SHA-256, hash chain, Merkle v2, canonical JSON; matches `bench/adapters.py` on shared vectors (28 tests) |
+| `:core:temporal` | Kotlin/JVM | Deterministic pattern engine, four demo rules, template explanations, zoned render, typed facts (62 tests) |
+| `:core:crypto` | Kotlin/JVM | Chunked AES-256-GCM blob envelope, key wrapping interface (33 tests) |
+| `:core:database` | Android | Room schema (26 tables), insert-only triggers, SQLCipher open path (34 tests) |
+| `:core:vault` | Android | Keystore wrapper, blob store, audit chain, case/evidence repositories, event store, actor registry, derivative store, review coordinator (142 JVM tests, 22 device tests) |
+| `:acquisition:importer` | Android | Share intents, pickers, paste, manual notes, streaming limits (84 JVM tests, 4 device tests) |
+| `:processing:text` | Kotlin/JVM | Language hints, rules cue engine, label mapping, WhatsApp text-export parser (52 tests) |
+| `:processing:analysis` | Android | Imported text to derivative, events, single-pass EventText, TextAnalyser, on-demand patterns (48 JVM tests, 2 device tests) |
+| `:export:bundle` | Kotlin/JVM | Bundle writer, offline verifier, command-line tool (47 tests) |
+| `:export:report` | Android | Report model, PDF renderer, Keystore signer, export service, audit records (38 JVM tests, 5 device tests) |
+| `:app` | Android | Onboarding, lock, cases, import, analysis, timeline, review, who is who, patterns, report preview and export (227 tests) |
+
+## Last full verification by the main session
+
+Full verification command: `cd android && JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew test :app:assembleDebug :app:lintDebug :app:verifyManifestPermissions` passed in 2m 8s:
+- 837 JVM unit tests passed, 0 failures, 0 errors, 0 skipped.
+- `:app:lintDebug` passed with 0 errors.
+- `:app:verifyManifestPermissions` confirmed only `USE_BIOMETRIC`, `USE_FINGERPRINT`, and dynamic receiver permission; zero `INTERNET` access.
+
+Device test command: `./gradlew :core:vault:connectedDebugAndroidTest :acquisition:importer:connectedDebugAndroidTest :processing:analysis:connectedDebugAndroidTest :export:report:connectedDebugAndroidTest` passed in 1m 51s on Samsung SM-S928B (Android 16, API 36):
+- 33 connected device tests passed, 0 failures, 0 errors, 0 skipped.
+
+## Completed items in this pass
+
+1. **Library enhancements:**
+   - `:core:vault`: added `loadLatest(EventId)`, `revisions(EventId)`, `observeEvent(EventId)`, `senderClaims(CaseId)`, `observeSenderClaims(CaseId)`, `decisionsForEvent(EventId)`, atomic `assignSenderToNewPerson(...)`, `clearBoundary(...)`, `ActorRegistry.observe(...)`, and `ActorRegistry.rename(...)`.
+   - `:core:temporal`: added zoned `PatternExplanation.render` and `PatternFacts` for localization.
+   - `:processing:analysis`: added `EventText.bodiesOf(events)` and `quotesOf(event)` for single-pass code-point body/quote slicing, `TextAnalyser` interface, and `CasePatterns.compute(..., withSupportingEvents = true)`.
+   - `:export:report`: added zoned pattern sentences, Keystore signing integration, PDF rendering, export audit records, and export error discriminators.
+
+2. **Report and export screens (`:app`):**
+   - Implemented report selection (with zero preselected items), on-screen preview of the exact model, Keystore-signed PDF/zip export, result screen with signing key ID, and secure private sharing via FileProvider with export cache cleanup on discard/leave/lock/unlock.
+
+3. **Workaround migrations and cleanups:**
+   - `HistoryRows.kt`: eliminated JSON regex parsing in favor of typed `DecisionTargetKind` and `DecisionChange`.
+   - `EventReviewViewModel.kt`: switched from revision probing to `vault.events.loadLatest(EventId)`.
+   - `WhoIsWhoViewModel.kt`: observed actors via `vault.actors.observe(CaseId)` and used atomic `vault.review.assignSenderToNewPerson(...)`.
+   - `PatternsViewModel.kt`: migrated to `CasePatterns.compute(..., withSupportingEvents = true)`.
+   - `ReportViewModel.kt` and `TimelineViewModel.kt`: migrated to `EventText(vault).bodiesOf(...)`.
+   - `BodySlices.kt`: deleted obsolete workaround class and migrated tests.
+   - Resolved test deadlocks in `ReportViewModelTest`.
+
+## Waiting on the owner
+
+- **Manual checks on the phone.** Unlock flow; share an image from another app into a case; pickers; lock on background; and the script in the next section. The share check matters most: whether the read grant on a shared file survives the hand-off from `ShareTargetActivity` to `MainActivity`. If it does not, every shared file fails to save and the trampoline design needs rework.
+- **Picker grace window.** While a system picker or share sheet opened from the app is showing, the app does not lock, for at most two minutes. This weakens lock-on-background on purpose. Needs a yes or no.
+- **Recording the sending app.** Imported items carry no record of which app shared them. Proposal: store the sender package name as a claim.
+- **Look and feel review** of the design system (debug builds: long-press "Sakshi" in the case list to open the design catalogue): dark theme, double font size, the "Note." prefix on evidence rows, Malayalam and Hindi rendering.
+- Megaplan open questions Q1 to Q10 (project licence, reference phone, hackathon date and expectations, schema v1.1, native-speaker review, recovery, counsel).
+
+## Manual test script (synthetic data)
+
+Paste into a new case with "Paste text":
+
+```
+24/09/2026, 21:05 - synthetic-alex: please stop messaging me
+24/09/2026, 21:10 - synthetic-sam: hello
+24/09/2026, 21:12 - synthetic-sam: why do you ignore me
+24/09/2026, 21:15 - synthetic-sam: answer me
+24/09/2026, 21:20 - synthetic-sam: you are an idiot
+24/09/2026, 21:25 - synthetic-sam: reply now
+24/09/2026, 21:30 - synthetic-sam: I am waiting
 ```
 
-Baseline regression command used with isolated pinned dependencies:
+1. Save, tap "Analyse now", choose `synthetic-alex` as yourself, continue.
+2. Open the timeline, tap "hello", then "This is ..." and name the sender as a new person.
+3. Open "please stop messaging me", choose that person under Boundary, tap "This is where I asked them to stop".
+4. Open "Patterns": expect a "Contact after a boundary" card whose sentence contains "6", with its limits listed.
 
-```bash
-uv run --no-project --python 3.12 --with scikit-learn==1.7.2 \
-  --with numpy==2.2.6 --with pycryptodome==3.23.0 --with psutil==7.0.0 \
-  python -m unittest discover -s bench/tests -v
-```
+## Not verified
 
-Model assets remain under `/tmp` and may disappear after reboot. Re-fetch only in an explicit preparation step, pinning the revisions recorded in section 6:
+- Any screen used by a person; TalkBack; large fonts; dark theme.
+- A file share from another app; the Photo Picker and document picker on the device.
+- The unlock path with a user present, the not-authenticated and key-invalidated paths, lock on background.
+- Backup and device-transfer exclusion (megaplan V-09).
+- Android versions below 16 on a device (the pre-Android 13 share path ran only under Robolectric), 16 KB page devices, lower-RAM devices.
+- Correct shaping of Malayalam and Devanagari in the exported PDF. Only "first page is not blank" was checked.
+- Any release-build, battery or thermal measurement.
+- A real WhatsApp export from any locale. The parser has only seen synthetic text.
 
-```bash
-hf download minuva/MiniLMv2-toxic-jigsaw-onnx \
-  --revision c035f27b6a6d68770f8069a4829f1715a48b8d51 \
-  --local-dir /tmp/sakshi-minilm-tox
-hf download minuva/MiniLMv2-goemotions-v2-onnx \
-  --revision 4fea72b9ec71ba8d84b88e0efa2ace3dcc733bfc \
-  --local-dir /tmp/sakshi-minilm-emotion
-```
+## Known weaknesses and deviations from the megaplan
 
-The current unpadded diagnostic reproduces anger 0.722891/insult 0.938573 on the literal fixture, threat 0.000657 on conditional photo exposure, approval 0.941967 on "Fine.", and five unknown tokens among eight behaviour tokens for a Malayalam fixture. These are Linux x86 synthetic diagnostics, **not** accuracy, calibration, emotion intensity, real evidence or Android resource results.
+- **Cue lists are the unreviewed demo set** ported from `bench/adapters.py`. No native speaker has checked them. Matching has no context: negated and quoted phrases match. The megaplan says unreviewed lists ship disabled for real use; the demo build has them on and says so in the review screen.
+- **Rules versus fixture gold labels:** 19 of 600 synthetic rows differ. This is a fixture regression figure, not accuracy.
+- **Schema v1 of the database was changed in place several times** (unreleased). Any device with an older debug install needs its app data cleared.
+- **Compose BOM 2026.06.01 and API 36** are pinned because Android SDK platform 37 is not installed. Lint shows version-availability warnings; they are left open. `TopAppBar` and `ModalBottomSheet` are experimental in this BOM and are not used.
+- **Keystore unlock window on API 26 to 29** is set through reflection because the only API for it is deprecated. Untested on such a device.
+- **Export signature** is ECDSA P-256 (megaplan decision D-09), not the Ed25519 the bench measured. Nothing ties the signing key to a person: a re-signed bundle verifies with a different key id, so the key id must be compared out of band.
+- **PDF uses system fonts**, not bundled Noto fonts.
+- **Patterns are computed on demand** and not stored in the `pattern` tables yet.
+- **The audit chain** cannot detect removal of its newest entries unless the head is kept elsewhere.
+- **A lost or invalidated device key makes the vault unrecoverable.** There is no recovery bundle.
+- **The orphan-file sweep** must only run at start-up; nothing enforces that.
+- **Python suite on Linux:** `test_screenshot_text_has_renderable_glyphs` errors because the committed screenshot manifest references Windows font paths. Not caused by the Android work.
 
-The 64-token padded anger comparison (0.570579 versus 0.722891 unpadded) and earlier laptop p50/RSS timings remain **historical observations**, not rerun measurements. The padding root cause is unisolated. Published device benchmark numbers belong to their authors' exact models/devices/workloads.
+## Not built yet (megaplan order)
 
-## Decisions that must survive editing
-
-- User review confirmed offline/private processing, English/Malayalam/Hindi priority (including Manglish/Hinglish and code mixing), other languages as future scope, and physical-device resource validation during implementation/testing.
-- Duplicate/gap policy is decided in report section 8: suppress representation updates without erasing repeated occurrences; distinguish historic/summary context; make uncertain duplicates reviewable; show coverage gaps; allow supported user-selected imports without fabricating missing history; rebuild associations and counts after correction.
-- Emotion is independent and optional; it never gates preservation or behaviour review.
-- Behaviour is the primary safety-related signal. The six-label Jigsaw baseline lacks comprehensive control, stalking, blackmail and sexual-harassment coverage.
-- Intensity is `null` in MVP; raw sigmoid scores are neither calibrated probabilities nor intensity.
-- No mandatory LLM. Qwen3-0.6B LiteRT-LM is the first optional integration experiment; Qwen3.5-2B GGUF/llama.cpp is a richer benchmark challenger. No reasoner is qualified by this documentation.
-- Kotlin temporal logic owns distinct reviewed-event counts, chronology and provenance. Expressed-language trajectories show source IDs, gaps and uncertainty, never escalation/danger verdicts.
-- Unsupported languages route to explicit unknown; no translation-before-classification default or confident English-model result for Indic input.
-- No automatic training, LoRA or federation in MVP.
-- Originals remain immutable; normalized/extracted text is a versioned derivative with source maps and canonical code-point anchors.
-
-## Open qualification work
-
-The documentation handoff is complete, not a claim that the app or model pack is production-ready. Before implementation/release:
-
-1. Create/verify the Android shell and supported user-mediated evidence acquisition on physical devices, including vendor/version restrictions and notification partial capture.
-2. Qualify native tokenizers, graph/padding/backend parity, asset manifests, error states, lifecycle/cancellation and canonical anchor conversion.
-3. Collect licensed/consented representative evaluation data with native-speaker review and leakage-safe partitions. Establish per-task/language quality, calibration and router criteria; synthetic fixtures are insufficient.
-4. Benchmark actual Android cold/warm latency, peak memory, energy, battery, thermal and scheduling constraints. Proposed budgets are targets, not measurements.
-5. Implement/audit vault encryption, nonce/key lifecycle, backup/recovery, logs, correction/deletion propagation and explicit export. Hashes alone cannot establish authenticity or admissibility.
-6. Resolve release-specific model/dataset/code rights and refresh mutable primary APIs/source details. Gated Gemma assets, HateXplain license discrepancy, NRC commercial rights and some dataset terms remain unqualified.
-
-No Android implementation, model training, representative quality/calibration experiment, private-data upload or Laya integration was performed in this completion. The user ended the Lavish review after submitting four decisions, all incorporated into the report, artifact and operating contract. Do not reopen that review session uninvited.
-
-## File map and investigation provenance
-
-- `research/sentiment-emotion-local-ai-android-design.md` - completed report and source register.
-- `.lavish/sakshi-sentiment-emotion-architecture.html` - completed review artifact.
-- `research/verification/` - reproducible diagnostics and browser evidence for this deliverable.
-- `research/laya-source-analysis-and-sakshi-local-ai-architecture.md`, `research/local-ai-architecture.md` - prior research boundaries.
-- `research/android-evidence-acquisition-specification.md`, `research/whatsapp-view-once-feasibility.md` - supported acquisition design.
-- `research/temporal-harassment-patterns.md`, `data/sakshi-event-schema.json` - shared temporal contract; unchanged in this handoff.
-- `Harassment_Pattern_Guard.pptx.pdf` - product proposal, not a working application specification.
-- Original research history: `/home/ashin/.local/share/devin/cli/summaries/history_d0e509aea77644fd.md`. Used to recover citations, not as a substitute for primary-source or device evidence.
-
-## Style constraints
-
-Use British "behaviour" consistently. No em dashes or automatic agent co-author trailers. Link durable repository artifacts; preserve explicit unknowns and source/measurement status when extending the report.
+1. OCR for screenshots (ML Kit bundled Latin, megaplan phase 10), including the check that it works with no `INTERNET` permission.
+2. Storing patterns and report snapshots; staleness tracking in the database rather than recompute on demand.
+3. Search (phase 8).
+4. Audio transcription (phase 11) and the secure seekable source it needs.
+5. Optional notification observation (phase 12).
+6. Security hardening pass (phase 13): the full 27.3 test list, forbidden-API lint, log audit.
+7. Release qualification (phase 15): licence, notices, privacy policy, counsel review.

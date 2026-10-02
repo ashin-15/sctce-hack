@@ -35,7 +35,6 @@
 
     <!-- Cases -->
     <string name="action_lock">Lock</string>
-    <string name="cases_empty">No cases yet. Create a case to start.</string>
     <string name="cases_new">New case</string>
     <string name="cases_archived_heading">Archived (%1$d)</string>
     <string name="cases_archived_expand">Show archived cases</string>
@@ -68,4 +67,616 @@
     <string name="message_title_blank">Enter a title for the case.</string>
     <string name="message_title_too_long">The title is too long. The limit is %1$d.</string>
     <string name="message_save_failed">The change could not be saved. Try again.</string>
+
+    <!-- Lock and share -->
+    <string name="lock_share_pending">Unlock to choose where to save what you shared.</string>
+    <string name="share_target_label">Save to Sakshi</string>
+
+    <!-- Case list -->
+    <string name="case_open">Open case</string>
+
+    <!-- Case detail -->
+    <string name="action_back">Back</string>
+    <string name="detail_missing">This case is no longer available.</string>
+    <string name="detail_archived">This case is archived. Move it back to active in the case list to add evidence.</string>
+    <string name="detail_add_files">Add files</string>
+    <string name="detail_add_media">Add photos or videos</string>
+    <string name="detail_paste">Paste text</string>
+    <string name="detail_write_note">Write a note</string>
+    <string name="detail_date_unknown">date unknown</string>
+    <string name="kind_text">Text</string>
+    <string name="kind_text_file">Text file</string>
+    <string name="kind_image">Image</string>
+    <string name="kind_audio">Audio</string>
+    <string name="kind_video">Video</string>
+    <string name="kind_pdf">PDF</string>
+    <string name="kind_archive">Archive</string>
+    <string name="kind_note">Note</string>
+    <string name="kind_file">File</string>
+    <string name="analysis_waiting">Saved. Waiting for text analysis.</string>
+    <string name="analysis_not_analysed">Saved. Not analysed in this version.</string>
+    <string name="evidence_options">Options for %1$s received %2$s</string>
+    <string name="evidence_check">Check integrity</string>
+    <string name="evidence_delete">Delete</string>
+    <string name="integrity_checking">Checking the stored file.</string>
+    <string name="integrity_intact">Intact. The stored file matches the fingerprint recorded when it was saved. This check compares those two things and nothing more.</string>
+    <string name="integrity_changed">Does not match. The stored file differs from the fingerprint recorded when it was saved.</string>
+    <string name="integrity_missing">File missing. The stored file could not be found, so it could not be compared with the fingerprint recorded when it was saved.</string>
+    <string name="integrity_not_authenticated">Could not be authenticated. The stored file failed its encryption check, so it could not be compared with the fingerprint recorded when it was saved.</string>
+    <string name="integrity_key_unavailable">Key unavailable. The device key could not be used, so the stored file could not be compared with the fingerprint recorded when it was saved.</string>
+    <string name="integrity_not_completed">The check could not be completed. Try again.</string>
+    <string name="delete_item_title">Delete this evidence item?</string>
+    <string name="delete_item_body">This removes the item and its stored file from this device. This cannot be undone. Physical erasure from the phone\'s storage cannot be promised.</string>
+    <string name="message_delete_failed">The item could not be deleted. Try again.</string>
+    <string name="paste_title">Paste text</string>
+    <string name="paste_label">Text to save</string>
+    <string name="paste_review">Review</string>
+
+    <!-- Import preview -->
+    <string name="import_title">Review before saving</string>
+    <string name="import_statement">Selected items are copied into Sakshi and encrypted on this device. The originals in other apps are not changed or removed.</string>
+    <string name="import_reported_note">Names, types and sizes are what the sending app reported. Sakshi has not checked them.</string>
+    <string name="import_reported_none">not reported</string>
+    <string name="import_item_shared_text">Shared text</string>
+    <string name="import_item_pasted_text">Pasted text</string>
+    <string name="import_rejected_heading">Cannot be saved</string>
+    <string name="import_case_heading">Save into</string>
+    <string name="import_case_fixed">Saving into: %1$s</string>
+    <string name="import_case_new">New case…</string>
+    <string name="import_case_none">You have no active cases. Choose New case to create one.</string>
+    <string name="import_case_required">Choose a case to enable saving.</string>
+    <string name="import_save">Save selected</string>
+    <string name="rejection_unsupported_scheme">Only items that Android hands over as content can be copied. This one was not offered that way.</string>
+    <string name="rejection_unreadable">Sakshi could not read this item.</string>
+    <string name="rejection_empty_text">The text is empty.</string>
+    <string name="rejection_text_too_long">The text is longer than Sakshi accepts.</string>
+    <string name="rejection_not_a_uri">The sending app offered this item in a form Sakshi cannot read.</string>
+
+    <!-- Import progress and result -->
+    <string name="import_saving_progress">Saving %1$d of %2$d</string>
+    <string name="import_saving_hint">Keep this screen open until saving finishes.</string>
+    <string name="result_finished_title">Import finished</string>
+    <string name="result_cancelled_title">Import cancelled</string>
+    <string name="result_cancelled_body">Items that were already saved remain saved. The others were not added.</string>
+    <string name="result_item_file">Item %1$d, reported name: %2$s</string>
+    <string name="result_item_file_no_name">Item %1$d, no reported name</string>
+    <string name="result_item_shared_text">Item %1$d, shared text</string>
+    <string name="result_item_pasted_text">Item %1$d, pasted text</string>
+    <string name="result_item_unknown">Item %1$d</string>
+    <string name="result_saved">Saved.</string>
+    <string name="result_saved_waiting">Waiting for text analysis.</string>
+    <string name="result_saved_kept">Kept as received. Not analysed in this version.</string>
+    <string name="result_duplicate">The same bytes are already saved in this case.</string>
+    <string name="result_not_saved">Not saved. %1$s</string>
+    <string name="failure_case_unavailable">The case is archived, missing, or could not be created.</string>
+    <string name="failure_too_large">The item is larger than Sakshi accepts for its type.</string>
+    <string name="failure_unreadable">Sakshi could not read the item. The sending app may no longer allow access.</string>
+    <string name="failure_access_denied">Android did not allow Sakshi to read the item.</string>
+    <string name="failure_storage_error">The item could not be written to this device\'s storage.</string>
+    <string name="failure_key_unavailable">The device key could not be used.</string>
+    <string name="failure_cancelled">The import was cancelled before this item was saved.</string>
+    <string name="result_nothing_saved">No items were saved.</string>
+    <string name="result_done">Done</string>
+
+    <!-- Manual note -->
+    <string name="note_title">Write a note</string>
+    <string name="note_statement">This is your own statement. It is saved as your account, not as a copy of the original message.</string>
+    <string name="note_text_label">What happened, in your own words</string>
+    <string name="note_time_label">When did this happen? (optional)</string>
+    <string name="note_time_hint">In your own words. It is stored exactly as you write it.</string>
+    <string name="note_sender_label">Who was it from? (optional)</string>
+    <string name="note_sender_hint">This is your statement about who sent it. Sakshi cannot confirm it.</string>
+    <string name="note_app_label">Which app? (optional)</string>
+    <string name="note_view_once">This was a view-once or disappearing message</string>
+    <string name="note_availability_heading">What do you have of it?</string>
+    <string name="note_availability_not_acquired">I could not save the original</string>
+    <string name="note_availability_context_only">I have a screenshot of the chat around it</string>
+    <string name="note_availability_independent">I have my own recording or copy</string>
+    <string name="note_save">Save note</string>
+    <string name="note_saving">Saving the note</string>
+    <string name="note_problem_text_required">Write what happened before saving.</string>
+    <string name="note_problem_too_long">A field is longer than Sakshi accepts.</string>
+    <string name="note_problem_choose">Choose one of the options for the view-once message.</string>
+    <string name="note_problem_save_failed">The note could not be saved. Try again.</string>
+    <plurals name="import_text_length">
+        <item quantity="one">%1$d character</item>
+        <item quantity="other">%1$d characters</item>
+    </plurals>
+    <plurals name="import_text_preview_note">
+        <item quantity="one">Showing %1$d of %2$d character.</item>
+        <item quantity="other">Showing %1$d of %2$d characters.</item>
+    </plurals>
+    <plurals name="paste_counter">
+        <item quantity="one">%1$d of %2$d character</item>
+        <item quantity="other">%1$d of %2$d characters</item>
+    </plurals>
+    <plurals name="rejection_too_many">
+        <item quantity="one">Only %1$d item can be added at once, so this and any further items were left out.</item>
+        <item quantity="other">Only %1$d items can be added at once, so this and any further items were left out.</item>
+    </plurals>
+    <plurals name="result_summary">
+        <item quantity="one">Saved %1$d of %2$d selected item.</item>
+        <item quantity="other">Saved %1$d of %2$d selected items.</item>
+    </plurals>
+    <!-- Design system -->
+    <string name="status_label_info">Note</string>
+    <string name="status_label_caution">Caution</string>
+    <string name="status_label_problem">Problem</string>
+    <string name="epistemic_observed">Observed</string>
+    <string name="epistemic_user_reported">Your statement</string>
+    <string name="epistemic_inferred">Suggestion</string>
+    <string name="epistemic_pattern">Pattern</string>
+    <string name="epistemic_unknown">Not known</string>
+
+    <!-- Restyled screens -->
+    <string name="cases_empty_title">No cases yet</string>
+    <string name="cases_empty_body">Create a case to start.</string>
+    <string name="detail_empty_title">Nothing added yet</string>
+    <string name="detail_empty_body">Add files, photos, text or a note.</string>
+    <string name="detail_evidence_heading">Evidence</string>
+    <string name="evidence_size_date">%1$s, received %2$s</string>
+    <string name="import_reported_group">Reported by the sending app</string>
+    <string name="import_label_name">Reported name</string>
+    <string name="import_label_type">Reported type</string>
+    <string name="import_label_size">Reported size</string>
+
+    <!-- Analysis -->
+    <string name="evidence_analyse">Analyse text</string>
+    <string name="result_analyse_now">Analyse now</string>
+    <string name="analysis_done_label">Saved. Analysed, the messages are on the timeline.</string>
+    <string name="analysis_done_in_part_label">Saved. Analysed in part, see the timeline.</string>
+    <string name="detail_timeline">Timeline</string>
+    <string name="detail_patterns">Patterns</string>
+    <string name="analysis_title">Analyse text</string>
+    <string name="analysis_idle_body">The text has not been read yet. It is read on this phone only.</string>
+    <string name="analysis_start">Analyse text</string>
+    <string name="analysis_running">Reading and analysing the text</string>
+    <string name="analysis_failed">The analysis stopped before it finished. You can try again.</string>
+    <string name="analysis_back_to_case">Back to the case</string>
+    <string name="analysis_done_title">Analysis finished</string>
+    <plurals name="analysis_done_messages">
+        <item quantity="one">%1$d message was placed on the timeline.</item>
+        <item quantity="other">%1$d messages were placed on the timeline.</item>
+    </plurals>
+    <plurals name="analysis_done_suggestions">
+        <item quantity="one">%1$d suggestion is waiting for your review.</item>
+        <item quantity="other">%1$d suggestions are waiting for your review.</item>
+    </plurals>
+    <string name="analysis_done_no_cue">No cue matched in this text.</string>
+    <string name="analysis_done_suggestion_note">A suggestion only means that words from a list matched. It is not a finding. You decide what it means.</string>
+    <string name="analysis_open_timeline">Open timeline</string>
+    <string name="analysis_questions_title">Questions about this chat export</string>
+    <string name="analysis_questions_intro">This looks like a chat export. Sakshi needs three answers before it can place the messages in time.</string>
+    <string name="analysis_dates_heading">1. Date order</string>
+    <string name="analysis_dates_samples">Dates as written in the file:</string>
+    <string name="analysis_dates_fixed_day">The dates in this file can only be read with the day before the month.</string>
+    <string name="analysis_dates_fixed_month">The dates in this file can only be read with the month before the day.</string>
+    <string name="analysis_dates_day_first">Day before month (31/12)</string>
+    <string name="analysis_dates_month_first">Month before day (12/31)</string>
+    <string name="analysis_zone_heading">2. Time zone</string>
+    <string name="analysis_zone_current">Times in the file will be read in the time zone %1$s.</string>
+    <string name="analysis_zone_change">Change</string>
+    <string name="analysis_zone_search">Search time zones</string>
+    <string name="analysis_owner_heading">3. Which of these names is you?</string>
+    <string name="analysis_owner_note">This is your statement. Sakshi cannot confirm who sent a message.</string>
+    <string name="analysis_owner_none">None of these / I am not sure</string>
+    <string name="analysis_continue">Continue</string>
+    <string name="analysis_refused_not_text">This item could not be read as text.</string>
+    <string name="analysis_refused_too_large">This text is larger than this version analyses.</string>
+    <string name="analysis_refused_preserve_only">This type of item is kept as received. This version does not analyse it.</string>
+    <string name="analysis_refused_note">A note you wrote is kept as your statement. It is not analysed here.</string>
+    <string name="analysis_refused_missing">This item is no longer in the case.</string>
+    <string name="analysis_refused_unreadable">The saved file could not be read, so it was not analysed.</string>
+    <string name="analysis_refused_already">This text has already been analysed. Its messages are on the timeline.</string>
+    <string name="analysis_warn_date_order">The dates in the file can only be read one way, so that reading was used instead of your answer.</string>
+    <plurals name="analysis_warn_system_lines">
+        <item quantity="one">%1$d line without a sender name, such as a notice from the chat app, was not turned into a message. It stays in the saved file.</item>
+        <item quantity="other">%1$d lines without a sender name, such as notices from the chat app, were not turned into messages. They stay in the saved file.</item>
+    </plurals>
+    <plurals name="analysis_warn_times">
+        <item quantity="one">%1$d message has a time that could not be read. It is kept, with its time shown as not known.</item>
+        <item quantity="other">%1$d messages have a time that could not be read. They are kept, with their time shown as not known.</item>
+    </plurals>
+    <string name="analysis_warn_limit">The file has more messages than this version reads at once. The rest were not analysed.</string>
+    <string name="analysis_warn_prefix">Text before the opening message of the file was kept in the saved file but not turned into a message.</string>
+    <string name="analysis_warn_language">Some messages are in a language or script this version cannot analyse. They are kept and shown, with no suggestions.</string>
+    <string name="analysis_warn_cue_list">Some word matches were held back because the word list for that language has not been reviewed.</string>
+
+    <!-- Time -->
+    <string name="time_unknown">Time not known</string>
+    <string name="time_day_only">%1$s, time of day not known</string>
+    <string name="time_between">between %1$s and %2$s</string>
+    <string name="time_basis_source">as written in the export</string>
+    <string name="time_basis_collector">as saved on this phone</string>
+    <string name="time_basis_user">as you reported</string>
+    <string name="time_basis_unknown">time not known</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">Timeline</string>
+    <string name="timeline_patterns">Patterns</string>
+    <string name="timeline_menu_options">More options for the timeline</string>
+    <string name="timeline_add_gap">Add a period with no records</string>
+    <string name="timeline_who_is_who">Who is who</string>
+    <plurals name="timeline_count">
+        <item quantity="one">%1$d item, %2$d need review</item>
+        <item quantity="other">%1$d items, %2$d need review</item>
+    </plurals>
+    <string name="filter_all">All</string>
+    <string name="filter_needs_review">Needs review</string>
+    <string name="filter_tagged">Tagged</string>
+    <string name="filter_selected">selected</string>
+    <string name="timeline_empty_title">No messages on the timeline yet</string>
+    <string name="timeline_empty_body">Imported text appears here after it has been analysed. In the case, choose Analyse text on a saved text item.</string>
+    <string name="timeline_filter_empty">No items match this filter.</string>
+    <string name="timeline_open_event">Review this message</string>
+    <string name="timeline_order_note">Order within this minute is not known</string>
+    <string name="timeline_undated_heading">Time not known</string>
+    <string name="sender_none">No sender name</string>
+    <string name="sender_confirmed">confirmed by you</string>
+    <string name="sender_confirmed_as">confirmed by you as %1$s</string>
+    <string name="sender_not_confirmed">name from the export, not confirmed</string>
+    <string name="direction_incoming">to you</string>
+    <string name="direction_outgoing">from you</string>
+    <string name="direction_system">system line</string>
+    <string name="direction_unknown">direction not known</string>
+    <string name="body_media_omitted">Text not available: the export says media was omitted</string>
+    <string name="body_not_available">Text not available: the saved text could not be read</string>
+    <string name="body_show_all">Show all</string>
+    <string name="body_show_less">Show less</string>
+    <string name="tag_needs_review">%1$s, needs review</string>
+    <string name="tag_accepted">You agreed: %1$s</string>
+    <string name="tag_own">Your tag: %1$s</string>
+    <string name="tag_disagreed">You disagreed: %1$s</string>
+    <string name="tag_not_sure">Not sure: %1$s</string>
+    <string name="gap_statement">No records for this period. This does not mean nothing happened.</string>
+    <string name="gap_period_both">%1$s to %2$s</string>
+    <string name="gap_period_from">From %1$s</string>
+    <string name="gap_period_until">Until %1$s</string>
+    <string name="gap_period_unknown">Period not known</string>
+    <string name="gap_dialog_title">Add a period with no records</string>
+    <string name="gap_dialog_body">Use this for a period the saved records do not cover, for example when only part of a chat was saved. Times are in your device time zone (%1$s).</string>
+    <string name="gap_start_label">From</string>
+    <string name="gap_end_label">Until</string>
+    <string name="gap_bounds_hint">Leave a field blank if that end is not known.</string>
+    <string name="gap_reason_heading">Why are there no records?</string>
+    <string name="gap_reason_import_selection">I only saved part of the conversation</string>
+    <string name="gap_reason_access_revoked">The app lost access</string>
+    <string name="gap_reason_listener">Collecting was switched off</string>
+    <string name="gap_reason_process">The app was stopped</string>
+    <string name="gap_reason_overflow">Too many items arrived at once</string>
+    <string name="gap_reason_key">The device key was not available</string>
+    <string name="gap_reason_unknown">I do not know why</string>
+    <string name="gap_problem_neither">Enter a start, an end, or both.</string>
+    <string name="gap_problem_start">The start must look like %1$s.</string>
+    <string name="gap_problem_end">The end must look like %1$s.</string>
+    <string name="gap_problem_order">The end is before the start.</string>
+    <string name="gap_problem_not_saved">The period could not be saved.</string>
+
+    <!-- Categories and review wording -->
+    <string name="category_verbal_abuse">Insulting or degrading wording</string>
+    <string name="category_explicit_threat">Wording that states harm</string>
+    <string name="category_implied_threat">Wording that hints at harm</string>
+    <string name="category_intimidation">Intimidating wording</string>
+    <string name="category_controlling_request">Controlling demand</string>
+    <string name="category_sexual_pressure">Sexual pressure</string>
+    <string name="category_privacy_exposure">Mentions exposing private information</string>
+    <string name="category_contact_request">Asks for contact</string>
+    <string name="category_ordinary">Ordinary</string>
+    <string name="category_unknown">Not sure</string>
+    <string name="category_basis_rule">Suggested because these words matched a list: %1$s. The list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.</string>
+    <string name="category_basis_rule_no_words">Suggested because words matched a list. The list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.</string>
+    <string name="category_basis_classifier">Suggested by a small classifier on this phone. It cannot read context, jokes or quotes.</string>
+    <string name="category_basis_llm">Suggested by a language model on this phone. It can be wrong and it cannot read context reliably.</string>
+    <string name="category_basis_user">You added this tag yourself.</string>
+    <string name="review_status_unreviewed">Waiting for your review</string>
+    <string name="review_status_accepted">You agreed</string>
+    <string name="review_status_rejected">You disagreed</string>
+    <string name="review_status_uncertain">You marked it as not sure</string>
+    <string name="reason_wrong_sender">Wrong sender or quote</string>
+    <string name="reason_extraction">The text was read wrongly</string>
+    <string name="reason_duplicate">Duplicate</string>
+    <string name="reason_context">Not enough context</string>
+    <string name="reason_absent">The words are not there</string>
+    <string name="reason_other">Another reason</string>
+
+    <!-- Event review -->
+    <string name="review_title">Review message</string>
+    <string name="review_event_missing">This message is not in the case any more.</string>
+    <string name="notice_dismiss">Dismiss</string>
+    <string name="review_saved_heading">What was saved</string>
+    <string name="review_matched_words">Matched words: \'%1$s\'</string>
+    <string name="review_source_label">Source</string>
+    <string name="review_source_export">A chat export you saved</string>
+    <string name="review_source_text">Text you pasted or shared</string>
+    <string name="review_source_note">A note you wrote</string>
+    <string name="review_source_other">A saved item</string>
+    <string name="review_time_label">Time</string>
+    <string name="review_fingerprint_label">Fingerprint of the saved file (start)</string>
+    <string name="review_fingerprint_what">What is this?</string>
+    <string name="review_fingerprint_explained">The fingerprint (hash) only shows whether the saved file has changed since it was saved. It does not show who wrote the message or that the message is genuine.</string>
+    <string name="review_who_heading">Who and when</string>
+    <string name="review_sender_label">Sender name</string>
+    <string name="review_direction_label">Direction</string>
+    <string name="review_this_is">This is …</string>
+    <string name="review_from_me">This message is from me</string>
+    <string name="review_to_me">This message is to me</string>
+    <string name="review_wantedness_label">Wanted or unwanted</string>
+    <string name="review_wantedness_unwanted">You marked it as unwanted contact</string>
+    <string name="review_wantedness_wanted">You marked it as wanted contact</string>
+    <string name="review_wantedness_none">Not marked</string>
+    <string name="review_mark_unwanted">Mark as unwanted contact</string>
+    <string name="review_mark_wanted">Mark as wanted contact</string>
+    <string name="review_clear_wantedness">Clear the mark</string>
+    <string name="review_signal_heading">Suggestions and tags</string>
+    <string name="review_no_cue">No cue matched in this text. You can still add your own tag.</string>
+    <string name="review_your_tag">Your tag</string>
+    <string name="review_agree">Agree</string>
+    <string name="review_disagree">Disagree</string>
+    <string name="review_not_sure">Not sure</string>
+    <string name="review_add_tag">Add my own tag</string>
+    <string name="review_disagree_title">Why do you disagree?</string>
+    <string name="review_disagree_body">Your answer is kept with your decision.</string>
+    <string name="review_disagree_confirm">Record</string>
+    <string name="review_tag_title">Add my own tag</string>
+    <string name="review_tag_body">Your tag applies to the whole message. It is your statement, not a finding.</string>
+    <string name="review_tag_confirm">Add tag</string>
+    <string name="review_boundary_heading">Boundary</string>
+    <string name="review_boundary_body">Use these only for a message of yours that set a limit or changed contact. They record what you did and say nothing about the other person.</string>
+    <string name="review_boundary_person">Which person does this concern?</string>
+    <string name="review_boundary_stop">This is where I asked them to stop</string>
+    <string name="review_boundary_stopped_replying">This is where I stopped replying</string>
+    <string name="review_boundary_limited">I limited contact here</string>
+    <string name="review_boundary_resumed">I chose to resume contact here</string>
+    <string name="review_boundary_need_person">A boundary refers to a person you have named. Name the person in Who is who, then come back.</string>
+    <string name="review_open_who">Open Who is who</string>
+    <string name="review_boundary_outgoing_only">Boundaries can only be set on your own messages.</string>
+    <string name="review_history_heading">History</string>
+    <string name="review_history_reason">Reason: %1$s</string>
+    <string name="review_done_agreed">Recorded. You agreed with the suggestion.</string>
+    <string name="review_done_disagreed">Recorded. Disagreeing with a suggestion does not label the message as fine.</string>
+    <string name="review_done_not_sure">Recorded. You marked the suggestion as not sure.</string>
+    <string name="review_done_tag">Your tag was added.</string>
+    <string name="review_done_direction">Direction recorded.</string>
+    <string name="review_done_wantedness">Recorded.</string>
+    <string name="review_done_boundary">The boundary was recorded.</string>
+    <string name="review_no_change">Already recorded.</string>
+    <string name="review_not_found">That message is no longer in this case.</string>
+    <string name="review_failed">That change could not be saved. Try again.</string>
+    <string name="review_problem_no_name">This sender has no name to match.</string>
+    <string name="review_problem_person">That person is not in this case.</string>
+    <string name="review_problem_value">That choice is not available here.</string>
+    <string name="review_problem_case">Those items belong to different cases.</string>
+    <string name="review_problem_generic">That change could not be saved.</string>
+    <string name="history_agreed">You agreed with the suggestion: %1$s</string>
+    <string name="history_disagreed">You disagreed with the suggestion: %1$s</string>
+    <string name="history_not_sure">You marked the suggestion as not sure: %1$s</string>
+    <string name="history_own_tag">You added your own tag: %1$s</string>
+    <string name="history_association_confirmed">You linked the sender name to a person.</string>
+    <string name="history_association_withdrawn">You withdrew the link from the sender name to a person.</string>
+    <string name="history_direction">You set the direction: %1$s</string>
+    <string name="history_unwanted">You marked this contact as unwanted.</string>
+    <string name="history_wanted">You marked this contact as wanted.</string>
+    <string name="history_wantedness_cleared">You cleared the wanted or unwanted mark.</string>
+    <string name="history_boundary">You marked this message as a boundary.</string>
+    <string name="history_duplicate">You changed the duplicate record for this message.</string>
+    <string name="history_other">You changed a record of this message.</string>
+
+    <!-- Who is who -->
+    <string name="people_title">Who is who</string>
+    <string name="people_statement">This records your statement about who the name refers to. The app cannot confirm who sent a message.</string>
+    <string name="people_claims_heading">Names not yet linked to a person</string>
+    <string name="people_claims_empty_title">No unlinked names</string>
+    <string name="people_claims_empty_body">Names from chat exports appear here after analysis, until you link them to a person.</string>
+    <string name="people_focused">Selected from the message you were reviewing</string>
+    <string name="people_source_export">Name in the chat export saved on %1$s</string>
+    <string name="people_source_text">Name in text saved on %1$s</string>
+    <string name="people_source_other">Name in an item saved on %1$s</string>
+    <plurals name="people_message_count">
+        <item quantity="one">%1$d message</item>
+        <item quantity="other">%1$d messages</item>
+    </plurals>
+    <string name="people_marked_own">All of these messages are marked as from you.</string>
+    <string name="people_this_is_me">This is me</string>
+    <string name="people_name_person">This is a person I want to name</string>
+    <string name="people_name_title">Who is this?</string>
+    <string name="people_new_person">A new person</string>
+    <string name="people_name_label">The name you use for this person</string>
+    <string name="people_named_heading">People you named</string>
+    <string name="people_linked_heading">Names linked to people</string>
+    <string name="people_linked_line">\'%1$s\' is recorded as %2$s</string>
+    <string name="people_undo">Undo</string>
+    <string name="people_undo_title">Undo this link?</string>
+    <string name="people_undo_body">The name goes back to being a name from the export, not linked to a person. The messages stay.</string>
+    <string name="people_done_own">Marked as from you.</string>
+    <string name="people_done_assigned">Linked to the person.</string>
+    <string name="people_done_undo">The link was withdrawn.</string>
+    <string name="people_problem_name">Enter a name of up to 256 characters.</string>
+
+    <!-- Patterns -->
+    <string name="patterns_title">Patterns</string>
+    <string name="patterns_confirmed_only">Confirmed items only</string>
+    <string name="patterns_include_waiting">Include items waiting for review</string>
+    <string name="patterns_preview_note">These are previews. They include items you have not reviewed, so they can change.</string>
+    <string name="patterns_loading">Working out the descriptions</string>
+    <string name="patterns_failed">The descriptions could not be worked out. Go back and open this screen again.</string>
+    <string name="patterns_empty_title">No pattern description yet</string>
+    <string name="patterns_empty_body">Patterns appear after messages are placed on the timeline and reviewed.</string>
+    <string name="patterns_footer">These descriptions summarise the records you selected. They are not conclusions about a person.</string>
+    <string name="patterns_limits_heading">Limits of this description</string>
+    <string name="patterns_limit_line">- %1$s</string>
+    <string name="patterns_support_line">%1$s: %2$s</string>
+    <string name="pattern_repeated_contact">Repeated contact</string>
+    <string name="pattern_after_boundary">Contact after a boundary</string>
+    <string name="pattern_wording_change">Change in wording</string>
+    <string name="pattern_frequency_change">Change in how often</string>
+    <string name="pattern_status_supported">Description supported by the selected records</string>
+    <string name="pattern_status_candidate">Possible, needs review</string>
+    <string name="pattern_status_insufficient">Not enough context to say</string>
+    <string name="pattern_status_not_observed">Not observed in the selected records. This does not mean nothing happened.</string>
+    <string name="pattern_interpretation">One way to read this: %1$s</string>
+    <plurals name="pattern_based_on">
+        <item quantity="one">Based on %1$d item</item>
+        <item quantity="other">Based on %1$d items</item>
+    </plurals>
+
+    <!-- Debug design catalogue -->
+    <string name="catalog_title">Design catalogue</string>
+    <string name="catalog_type">Type scale</string>
+    <string name="catalog_style_screen">Screen title</string>
+    <string name="catalog_style_section">Section title</string>
+    <string name="catalog_style_body">Body text</string>
+    <string name="catalog_style_supporting">Supporting text</string>
+    <string name="catalog_style_label">Label</string>
+    <string name="catalog_sample_hindi">यह एक नमूना वाक्य है।</string>
+    <string name="catalog_sample_malayalam">ഇത് ഒരു ഉദാഹരണ വാക്യമാണ്.</string>
+    <string name="catalog_epistemic">Kinds of statement</string>
+    <string name="catalog_sample_observed">The text exactly as it appears in the saved item.</string>
+    <string name="catalog_sample_user_reported">What the person wrote about it, in their own words.</string>
+    <string name="catalog_sample_inferred">A possible reading offered by the app. The person decides.</string>
+    <string name="catalog_sample_pattern">Several saved items point the same way over time.</string>
+    <string name="catalog_sample_unknown">Who sent it is not established by anything saved.</string>
+    <string name="catalog_labels_alone">The labels alone:</string>
+    <string name="catalog_buttons">Buttons and dialogs</string>
+    <string name="catalog_primary">Primary action</string>
+    <string name="catalog_secondary">Secondary action</string>
+    <string name="catalog_quiet">Quiet action</string>
+    <string name="catalog_disabled">Disabled action</string>
+    <string name="catalog_open_confirm">Open confirm dialog</string>
+    <string name="catalog_open_destructive">Open destructive dialog</string>
+    <string name="catalog_open_entry">Open text entry dialog</string>
+    <string name="catalog_dialog_title">Sample dialog</string>
+    <string name="catalog_dialog_body">Nothing is changed by this sample.</string>
+    <string name="catalog_notes">Status notes</string>
+    <string name="catalog_note_info">An ordinary piece of information.</string>
+    <string name="catalog_note_caution">Something worth a calm look.</string>
+    <string name="catalog_note_problem">Something did not work.</string>
+    <string name="catalog_surfaces">Cards and menus</string>
+    <string name="catalog_card">Sample card</string>
+    <string name="catalog_card_body">A flat surface with a thin outline.</string>
+    <string name="catalog_card_quiet">A quieter card, used for items that cannot be chosen.</string>
+    <string name="catalog_menu_description">Options for the sample card</string>
+    <string name="catalog_empty_title">Nothing here yet</string>
+    <string name="catalog_empty_body">An empty state says what is missing and what to do.</string>
+    <string name="catalog_progress">Progress</string>
+    <string name="catalog_choices">Choices and fields</string>
+    <string name="catalog_choice_one">Option A</string>
+    <string name="catalog_choice_two">Option B</string>
+    <string name="catalog_field_label">A text field</string>
+    <string name="catalog_open_form">Open form dialog</string>
+    <string name="catalog_form_body">A form dialog holds any content, such as a list of choices.</string>
+
+    <!-- Report and export -->
+    <string name="detail_make_report">Make a report</string>
+    <string name="report_select_title">Choose what to include</string>
+    <string name="report_select_intro">The report is a document Sakshi made from the records you selected. Nothing is shared until you choose to share the file.</string>
+    <string name="report_messages_heading">Messages and notes to include</string>
+    <string name="report_select_all">Select all</string>
+    <string name="report_select_none">Select none</string>
+    <string name="report_select_tagged">Select items I tagged or agreed with</string>
+    <string name="report_selected_count">%1$d of %2$d selected</string>
+    <string name="report_empty_title">Nothing to include yet</string>
+    <string name="report_empty_body">A report is made from the messages and notes in the timeline. Add text and let Sakshi read it, then come back.</string>
+    <string name="report_blocked_pending">Cannot be included: you have not confirmed this item yet.</string>
+    <string name="report_blocked_rejected">Cannot be included: you rejected this item.</string>
+    <string name="report_blocked_expired">Cannot be included: the confirmation of this item has expired.</string>
+    <string name="report_unreviewed_heading">Suggestions I have not reviewed</string>
+    <string name="report_unreviewed_switch">Include suggestions I have not reviewed</string>
+    <string name="report_unreviewed_note">These were suggested by a word list and not checked by you. In the report they are marked as not reviewed.</string>
+    <string name="report_originals_heading">Original files</string>
+    <string name="report_originals_none">The selected items do not come from a saved file, so there is no original to include.</string>
+    <string name="report_originals_note">These saved files hold the selected messages. You can put a copy of the saved original into the export.</string>
+    <string name="report_original_include">Include the saved original file</string>
+    <string name="report_original_detail">%1$s, %2$s</string>
+    <string name="report_original_caution">The original may contain more than the selected messages, for example the whole chat.</string>
+    <string name="report_zone_heading">Time zone</string>
+    <string name="report_zone_current">Times in the report are shown in the time zone %1$s.</string>
+    <string name="report_limits_heading">Before you continue</string>
+    <string name="report_limit_saved">The report shows what was saved and what you marked.</string>
+    <string name="report_limit_sender">It does not show who really sent a message.</string>
+    <string name="report_limit_real">It does not show that a message is real.</string>
+    <string name="report_limit_time">It does not show when a message was really sent. The times come from the saved records and from the clock of this phone.</string>
+    <string name="report_preview_action">Preview report</string>
+
+    <string name="report_preview_title">Preview of the report</string>
+    <string name="report_preview_intro">This is how the report will read. The file contains a PDF made from the same data.</string>
+    <string name="report_building">Building the preview</string>
+    <string name="report_summary_heading">What will be in the file</string>
+    <plurals name="report_summary_messages">
+        <item quantity="one">%1$d message or note</item>
+        <item quantity="other">%1$d messages and notes</item>
+    </plurals>
+    <plurals name="report_summary_originals">
+        <item quantity="one">%1$d original file (%2$s)</item>
+        <item quantity="other">%1$d original files (%2$s)</item>
+    </plurals>
+    <string name="report_summary_no_originals">No original files</string>
+    <plurals name="report_summary_left_out">
+        <item quantity="one">%1$d item left out</item>
+        <item quantity="other">%1$d items left out</item>
+    </plurals>
+    <string name="report_summary_unreviewed_on">Suggestions you have not reviewed are included and marked as not reviewed</string>
+    <string name="report_summary_unreviewed_off">Suggestions you have not reviewed are not included</string>
+    <string name="report_create_export">Create export file</string>
+    <string name="report_change_selection">Change selection</string>
+    <string name="report_refused_empty">Nothing is selected. Choose at least one message or note.</string>
+    <string name="report_refused_unconfirmed">One of the selected items has not been confirmed by you, so it cannot go into a report.</string>
+    <string name="report_refused_unknown_event">One of the selected items is no longer in this case. Change the selection and try again.</string>
+    <string name="report_refused_case_missing">This case is no longer available.</string>
+    <string name="report_refused_unknown_evidence">One of the chosen original files is not part of this case. Change the selection and try again.</string>
+
+    <string name="export_notice_ok">OK</string>
+    <string name="export_running">Creating the export file</string>
+    <string name="export_cancelling">Stopping the export</string>
+    <string name="export_cancelled">The export was cancelled. Nothing was kept.</string>
+    <string name="export_failed_verification">The new file did not pass Sakshi\'s own check, so it was not kept. Try again.</string>
+    <string name="export_failed_content">Something in the selection could not be put into the file. Change the selection and try again.</string>
+    <string name="export_failed_original">A saved original file could not be read, so no file was created. Try again without that original.</string>
+    <string name="export_failed_original_changed">A saved original file no longer matches the fingerprint stored when it was imported, so no file was created. Use Check integrity on the case page, or try again without that original.</string>
+    <string name="export_failed_render">The report document could not be made. Try again.</string>
+    <string name="export_failed_key">The signing key on this phone could not be used. Try again. If this keeps happening, restart the phone.</string>
+    <string name="export_failed_storage">There was a storage problem, so no file was created. Check that the phone has free space and try again.</string>
+    <string name="export_failed_unexpected">The export could not be completed. Nothing was kept.</string>
+
+    <string name="export_result_title">Export file</string>
+    <string name="export_ready">The export file is ready.</string>
+    <string name="export_file_size">File size</string>
+    <string name="export_key_label">Signing key code</string>
+    <string name="export_key_what">What is this?</string>
+    <string name="export_key_explanation">This identifies the key on this phone that signed the file. Anyone checking the file should compare this code with you through another channel. It does not show who you are.</string>
+    <string name="export_inside_heading">What is inside</string>
+    <plurals name="export_inside_events">
+        <item quantity="one">%1$d message or note</item>
+        <item quantity="other">%1$d messages and notes</item>
+    </plurals>
+    <plurals name="export_inside_findings">
+        <item quantity="one">%1$d tag or suggestion listed</item>
+        <item quantity="other">%1$d tags and suggestions listed</item>
+    </plurals>
+    <plurals name="export_inside_patterns">
+        <item quantity="one">%1$d described pattern</item>
+        <item quantity="other">%1$d described patterns</item>
+    </plurals>
+    <plurals name="export_inside_originals">
+        <item quantity="one">%1$d original file</item>
+        <item quantity="other">%1$d original files</item>
+    </plurals>
+    <plurals name="export_inside_pages">
+        <item quantity="one">%1$d page in the report</item>
+        <item quantity="other">%1$d pages in the report</item>
+    </plurals>
+    <plurals name="export_inside_left_out">
+        <item quantity="one">%1$d item of this case left out</item>
+        <item quantity="other">%1$d items of this case left out</item>
+    </plurals>
+    <string name="export_caution_control">Once you share this file, Sakshi cannot control who sees it or remove it.</string>
+    <string name="export_caution_plain">The file is not encrypted. Anyone who has it can read it.</string>
+    <string name="export_check_heading">How someone can check this file</string>
+    <string name="export_check_readme">The file contains a README that explains the steps.</string>
+    <string name="export_check_tool">The check needs the Sakshi verifier tool on a computer.</string>
+    <string name="export_check_compares">It compares the file with itself and with the signing key.</string>
+    <string name="export_check_not_real">It does not show that the content is real.</string>
+    <string name="export_share">Share</string>
+    <string name="export_share_title">Share export file</string>
+    <string name="export_share_unavailable">No app on this phone can receive the file.</string>
+    <string name="export_discard">Discard export file</string>
 </resources>

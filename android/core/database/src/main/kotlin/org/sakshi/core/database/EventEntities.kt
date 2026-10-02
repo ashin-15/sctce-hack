@@ -97,7 +97,9 @@ public data class EventRevisionEntity(
  * Points an event revision at the exact evidence it rests on. Insert-only.
  *
  * [referenceId] is the schema's per-revision reference id and [artifactId] the schema artifact id.
- * [evidenceId] is null when the artifact is not stored in this vault. Text locators use
+ * [evidenceId] is null when the artifact is not stored in this vault. [sha256] is null when the reference
+ * carries no digest. [regionId] is the schema's region id as given; it has no foreign key because the region
+ * may not exist as a `region` row (for example in imported events). Text locators use
  * half-open Unicode code point offsets; audio locators use milliseconds.
  */
 @Entity(
@@ -109,13 +111,11 @@ public data class EventRevisionEntity(
         ),
         ForeignKey(EvidenceEntity::class, ["id"], ["evidence_id"], onDelete = ForeignKey.CASCADE),
         ForeignKey(DerivativeEntity::class, ["id"], ["derivative_id"], onDelete = ForeignKey.CASCADE),
-        ForeignKey(RegionEntity::class, ["id"], ["region_id"], onDelete = ForeignKey.CASCADE),
     ],
     indices = [
         Index("event_id", "event_revision", "reference_id", unique = true),
         Index("evidence_id"),
         Index("derivative_id"),
-        Index("region_id"),
     ],
 )
 public data class EvidenceAnchorEntity(
@@ -126,7 +126,7 @@ public data class EvidenceAnchorEntity(
     @ColumnInfo(name = "artifact_id") val artifactId: String,
     @ColumnInfo(name = "evidence_id") val evidenceId: String?,
     @ColumnInfo(name = "derivative_id") val derivativeId: String?,
-    val sha256: String,
+    val sha256: String?,
     val representation: String,
     @ColumnInfo(name = "locator_kind") val locatorKind: String,
     @ColumnInfo(name = "start_cp") val startCp: Int?,

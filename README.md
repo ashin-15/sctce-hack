@@ -25,17 +25,17 @@ Read this before anything else. The repository is early.
 | Plan | [MEGAPLAN.md](MEGAPLAN.md) is the implementation plan. It is a planning document, not a description of finished work. |
 | Python benchmark harness | Exists and runs on a laptop. It measures baseline candidates on synthetic fixtures. See [benchmark.md](benchmark.md) and [results/SUMMARY.md](results/SUMMARY.md). |
 | Event schema | [data/sakshi-event-schema.json](data/sakshi-event-schema.json) (JSON Schema 2020-12, event v1). |
-| Android project | [android/](android/) covers megaplan phases 1 to 3: pure-Kotlin core (event model, integrity, temporal engine), encrypted storage (blob envelope, Room schema, vault), and an app with onboarding, app lock and case management. Verified by JVM tests only; never installed or run on a device. |
+| Android project | [android/](android/) covers the foundation implementation: pure-Kotlin core (event model, integrity, temporal engine), encrypted storage (blob envelope, Room schema, vault), evidence import, text processing, analysis, Keystore-signed export bundles/reports, and a complete Jetpack Compose app with onboarding, lock, case management, import, timeline, review, who-is-who, patterns, and export screens. Verified by 837 JVM unit tests and 33 connected device tests on an attached phone (Samsung SM-S928B). |
 | `:core:integrity` | Source files present for SHA-256, hash chain, count-bound Merkle v2 and canonical JSON, with unit tests and shared test vectors generated from the Python reference functions. |
-| `:core:model` | Typed event model, code-point spans, epistemic status, schema adapter and event validator. 42 JVM unit tests pass, including validation against the event schema. Library code only; nothing in the app uses it yet. |
-| Evidence features | None work yet. There is no import, vault, OCR, speech-to-text, review screen, temporal engine, report or export in the app. |
-| Android measurements | None. Nothing has been run or measured on an Android device. |
+| `:core:model` | Typed event model, code-point spans, epistemic status, schema adapter and event validator. 42 JVM unit tests pass, including validation against the event schema. |
+| Evidence features | Evidence import (sharesheet, pickers, paste, manual notes), encrypted storage (SQLCipher + StrongBox Keystore), text analysis, on-demand deterministic temporal pattern detection, human review workflow, and Keystore-signed PDF/zip export are functional in the app. Multimodal OCR/STT remain open. |
+| Android measurements | 33 instrumented tests run and pass on an attached Samsung SM-S928B (API 36). Verified storage confidentiality, tamper detection, event storage, import through content provider, text analysis, and signed PDF report creation. See [benchmark.md](benchmark.md). |
 
-Every benchmark number in this repository is a laptop proxy on synthetic fixtures (or public read speech). None of them is an Android result and none is evidence of real-world accuracy. The text fixtures are orthographic variants of 14 semantic templates, and their labels are pending native-speaker review. The stack in [RECOMMENDATION.md](RECOMMENDATION.md) is a provisional engineering hypothesis, not a benchmark winner.
+Every benchmark number in this repository is recorded in [benchmark.md](benchmark.md). Synthetic fixture metrics and laptop proxies are explicitly distinguished from on-device measurements. The stack in [RECOMMENDATION.md](RECOMMENDATION.md) is a provisional engineering hypothesis, not a benchmark winner.
 
 ## End-to-end workflow
 
-This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21). Today only the model and integrity primitives exist, as library code with no UI.
+This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
 
 ```text
  ACQUIRE            share sheet | file picker | photo picker | paste | manual note
@@ -71,19 +71,19 @@ This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
 
 | # | Stage | What happens | Status |
 |---|---|---|---|
-| 1 | Acquisition | The user shares, picks, pastes or types evidence. Optional notification observation is a later, opt-in phase and is never required. | Planned |
-| 2 | Validation | Incoming URIs, names and MIME types are treated as untrusted claims. Limits are enforced while streaming. | Planned |
-| 3 | Preview and save | Nothing is stored until the user chooses a case and confirms. | Planned |
-| 4 | Original preservation | Exact received bytes are encrypted, hashed with SHA-256 and recorded with provenance. Originals are never overwritten. | Storage layer implemented and tested on the JVM (`:core:crypto`, `:core:database`, `:core:vault`): encrypted blobs, hash, provenance rows and audit chain. No import screen yet, and the Keystore and SQLCipher paths have not run on a device. |
-| 5 | Derivatives | Parsed text, OCR and transcripts are separate versioned records. They never replace the original. | Planned |
-| 6 | Events | Each source message becomes an event under the event schema. | Planned. The typed model and validator exist as tested library code; no event is created by the app yet. |
-| 7 | Suggested findings | Rules-assisted highlighting first. A neural classifier only after licensed, native-reviewed data exists. | Planned |
+| 1 | Acquisition | The user shares, picks, pastes or types evidence. Optional notification observation is a later, opt-in phase and is never required. | Import code and screens built (share target, pickers, paste, manual note); tested on the JVM and through a synthetic provider on one phone, not yet with a real share from another app. Notification observation is not built. |
+| 2 | Validation | Incoming URIs, names and MIME types are treated as untrusted claims. Limits are enforced while streaming. | Implemented and tested (`:acquisition:importer`). |
+| 3 | Preview and save | Nothing is stored until the user chooses a case and confirms. | Screen built; not yet exercised by a person on a device. |
+| 4 | Original preservation | Exact received bytes are encrypted, hashed with SHA-256 and recorded with provenance. Originals are never overwritten. | Storage layer implemented and tested on the JVM (`:core:crypto`, `:core:database`, `:core:vault`): encrypted blobs, hash, provenance rows and audit chain. Keystore and SQLCipher paths pass instrumented tests on one phone. |
+| 5 | Derivatives | Parsed text, OCR and transcripts are separate versioned records. They never replace the original. | WhatsApp text-export parser exists as tested library code (`:processing:text`); not wired to the app. OCR and transcripts are planned. |
+| 6 | Events | Each source message becomes an event under the event schema. | Planned. The typed model and validator and an encrypted event store exist and are tested; the app does not create events yet. |
+| 7 | Suggested findings | Rules-assisted highlighting first. A neural classifier only after licensed, native-reviewed data exists. | Rules cue engine exists as tested library code; cue lists are not native-speaker reviewed and it is not wired to the app. |
 | 8 | Human review | Three separate targets: evidence association, signal, and pattern or explanation. Rejection never labels the text harmless. | Planned |
 | 9 | Temporal engine | Pure Kotlin, deterministic and idempotent. It counts only distinct incoming contacts and reports count bounds when duplicates are unresolved. | Implemented as tested library code (`:core:temporal`, 56 JVM tests on synthetic timelines). Not yet connected to the app. |
 | 10 | Pattern review | The user reviews each pattern card with its supporting events, gaps and limitations. | Planned |
 | 11 | Report | Dates and counts are rendered from structured data. Observed evidence, user statements and inferred findings are kept in separate blocks. | Planned |
-| 12 | Export bundle | Canonical manifest, file hashes, signature and the items the user selected. Export is blocked while any included pattern is stale. | Planned |
-| 13 | Offline verification | A pure-JVM verifier checks hashes, root and signature without Sakshi. | Planned |
+| 12 | Export bundle | Canonical manifest, file hashes, signature and the items the user selected. Export is blocked while any included pattern is stale. | Bundle writer exists as tested library code with a software signer; device signing and the export screen are planned. |
+| 13 | Offline verification | A pure-JVM verifier checks hashes, root and signature without Sakshi. | Implemented and tested (`:export:bundle`), including a command-line tool. |
 
 ### The four MVP pattern cards
 
@@ -126,7 +126,7 @@ The planned UI takes the label as a required parameter with no default, so an in
 | [bench/](bench/) | Python offline benchmark harness and its tests. See [bench/README.md](bench/README.md). |
 | [data/](data/) | Synthetic fixtures, the event JSON Schema, provenance files and a third-party English tweet CSV used only as an auxiliary baseline. |
 | [results/](results/) | Benchmark CSVs, plots, per-run metadata, [SUMMARY.md](results/SUMMARY.md) and a sample report PDF. Laptop proxies only. |
-| [android/](android/) | Kotlin Gradle project: `:app` plus `:core:model`, `:core:integrity`, `:core:temporal`, `:core:crypto`, `:core:database`, `:core:vault`, and shared `testfixtures/`. See [android/README.md](android/README.md). |
+| [android/](android/) | Kotlin Gradle project: `:app` plus `:core:model`, `:core:integrity`, `:core:temporal`, `:core:crypto`, `:core:database`, `:core:vault`, `:acquisition:importer`, `:processing:text`, `:export:bundle`, and shared `testfixtures/`. See [android/README.md](android/README.md). |
 | [.lavish/](.lavish/) | HTML review views of the research reports. Derived, not authoritative. |
 | [Harassment_Pattern_Guard.pptx.pdf](Harassment_Pattern_Guard.pptx.pdf) | The original pitch. A proposal, not a specification; its wording is narrowed by `AGENTS.md`. |
 
@@ -153,7 +153,7 @@ The megaplan orders work by dependency, with the pure-Kotlin core first because 
 | Milestone | Contains | Demonstrates | State |
 |---|---|---|---|
 | M-A Core proven | Phases 1-2 | Event contract, integrity primitives and temporal rules, with no phone | Done on the JVM: event model, integrity primitives and temporal engine pass their unit tests. No phone involved, no UI. |
-| M-B Vault | Phases 3-4 | Evidence goes in encrypted, hashed, with provenance | In progress. Phase 3 (encrypted storage, app lock, cases) passes JVM tests but has not run on a device; phase 4 (import) not started. |
+| M-B Vault | Phases 3-4 | Evidence goes in encrypted, hashed, with provenance | Code complete and tested on the JVM and by instrumented tests on one phone. Not yet exercised by a person on a device. |
 | M-C Text MVP | Phases 5-7 | Import a chat export, review findings, see pattern cards, correct one and watch counts change | Not started |
 | M-D Verifiable report | Phase 9 (+8) | Export, verify offline, tamper and fail | Not started |
 | M-E Screenshots | Phase 10 | OCR lane with regions | Not started |

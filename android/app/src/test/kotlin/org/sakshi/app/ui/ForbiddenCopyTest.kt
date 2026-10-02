@@ -5,14 +5,10 @@ import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.sakshi.app.support.ForbiddenWords
 import org.w3c.dom.Element
 
 class ForbiddenCopyTest {
-    private val forbidden = listOf(
-        "safe", "protected from", "guaranteed", "court", "admissible", "proves", "proof",
-        "secure forever", "nobody can", "first",
-    ).map { Regex("\\b${Regex.escape(it)}\\b", RegexOption.IGNORE_CASE) }
-
     private fun strings(): List<Pair<String, String>> {
         val file = File(requireNotNull(System.getProperty("sakshi.stringsXml")) { "sakshi.stringsXml is not set" })
         val root = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file).documentElement
@@ -28,6 +24,12 @@ class ForbiddenCopyTest {
     }
 
     @Test
+    fun theListHoldsEveryWordFromTheBrief() {
+        listOf("harasser", "abuser", "stalker", "stalking", "guilty", "danger", "risk score", "threat detected", "harassment detected", "all clear", "nothing found", "harmless")
+            .forEach { assertTrue(it in ForbiddenWords.phrases, it) }
+    }
+
+    @Test
     fun readsTheStringResources() {
         assertTrue(strings().size > 20)
     }
@@ -35,14 +37,8 @@ class ForbiddenCopyTest {
     @Test
     fun noForbiddenWordsOrDashes() {
         val violations = strings().flatMap { (name, text) ->
-            forbidden.filter { it.containsMatchIn(text) }.map { "$name: ${it.pattern}" } +
-                listOfNotNull("$name: dash".takeIf { text.any { c -> c.code == EM_DASH || c.code == EN_DASH } })
+            ForbiddenWords.found(text).map { "$name: $it" } + listOfNotNull("$name: dash".takeIf { ForbiddenWords.hasDash(text) })
         }
         assertEquals(emptyList(), violations)
-    }
-
-    private companion object {
-        const val EM_DASH = 0x2014
-        const val EN_DASH = 0x2013
     }
 }

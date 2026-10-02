@@ -33,6 +33,7 @@ kotlin {
 dependencies {
     api(project(":core:vault"))
     implementation(project(":core:integrity"))
+    implementation(libs.androidx.core)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
 

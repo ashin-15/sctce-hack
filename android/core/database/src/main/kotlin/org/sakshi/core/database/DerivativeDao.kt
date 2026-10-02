@@ -39,6 +39,10 @@ public abstract class DerivativeDao {
     @Query("SELECT * FROM derivative WHERE evidence_id = :evidenceId AND kind = :kind ORDER BY revision DESC LIMIT 1")
     public abstract suspend fun getLatest(evidenceId: String, kind: String): DerivativeEntity?
 
+    /** Every derivative of the evidence, text included, by kind and then oldest revision first. */
+    @Query("SELECT * FROM derivative WHERE evidence_id = :evidenceId ORDER BY kind, revision, id")
+    public abstract suspend fun getAllForEvidence(evidenceId: String): List<DerivativeEntity>
+
     @Query(
         "SELECT id, revision, kind, parent_derivative_id, tool_id, created_at FROM derivative " +
             "WHERE evidence_id = :evidenceId ORDER BY kind, revision DESC, id",

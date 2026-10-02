@@ -14,7 +14,7 @@ import org.sakshi.core.database.SakshiDatabaseFactory
 /** What [Vault.startUp] cleaned up. */
 public class StartUpReport(public val sweep: SweepReport, public val jobsRecovered: Int)
 
-/** An open vault session: cases, evidence, audit log and job queue over one database and blob store. */
+/** An open vault session: cases, evidence, events, actors, audit log and job queue over one database and blob store. */
 public class Vault private constructor(
     private val database: SakshiDatabase,
     private val sweeper: OrphanSweeper,
@@ -22,6 +22,10 @@ public class Vault private constructor(
     public val evidence: EvidenceRepository,
     public val audit: AuditLog,
     public val jobs: JobQueue,
+    public val events: EventStore,
+    public val actors: ActorRegistry,
+    public val derivatives: DerivativeStore,
+    public val review: ReviewCoordinator,
 ) : Closeable {
 
     /** Removes temporary and orphaned files, returns interrupted jobs to the queue and audits the opening. */
@@ -106,6 +110,7 @@ public class Vault private constructor(
         ): Vault {
             val blobs = BlobStore(blobDirectory, wrapper)
             val audit = AuditLog(database, clock)
+            val events = EventStore(database, audit, clock, ids, dispatcher)
             return Vault(
                 database = database,
                 sweeper = OrphanSweeper(database, blobs, dispatcher),
@@ -113,6 +118,10 @@ public class Vault private constructor(
                 evidence = EvidenceRepository(database, blobs, audit, clock, ids, dispatcher),
                 audit = audit,
                 jobs = JobQueue(database, clock),
+                events = events,
+                actors = ActorRegistry(database, audit, ids, dispatcher),
+                derivatives = DerivativeStore(database, audit, clock, ids, dispatcher),
+                review = ReviewCoordinator(database, events, audit, clock, ids, dispatcher),
             )
         }
     }

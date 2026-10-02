@@ -212,4 +212,12 @@ class DaoRoundTripTest : DatabaseTestBase() {
         assertEquals(listOf(anchor), db.eventDao().getAnchors(EVENT_ID, 1))
         assertFailsWith<Exception> { db.eventDao().insertAnchors(listOf(anchorRow("anchor-2", evidenceId = null, referenceId = anchor.referenceId))) }
     }
+
+    @Test
+    fun anchorKeepsANullDigestAndARegionIdThatHasNoRegionRow() = runTest {
+        db.caseDao().insert(caseRow())
+        val anchor = anchorRow(evidenceId = null).copy(sha256 = null, regionId = "imported-region-9", pageIndex = null)
+        db.eventDao().insertEventWithRevision(eventRow(), revisionRow(), listOf(anchor))
+        assertEquals(listOf(anchor), db.eventDao().getAnchors(EVENT_ID, 1))
+    }
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the export folder of the cache can be handed to another app. -->
+<paths>
+    <cache-path
+        name="exports"
+        path="exports/" />
+</paths>

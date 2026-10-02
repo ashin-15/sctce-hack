@@ -1,31 +1,19 @@
 package org.sakshi.app.cases
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,17 +23,27 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import java.time.ZoneId
+import org.sakshi.app.BuildConfig
 import org.sakshi.app.R
+import org.sakshi.app.ui.catalog.DesignCatalog
+import org.sakshi.app.ui.components.EmptyState
+import org.sakshi.app.ui.components.MenuAction
+import org.sakshi.app.ui.components.OverflowMenuButton
+import org.sakshi.app.ui.components.PrimaryButton
+import org.sakshi.app.ui.components.SakshiCard
+import org.sakshi.app.ui.components.SakshiScaffold
+import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.TopAction
 import org.sakshi.app.ui.formatCreatedDate
+import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.vault.CaseRepository
 import org.sakshi.core.vault.CaseSummary
 
@@ -68,10 +66,12 @@ fun CaseListScreen(
     onDelete: (String) -> Unit,
     onMessageShown: () -> Unit,
     onLock: () -> Unit,
+    onOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var dialog by remember { mutableStateOf<Dialog?>(null) }
     var archivedExpanded by rememberSaveable { mutableStateOf(false) }
+    var catalogOpen by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
 
     val notice = state.message?.let { messageText(it) }
@@ -82,25 +82,35 @@ fun CaseListScreen(
         }
     }
 
-    Scaffold(
+    if (BuildConfig.DEBUG && catalogOpen) {
+        DesignCatalog(onClose = { catalogOpen = false }, modifier = modifier)
+        return
+    }
+
+    SakshiScaffold(
+        title = stringResource(R.string.app_name),
         modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbar) },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = { dialog = Dialog.Create }) { Text(stringResource(R.string.cases_new)) }
-        },
-    ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-            TopRow(onLock)
-            CaseList(
-                state = state,
-                archivedExpanded = archivedExpanded,
-                onToggleArchived = { archivedExpanded = !archivedExpanded },
-                onRename = { dialog = Dialog.Rename(it) },
-                onArchive = onArchive,
-                onUnarchive = onUnarchive,
-                onDelete = { dialog = Dialog.Delete(it) },
+        actions = listOf(TopAction(stringResource(R.string.action_lock), onLock)),
+        onTitleLongPress = if (BuildConfig.DEBUG) ({ catalogOpen = true }) else null,
+        snackbarHostState = snackbar,
+        bottomBar = {
+            PrimaryButton(
+                stringResource(R.string.cases_new),
+                { dialog = Dialog.Create },
+                Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
             )
-        }
+        },
+    ) {
+        CaseList(
+            state = state,
+            archivedExpanded = archivedExpanded,
+            onToggleArchived = { archivedExpanded = !archivedExpanded },
+            onRename = { dialog = Dialog.Rename(it) },
+            onArchive = onArchive,
+            onUnarchive = onUnarchive,
+            onDelete = { dialog = Dialog.Delete(it) },
+            onOpen = onOpen,
+        )
     }
 
     when (val current = dialog) {
@@ -135,21 +145,6 @@ private fun messageText(message: CaseMessage): String = when (message) {
 }
 
 @Composable
-private fun TopRow(onLock: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp).heightIn(min = 56.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.weight(1f).semantics { heading() },
-        )
-        TextButton(onClick = onLock, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.action_lock)) }
-    }
-}
-
-@Composable
 private fun CaseList(
     state: CaseListUiState,
     archivedExpanded: Boolean,
@@ -158,19 +153,20 @@ private fun CaseList(
     onArchive: (String) -> Unit,
     onUnarchive: (String) -> Unit,
     onDelete: (CaseSummary) -> Unit,
+    onOpen: (String) -> Unit,
 ) {
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 88.dp)) {
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
         if (state.active.isEmpty()) {
             item(key = "empty") {
-                Text(
-                    stringResource(R.string.cases_empty),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(16.dp),
-                )
+                EmptyState(stringResource(R.string.cases_empty_title), stringResource(R.string.cases_empty_body))
             }
         }
         items(state.active, key = { it.id }) { case ->
-            CaseRow(case, archived = false, onRename, onArchive, onUnarchive, onDelete)
+            CaseRow(case, archived = false, onRename, onArchive, onUnarchive, onDelete, onOpen)
         }
         if (state.archived.isNotEmpty()) {
             item(key = "archived-heading") {
@@ -178,7 +174,7 @@ private fun CaseList(
             }
             if (archivedExpanded) {
                 items(state.archived, key = { it.id }) { case ->
-                    CaseRow(case, archived = true, onRename, onArchive, onUnarchive, onDelete)
+                    CaseRow(case, archived = true, onRename, onArchive, onUnarchive, onDelete, onOpen)
                 }
             }
         }
@@ -188,20 +184,19 @@ private fun CaseList(
 @Composable
 private fun ArchivedHeading(count: Int, expanded: Boolean, onToggle: () -> Unit) {
     val action = stringResource(if (expanded) R.string.cases_archived_collapse else R.string.cases_archived_expand)
-    Column {
-        HorizontalDivider()
-        Row(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = action, onClick = onToggle)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                stringResource(R.string.cases_archived_heading, count),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f),
-            )
-            Text(action, style = MaterialTheme.typography.labelLarge)
-        }
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = Spacing.touchTarget)
+            .clickable(onClickLabel = action, role = Role.Button, onClick = onToggle)
+            .padding(top = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Text(
+            stringResource(R.string.cases_archived_heading, count),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f).semantics { heading() },
+        )
+        Text(action, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -213,60 +208,35 @@ private fun CaseRow(
     onArchive: (String) -> Unit,
     onUnarchive: (String) -> Unit,
     onDelete: (CaseSummary) -> Unit,
+    onOpen: (String) -> Unit,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val created = formatCreatedDate(case.createdAt, locale, ZoneId.systemDefault())
         ?.let { stringResource(R.string.case_created_on, it) }
         ?: stringResource(R.string.case_created_unknown)
-    Row(
-        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(start = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(case.title, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                pluralStringResource(R.plurals.evidence_count, case.evidenceCount, case.evidenceCount) + " - " + created,
-                style = MaterialTheme.typography.bodyMedium,
+    SakshiCard(quiet = archived) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(
+                Modifier.weight(1f)
+                    .clickable(onClickLabel = stringResource(R.string.case_open), role = Role.Button) { onOpen(case.id) }
+                    .heightIn(min = Spacing.touchTarget + Spacing.lg)
+                    .padding(start = Spacing.lg, top = Spacing.md, bottom = Spacing.md),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+            ) {
+                Text(case.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                SupportingText(pluralStringResource(R.plurals.evidence_count, case.evidenceCount, case.evidenceCount) + " - " + created)
+            }
+            OverflowMenuButton(
+                contentDescription = stringResource(R.string.case_options, case.title),
+                items = listOf(
+                    MenuAction(stringResource(R.string.case_rename)) { onRename(case) },
+                    MenuAction(stringResource(if (archived) R.string.case_unarchive else R.string.case_archive)) {
+                        if (archived) onUnarchive(case.id) else onArchive(case.id)
+                    },
+                    MenuAction(stringResource(R.string.case_delete), destructive = true) { onDelete(case) },
+                ),
+                modifier = Modifier.padding(horizontal = Spacing.xs),
             )
         }
-        CaseMenu(
-            title = case.title,
-            archived = archived,
-            onRename = { onRename(case) },
-            onToggleArchive = { if (archived) onUnarchive(case.id) else onArchive(case.id) },
-            onDelete = { onDelete(case) },
-        )
-    }
-}
-
-@Composable
-private fun CaseMenu(title: String, archived: Boolean, onRename: () -> Unit, onToggleArchive: () -> Unit, onDelete: () -> Unit) {
-    var open by remember { mutableStateOf(false) }
-    Box {
-        val description = stringResource(R.string.case_options, title)
-        IconButton(
-            onClick = { open = true },
-            modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).semantics { contentDescription = description },
-        ) {
-            OverflowGlyph()
-        }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            DropdownMenuItem(text = { Text(stringResource(R.string.case_rename)) }, onClick = { open = false; onRename() })
-            DropdownMenuItem(
-                text = { Text(stringResource(if (archived) R.string.case_unarchive else R.string.case_archive)) },
-                onClick = { open = false; onToggleArchive() },
-            )
-            DropdownMenuItem(text = { Text(stringResource(R.string.case_delete)) }, onClick = { open = false; onDelete() })
-        }
-    }
-}
-
-/** Three vertical dots. Drawn directly because the icon library is not a dependency. */
-@Composable
-private fun OverflowGlyph() {
-    val colour = MaterialTheme.colorScheme.onSurfaceVariant
-    Canvas(Modifier.size(24.dp)) {
-        val radius = 2.dp.toPx()
-        listOf(5.dp, 12.dp, 19.dp).forEach { y -> drawCircle(colour, radius, Offset(size.width / 2, y.toPx())) }
     }
 }

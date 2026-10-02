@@ -1,10 +1,14 @@
 package org.sakshi.app
 
 import android.content.Context
+import java.time.Instant
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.sakshi.app.importing.ImportCoordinator
+import org.sakshi.app.importing.PickerGrace
+import org.sakshi.app.importing.ShareIntake
 import org.sakshi.app.onboarding.OnboardingStore
 import org.sakshi.app.onboarding.SharedPreferencesOnboardingStore
 import org.sakshi.app.session.AndroidDeviceSecurity
@@ -18,11 +22,23 @@ class AppContainer(
     val session: SessionController,
     val onboarding: OnboardingStore,
     val dispatchers: AppDispatchers,
+    val importCoordinator: ImportCoordinator,
+    val pickerGrace: PickerGrace,
+    val shareIntake: ShareIntake,
 ) {
     companion object {
         fun create(context: Context, scope: CoroutineScope = defaultScope()): AppContainer {
             val session = SessionController(KeystoreVaultOpener(context), AndroidDeviceSecurity(context), scope)
-            return AppContainer(session, SharedPreferencesOnboardingStore.create(context), AppDispatchers(Dispatchers.Main, Dispatchers.IO))
+            val dispatchers = AppDispatchers(Dispatchers.Main, Dispatchers.IO)
+            val coordinator = ImportCoordinator(Instant::now)
+            return AppContainer(
+                session = session,
+                onboarding = SharedPreferencesOnboardingStore.create(context),
+                dispatchers = dispatchers,
+                importCoordinator = coordinator,
+                pickerGrace = PickerGrace(scope, session::lock),
+                shareIntake = ShareIntake(coordinator, context.contentResolver, scope, dispatchers.io),
+            )
         }
 
         private fun defaultScope() = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)

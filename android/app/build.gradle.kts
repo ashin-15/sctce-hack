@@ -5,7 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-/** Fails the build when the merged manifest requests a permission that is not on the allowlist. */
+/**
+ * Fails the build when the merged manifest requests a permission that is not on the allowlist, or when a component
+ * other than the allowlisted ones is exported.
+ */
 abstract class VerifyManifestPermissions : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
@@ -13,6 +16,9 @@ abstract class VerifyManifestPermissions : DefaultTask() {
 
     @get:Input
     abstract val allowed: ListProperty<String>
+
+    @get:Input
+    abstract val allowedExported: ListProperty<String>
 
     @TaskAction
     fun verify() {
@@ -25,6 +31,14 @@ abstract class VerifyManifestPermissions : DefaultTask() {
         val unexpected = requested.filterNot { it in allowed.get() }
         check(unexpected.isEmpty()) { "Merged manifest requests permissions outside the allowlist: $unexpected" }
         requested.sorted().forEach { logger.lifecycle("uses-permission: $it") }
+        val exported = listOf("activity", "activity-alias", "service", "receiver", "provider").flatMap { tag ->
+            document.getElementsByTagName(tag).let { nodes ->
+                (0 until nodes.length).map { nodes.item(it) as org.w3c.dom.Element }
+            }
+        }.filter { it.getAttributeNS(namespace, "exported") == "true" }.map { it.getAttributeNS(namespace, "name") }
+        val unexported = exported.filterNot { it in allowedExported.get() }
+        check(unexported.isEmpty()) { "Merged manifest exports components outside the allowlist: $unexported" }
+        exported.sorted().forEach { logger.lifecycle("exported component: $it") }
     }
 }
 
@@ -42,6 +56,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     lint {
@@ -71,6 +86,9 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:integrity"))
     implementation(project(":core:vault"))
+    implementation(project(":acquisition:importer"))
+    implementation(project(":processing:analysis"))
+    implementation(project(":export:report"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -86,7 +104,7 @@ dependencies {
 }
 
 val verifyManifestPermissions = tasks.register<VerifyManifestPermissions>("verifyManifestPermissions") {
-    description = "Fails if the merged debug manifest requests a permission outside the allowlist."
+    description = "Fails if the merged debug manifest requests a permission or exports a component outside the allowlist."
     group = "verification"
     mergedManifest.set(layout.buildDirectory.file("intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml"))
     allowed.set(
@@ -94,6 +112,13 @@ val verifyManifestPermissions = tasks.register<VerifyManifestPermissions>("verif
             "android.permission.USE_BIOMETRIC",
             "android.permission.USE_FINGERPRINT",
             "org.sakshi.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        ),
+    )
+    allowedExported.set(
+        listOf(
+            "org.sakshi.app.MainActivity",
+            "org.sakshi.app.ShareTargetActivity",
+            "androidx.profileinstaller.ProfileInstallReceiver",
         ),
     )
     dependsOn("processDebugMainManifest")

@@ -1,0 +1,6804 @@
+{
+ "generated_by": "python3 android/tools/gen_rule_expectations.py <repo root> <output>; RULES read by ast from bench/adapters.py, Language.identify extracted by ast and exec-ed, any(k.casefold() in text.casefold()) replicated; fixtures are synthetic",
+ "rules": {
+  "insult": [
+   "worthless",
+   "idiot",
+   "बेकार",
+   "मूर्ख",
+   "bekaar",
+   "bewakoof",
+   "കൊള്ളില്ല",
+   "വിഡ്ഢി",
+   "kollilla",
+   "viddhi"
+  ],
+  "threat": [
+   "hurt you",
+   "not be safe",
+   "चोट",
+   "सुरक्षित नहीं",
+   "chot",
+   "safe nahi",
+   "ഉപദ്രവിക്കും",
+   "സുരക്ഷിതമാകില്ല",
+   "upadravikkum",
+   "safe aakilla"
+  ],
+  "sexual_harassment": [
+   "nude",
+   "sexual messages",
+   "नग्न",
+   "अश्लील",
+   "ashleel",
+   "നഗ്ന",
+   "അശ്ലീല",
+   "ashleela"
+  ],
+  "caste_religious_slur": [
+   "caste are dirty",
+   "religion makes you inferior",
+   "जाति",
+   "धर्म",
+   "jaati",
+   "dharm",
+   "ജാതി",
+   "മതം",
+   "jaathi",
+   "matham"
+  ],
+  "doxxing": [
+   "publish",
+   "प्रकाशित",
+   "പരസ്യമാക്കും"
+  ],
+  "coercive_control": [
+   "password",
+   "पासवर्ड",
+   "പാസ്‌വേഡ്"
+  ]
+ },
+ "rows": [
+  {
+   "id": "t00-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-0-7",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-1-7",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t00-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-3-7",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t00-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-4-7",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t00-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t00-5-7",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t01-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-1-7",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t01-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-3-7",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t01-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-4-7",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-5-7",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t02-0-7",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-1-7",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t02-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-2-7",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t02-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-3-7",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t02-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-4-7",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t02-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t02-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t03-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t03-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t03-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t04-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t05-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t05-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t06-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t06-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t06-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t07-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t07-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t07-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t07-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t07-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t08-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t08-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t09-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t09-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t10-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t10-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t10-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t10-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t11-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t11-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-3-0",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-1",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-2",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-3",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-4",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-5",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-3-6",
+   "split": "train",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t11-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-4-0",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-1",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-2",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-3",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-4",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-5",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-4-6",
+   "split": "train",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-5-0",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-1",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-2",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-3",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-4",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-5",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t12-5-6",
+   "split": "train",
+   "language": "mixed",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-0-0",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-1",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-2",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-3",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-4",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-5",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-0-6",
+   "split": "train",
+   "language": "en",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t13-1-0",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-1",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-2",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-3",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-4",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-5",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-1-6",
+   "split": "train",
+   "language": "hi",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-2-0",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-1",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-2",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-3",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-4",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-5",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t13-2-6",
+   "split": "train",
+   "language": "hinglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-0-0",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-1",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-2",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-3",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-4",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-5",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t01-0-6",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t04-1-0",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-1",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-2",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-3",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-4",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-5",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-1-6",
+   "split": "val",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t04-2-0",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-1",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-2",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-3",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-4",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-5",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-2-6",
+   "split": "val",
+   "language": "hinglish",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t04-3-0",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-1",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-2",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-3",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-4",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-5",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t04-3-6",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-0-0",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-1",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-2",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-3",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-4",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-5",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t05-0-6",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-3-0",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-1",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-2",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-3",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-4",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-5",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-3-6",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-0-0",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-1",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-2",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-3",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-4",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-5",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-0-6",
+   "split": "val",
+   "language": "en",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t08-5-0",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-1",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-2",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-3",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-4",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-5",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t08-5-6",
+   "split": "val",
+   "language": "mixed",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t09-3-0",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-1",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-2",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-3",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-4",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-5",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t09-3-6",
+   "split": "val",
+   "language": "ml",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-0",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-1",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-2",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-3",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-4",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-5",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t10-3-6",
+   "split": "val",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t11-0-0",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-1",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-2",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-3",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-4",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-5",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t11-0-6",
+   "split": "val",
+   "language": "en",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t12-1-0",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-1",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-2",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-3",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-4",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-5",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t12-1-6",
+   "split": "val",
+   "language": "hi",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "hi"
+  },
+  {
+   "id": "t13-4-0",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t13-4-1",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t13-4-2",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t13-4-3",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t13-4-4",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t13-4-5",
+   "split": "val",
+   "language": "manglish",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "manglish"
+  },
+  {
+   "id": "t00-2-0",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-1",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-2",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-3",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-4",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-5",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t00-2-6",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-0",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-1",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-2",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-3",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-4",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-5",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t01-2-6",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "insult"
+   ],
+   "rule_labels": [
+    "insult"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-0",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-1",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-2",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-3",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-4",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-5",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t03-5-6",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "threat"
+   ],
+   "rule_labels": [
+    "threat"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t05-1-0",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-1",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-2",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-3",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-4",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-5",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-1-6",
+   "split": "test",
+   "language": "hi",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "hi"
+  },
+  {
+   "id": "t05-3-0",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-1",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-2",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-3",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-4",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-5",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t05-3-6",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "sexual_harassment"
+   ],
+   "rule_labels": [
+    "sexual_harassment"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t06-0-0",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-1",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-2",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-3",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-4",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-5",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t06-0-6",
+   "split": "test",
+   "language": "en",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t07-3-0",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-1",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-2",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-3",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-4",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-5",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t07-3-6",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "caste_religious_slur"
+   ],
+   "rule_labels": [
+    "caste_religious_slur"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t08-2-0",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-1",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-2",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-3",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-4",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-5",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t08-2-6",
+   "split": "test",
+   "language": "hinglish",
+   "gold": [
+    "doxxing"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "hinglish"
+  },
+  {
+   "id": "t09-5-0",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-1",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-2",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-3",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-4",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-5",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t09-5-6",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "coercive_control"
+   ],
+   "rule_labels": [
+    "coercive_control"
+   ],
+   "identify": "en"
+  },
+  {
+   "id": "t10-4-0",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-1",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-2",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-3",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-4",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-5",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t10-4-6",
+   "split": "test",
+   "language": "manglish",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "manglish"
+  },
+  {
+   "id": "t12-3-0",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-1",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-2",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-3",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-4",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-5",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t12-3-6",
+   "split": "test",
+   "language": "ml",
+   "gold": [],
+   "rule_labels": [],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-0",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-1",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-2",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-3",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-4",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-5",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-3-6",
+   "split": "test",
+   "language": "ml",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "ml"
+  },
+  {
+   "id": "t13-5-0",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-5-1",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-5-2",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-5-3",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-5-4",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing"
+   ],
+   "identify": "mixed"
+  },
+  {
+   "id": "t13-5-5",
+   "split": "test",
+   "language": "mixed",
+   "gold": [
+    "doxxing",
+    "threat"
+   ],
+   "rule_labels": [
+    "doxxing",
+    "threat"
+   ],
+   "identify": "mixed"
+  }
+ ]
+}

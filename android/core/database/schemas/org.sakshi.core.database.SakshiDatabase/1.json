@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c9074e2b5c764fce1e9b685e02fa8529",
+    "identityHash": "9df0603915cec7c754f99e2b13bb0921",
     "entities": [
       {
         "tableName": "case_file",
@@ -1060,7 +1060,7 @@
       },
       {
         "tableName": "evidence_anchor",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `reference_id` TEXT NOT NULL, `artifact_id` TEXT NOT NULL, `evidence_id` TEXT, `derivative_id` TEXT, `sha256` TEXT NOT NULL, `representation` TEXT NOT NULL, `locator_kind` TEXT NOT NULL, `start_cp` INTEGER, `end_cp` INTEGER, `start_ms` INTEGER, `end_ms` INTEGER, `page_index` INTEGER, `region_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`region_id`) REFERENCES `region`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `reference_id` TEXT NOT NULL, `artifact_id` TEXT NOT NULL, `evidence_id` TEXT, `derivative_id` TEXT, `sha256` TEXT, `representation` TEXT NOT NULL, `locator_kind` TEXT NOT NULL, `start_cp` INTEGER, `end_cp` INTEGER, `start_ms` INTEGER, `end_ms` INTEGER, `page_index` INTEGER, `region_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1105,8 +1105,7 @@
           {
             "fieldPath": "sha256",
             "columnName": "sha256",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "representation",
@@ -1186,15 +1185,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_anchor_derivative_id` ON `${TABLE_NAME}` (`derivative_id`)"
-          },
-          {
-            "name": "index_evidence_anchor_region_id",
-            "unique": false,
-            "columnNames": [
-              "region_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_anchor_region_id` ON `${TABLE_NAME}` (`region_id`)"
           }
         ],
         "foreignKeys": [
@@ -1228,17 +1218,6 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "derivative_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "region",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "region_id"
             ],
             "referencedColumns": [
               "id"
@@ -2557,7 +2536,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c9074e2b5c764fce1e9b685e02fa8529')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9df0603915cec7c754f99e2b13bb0921')"
     ]
   }
 }

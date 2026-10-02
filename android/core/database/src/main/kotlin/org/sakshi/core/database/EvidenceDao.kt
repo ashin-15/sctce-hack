@@ -17,6 +17,12 @@ public data class EvidenceListItem(
     @ColumnInfo(name = "support_state") val supportState: String,
 )
 
+/** Where an evidence item's encrypted file is, without the wrapped key. */
+public data class BlobPathRow(
+    @ColumnInfo(name = "evidence_id") val evidenceId: String,
+    val path: String,
+)
+
 /** Access to evidence, its blob record, capture metadata and processing state. */
 @Dao
 public abstract class EvidenceDao {
@@ -54,6 +60,18 @@ public abstract class EvidenceDao {
 
     @Query("SELECT * FROM capture_metadata WHERE evidence_id = :evidenceId")
     public abstract suspend fun getMetadata(evidenceId: String): CaptureMetadataEntity?
+
+    @Query("SELECT evidence_id, path FROM evidence_blob ORDER BY evidence_id")
+    public abstract suspend fun getAllBlobPaths(): List<BlobPathRow>
+
+    @Query(
+        "SELECT b.path FROM evidence_blob b JOIN evidence e ON e.id = b.evidence_id " +
+            "WHERE e.case_id = :caseId ORDER BY b.path",
+    )
+    public abstract suspend fun getBlobPathsForCase(caseId: String): List<String>
+
+    @Query("SELECT id FROM evidence WHERE case_id = :caseId")
+    public abstract suspend fun getIdsForCase(caseId: String): List<String>
 
     @Query("SELECT * FROM evidence_state WHERE evidence_id = :evidenceId")
     public abstract suspend fun getState(evidenceId: String): EvidenceStateEntity?

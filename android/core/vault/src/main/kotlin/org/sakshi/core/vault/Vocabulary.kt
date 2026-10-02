@@ -3,6 +3,7 @@ package org.sakshi.core.vault
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import org.sakshi.core.database.SupportState
 
 /** Values of `evidence.acquisition_kind`. */
 public object AcquisitionKind {
@@ -24,6 +25,17 @@ public object AccessClass {
 
     internal val all: Set<String> = setOf(USER_MEDIATED, NOTIFICATION_OBSERVATION)
 }
+
+/** Every [SupportState] value. */
+internal val SUPPORT_STATES: Set<String> = setOf(
+    SupportState.SAVED,
+    SupportState.ANALYSIS_PENDING,
+    SupportState.ANALYZED,
+    SupportState.PARTIAL,
+    SupportState.UNSUPPORTED,
+    SupportState.UNAVAILABLE,
+    SupportState.FAILED,
+)
 
 /** `evidence.retention_mode` for evidence the user explicitly saved. */
 internal const val RETENTION_CONFIRMED_VAULT: String = "confirmed_vault"

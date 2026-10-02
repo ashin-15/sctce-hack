@@ -2,33 +2,40 @@ package org.sakshi.app.onboarding
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
+import org.sakshi.app.ui.components.PrimaryButton
+import org.sakshi.app.ui.components.SakshiScaffold
+import org.sakshi.app.ui.components.ScreenTitle
+import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.theme.Spacing
 
+/** The three plain sections the user reads once. The button stays at the bottom; the text scrolls above it. */
 @Composable
 fun OnboardingScreen(onAcknowledge: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 16.dp)) {
+    SakshiScaffold(
+        title = null,
+        modifier = modifier,
+        bottomBar = {
+            PrimaryButton(
+                stringResource(R.string.onboarding_acknowledge),
+                onAcknowledge,
+                Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
+            )
+        },
+    ) {
         Column(
-            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            Modifier.verticalScroll(rememberScrollState()).padding(horizontal = Spacing.gutter, vertical = Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl),
         ) {
-            Text(stringResource(R.string.onboarding_title), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.semantics { heading() })
+            ScreenTitle(stringResource(R.string.onboarding_title))
             Section(R.string.onboarding_does_heading, listOf(R.string.onboarding_does_body))
             Section(R.string.onboarding_cannot_heading, listOf(R.string.onboarding_cannot_body))
             Section(
@@ -41,17 +48,13 @@ fun OnboardingScreen(onAcknowledge: () -> Unit, modifier: Modifier = Modifier) {
                 ),
             )
         }
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = onAcknowledge, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-            Text(stringResource(R.string.onboarding_acknowledge))
-        }
     }
 }
 
 @Composable
 private fun Section(heading: Int, paragraphs: List<Int>) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(stringResource(heading), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        SectionHeader(stringResource(heading))
         paragraphs.forEach { Text(stringResource(it), style = MaterialTheme.typography.bodyLarge) }
     }
 }

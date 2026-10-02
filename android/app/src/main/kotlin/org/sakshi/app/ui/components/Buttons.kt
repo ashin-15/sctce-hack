@@ -1,0 +1,72 @@
+package org.sakshi.app.ui.components
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import org.sakshi.app.ui.theme.Spacing
+
+private fun Modifier.target(): Modifier = heightIn(min = Spacing.touchTarget).widthIn(min = Spacing.touchTarget)
+
+@Composable
+private fun Label(text: String) = Text(text, textAlign = TextAlign.Center)
+
+/** The one main action of a screen: filled with the plum ink colour, full width by default. */
+@Composable
+fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth().target(),
+        enabled = enabled,
+        shape = MaterialTheme.shapes.medium,
+    ) { Label(text) }
+}
+
+/** An alternative action: outlined, no fill. */
+@Composable
+fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.target(),
+        enabled = enabled,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(
+            1.dp,
+            if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) { Label(text) }
+}
+
+/** A low-emphasis action that is only text. */
+@Composable
+fun QuietTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    TextButton(onClick = onClick, modifier = modifier.target(), enabled = enabled, shape = MaterialTheme.shapes.medium) {
+        Label(text)
+    }
+}
+
+/** An action that removes something. Outlined, never filled red: the word on the button does the work. */
+@Composable
+fun DestructiveButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.target(),
+        enabled = enabled,
+        shape = MaterialTheme.shapes.medium,
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+        border = BorderStroke(
+            1.dp,
+            if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) { Label(text) }
+}

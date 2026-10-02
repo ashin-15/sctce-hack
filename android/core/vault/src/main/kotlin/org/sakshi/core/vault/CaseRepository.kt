@@ -1,19 +1,19 @@
 package org.sakshi.core.vault
 
 import androidx.room.withTransaction
-import androidx.sqlite.db.SimpleSQLiteQuery
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.sakshi.core.database.CaseEntity
 import org.sakshi.core.database.CaseStatus
 import org.sakshi.core.database.SakshiDatabase
-import org.sakshi.core.database.SakshiSchema
 
 /** A case with the number of evidence items it holds. */
 public data class CaseSummary(
@@ -60,12 +60,13 @@ public class CaseRepository(
     /**
      * Deletes the case and everything it owns. Rows go first, in one transaction with the audit record, so the
      * wrapped keys are destroyed even if a file cannot be removed; leftover files are found by [OrphanSweeper].
+     * Once the rows are gone the files are removed even if the caller is cancelled meanwhile; the cancellation
+     * is then rethrown.
      */
     public suspend fun delete(caseId: String) {
         val paths = database.withTransaction {
             val found = requireNotNull(database.caseDao().get(caseId)) { "Unknown case" }
-            val evidenceDao = database.evidenceDao()
-            val collected = evidenceDao.observeForCase(found.id).first().mapNotNull { evidenceDao.getBlob(it.id)?.path }
+            val collected = database.evidenceDao().getBlobPathsForCase(found.id)
             database.caseDao().delete(found.id)
             audit.append(
                 AuditActions.CASE_DELETED,
@@ -75,13 +76,15 @@ public class CaseRepository(
             )
             collected
         }
-        withContext(dispatcher) { paths.forEach(blobs::delete) }
+        withContext(NonCancellable + dispatcher) { paths.forEach(blobs::delete) }
+        currentCoroutineContext().ensureActive()
     }
 
     /** Emits every case, newest first, whenever cases or evidence change. */
     public fun observe(): Flow<List<CaseSummary>> =
-        database.invalidationTracker.createFlow(SakshiSchema.CASE_FILE, SakshiSchema.EVIDENCE)
-            .map { withContext(dispatcher) { summaries() } }
+        database.caseDao().observeWithEvidenceCounts().map { rows ->
+            rows.map { CaseSummary(it.id, it.title, it.status, it.createdAt, it.evidenceCount) }
+        }
 
     private suspend fun update(caseId: String, action: String, change: (CaseEntity) -> CaseEntity) {
         database.withTransaction {
@@ -92,15 +95,6 @@ public class CaseRepository(
         }
     }
 
-    private fun summaries(): List<CaseSummary> =
-        database.query(SimpleSQLiteQuery(SUMMARY_SQL)).use { cursor ->
-            buildList {
-                while (cursor.moveToNext()) {
-                    add(CaseSummary(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4)))
-                }
-            }
-        }
-
     private fun validTitle(title: String): String {
         val clean = title.trim()
         require(clean.length in 1..MAX_TITLE_LENGTH) { "Title must be 1..$MAX_TITLE_LENGTH characters" }
@@ -110,9 +104,5 @@ public class CaseRepository(
     public companion object {
         public const val MAX_TITLE_LENGTH: Int = 120
         private const val SUBJECT_TYPE = "case"
-        private val SUMMARY_SQL =
-            "SELECT c.id, c.title, c.status, c.created_at, " +
-                "(SELECT COUNT(*) FROM ${SakshiSchema.EVIDENCE} e WHERE e.case_id = c.id) " +
-                "FROM ${SakshiSchema.CASE_FILE} c ORDER BY c.created_at DESC, c.id"
     }
 }
