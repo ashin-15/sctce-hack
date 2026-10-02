@@ -165,6 +165,30 @@ def report():
     winner = f"Best fixture macro-F1 among executed baselines: {best['candidate']} ({best['quality_value']:.4f}). This is not a validated real-world or Android winner." if best else 'No classifier measurements yet.'
     recommendation = f'''# Sakshi recommendation — provisional, not a final stack ranking
 
+## Current MVP decision — engineering recommendation, not a benchmark winner
+
+| Component | Proposed choice |
+|---|---|
+| App | Kotlin + Jetpack Compose |
+| Import | Explicit share sheet, system picker/SAF, and WhatsApp export parser |
+| OCR | Bundled ML Kit Latin/Devanagari; Tesseract mal fallback for Malayalam |
+| STT | whisper.cpp base q5_1; editable/manual transcript fallback |
+| Classifier | Multilingual MiniLM embeddings plus a multi-label logistic-regression head; ONNX int8 after validation; rules-assisted highlighting |
+| Language | Script/language hints; preserve original text; do not automatically rewrite transliteration until downstream benefit is measured |
+| Extraction/summary | Source-bound fields and template summaries; no LLM in the first release |
+| Linking | User-confirmed sender identity plus configurable time-window rules |
+| Storage | Room + SQLCipher; database key protected by Android Keystore |
+| Integrity | SHA-256 hashes of originals plus an append-only chain and an anchored/signed export root |
+| PDF | Android PdfDocument with locally bundled, appropriately licensed Indic-capable fonts; visual shaping validation required |
+| Queue | WorkManager plus persistent resumable job state |
+| Export | Mandatory user confirmation of quotes, sender, dates and incidents |
+
+Proposed cascade: import -> hash originals -> serial OCR/STT -> classify every message -> suggest source-bound fields -> link -> user review -> PDF. Preserve unflagged evidence and originals separately from derived outputs. Bundle or explicitly provision models before offline jobs; no inference-time cloud fallback or implicit asset download.
+
+These exact Android choices have not been benchmarked. Desktop faster-whisper base is not evidence for whisper.cpp q5_1, and the measured TF-IDF/rules results are not evidence for MiniLM. Do not deploy a reliable-harassment-detector claim from the current fourteen-template synthetic corpus. Until broader native-language validation exists, ship manual import/review, rules-assisted highlighting, verified verbatim quotes, encrypted storage and template reports.
+
+Later experiment: Qwen2.5-1.5B-Instruct Q4_K_M via llama.cpp, with JSON-schema constraints and exact-source quote checks. This candidate is untested here, not a selected winner. Keep it out of the MVP unless extraction gains justify measured native RAM, latency, faithfulness and thermal costs. Notification monitoring, screen capture and automatic identity matching stay out of the default first-release path.
+
 ## Evidence boundary
 
 {winner}
