@@ -84,3 +84,10 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Sender/timestamp substring-presence proxies were 1.0 on these fixtures, but exact structured metadata parsing is not established. Source text includes visible UI labels; font shaping and labels still require native-speaker review.
 - Remeasured count-bound Merkle v2 on 10,000 synthetic entries with a successful valid verification and failed one-byte-tampered verification, using one warmup and five repeats. New rows retain the variant identifier and source hashes; legacy rows remain historical.
 - The publication audit now summarizes fifteen full applicable-data candidates. Full sixty-clip faster-whisper base without/with Silero VAD and the proxy pipeline are still running or pending, not completed at this milestone. Weighted ranking, Android energy/thermal results and the five actual requested stacks remain unavailable.
+
+## Recommendation and progress handoff
+
+- Recorded the proposed lean no-LLM Android MVP, its manual-review fallback, and a later untested Qwen2.5-1.5B Q4 experiment in RECOMMENDATION.md. Each proposal is explicitly distinguished from measured candidates; the report generator preserves this decision section.
+- At this publication checkpoint, the full sixty-clip faster-whisper base run without VAD completed its warmup and three of five timed batches. Observed completed-batch elapsed times were 800.053, 338.818 and 405.267 seconds. These partial observations are not a final median/p95 or a completion-time estimate. The full VAD run remains queued.
+- Committed measured CSVs, plots, trial records, candidate inventory, data manifests, licence/provenance notes, weaknesses, source/runtime hashes, and fixed benchmark code. Model/audio/image binaries and Python environments remain excluded and are recreated by preparation commands.
+- Still open: the full requested neural/embedding/LLM/export/runtime matrix, natural code-mixed speech, native-speaker adjudication, native Android/energy/thermal tests, actual stacks A–E and a defensible final weighted ranking. Missing implementation is not recorded as a model-unavailable skip.
