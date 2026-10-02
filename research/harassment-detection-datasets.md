@@ -2,6 +2,10 @@
 
 Research date: 2 October 2026. Deliverables A-G. Scope: a privacy-first Android evidence organizer using compact local classifiers, user review, and a separate temporal engine. Laya integration remains deferred.
 
+**Completion verification:** the supplied CSV was re-counted without modification; all 41 source keys resolve and all three comparison tables contain D01-D39. MACD, DravidianCodeMix, ICHCL, SafeCity and InViS statistics were spot-checked against primary sources. Section E4 reconciles the research proposal with the temporal event contract. Reproduction commands, source checks and limitations are recorded in `research/verification/datasets-README.md`. This is research completion, not collection, training or Android validation.
+
+**Current language scope:** English, Malayalam and Hindi, including Manglish, Hinglish, native scripts, Romanized text, slang and code mixing involving these languages, per the 2 October 2026 project decision. Other language rows remain comparative research and future scope; their presence does not expand the current pilot or model requirements.
+
 ## Executive decision
 
 **Use a portfolio, not one universal harassment dataset.** Public resources are useful for recognizing abusive text, identity-targeted hate, threat language, and gendered abuse. A smaller subset supplies reply context or session timestamps. None of the resources verified here establishes a ready-to-use benchmark for multilingual Indian private-chat harassment with long-term boundary violations, coercive control, escalation, and original-to-derived multimodal evidence links.
@@ -331,8 +335,8 @@ Use four independent, explicitly named tracks. Public availability and artificia
 
 These are proposed annotation-workload targets, not existing sample counts or a power-certified safety dataset:
 
-- First rubric pilot: 240 conversation windows, 30 per priority language/form: English, Malayalam, Hindi, Tamil, Telugu, Kannada, Bengali and Hinglish. Explicitly include native/Romanized/mixed forms inside Indic strata. Include Marathi in a later separate 30-window pilot if enabled.
-- First authored benchmark: 100 scenario families per priority stratum, each with one behavior-positive and one closely matched benign/ambiguous contrast: 1,600 fictional sequences total. Reserve at least 20% families for evaluator-owned tests; assign before writing/LLM variation, and keep family translations together.
+- First rubric pilot: 240 conversation windows, 40 per diagnostic stratum: English, native-script Malayalam, Manglish, native-script Hindi, Hinglish, and mixed-script/code-mixed English-Malayalam-Hindi. Assign one primary stratum per window and retain overlapping language/script tags. These sampling bins are not six independent languages. Tamil, Telugu, Kannada, Bengali and Marathi remain future scope.
+- First authored benchmark: 100 scenario families per current stratum, each with one behavior-positive and one closely matched benign/ambiguous contrast: 1,200 fictional sequences total across six strata. Reserve at least 20% families for evaluator-owned tests; assign before writing/LLM variation, and keep family translations together. These are proposed counts, not generated data.
 - First real-data feasibility target: approximately 200 independently consented cases overall, with language/form strata recorded. This is a feasibility target, **not enough to certify rare-label performance in each language**. If safe recruitment fails, remain at authored/staged demonstration and explicitly do not claim validated real-world detection.
 - First extraction fixtures: 25 screenshot layouts and 20 adult-recorded voice-note segments per language/form, with held-out devices/fonts/speakers. Reuse of the same scripted dialogue counts as a derivative family, not independent samples.
 - Expansion: prioritize rare behavior/context combinations after annotation/error audits. Recruit more independent dyads rather than hundreds of extra messages from one person. Language/label coverage and confidence-interval width, not an attractive total row count, determine readiness.
@@ -349,13 +353,13 @@ These are proposed annotation-workload targets, not existing sample counts or a 
 | DatasetRelease | `dataset_id:string`, `schema_version:string`, `revision:string`, `ontology_version:string`, `source_manifest:list`, `rights_status:enum`, `terms_hash:string`, `artifact_hash:string`, `created_at:UTC` | Freeze data, mapping and terms; `rights_status` unresolved/research_only/product_cleared; do not mix rights classes silently |
 | Case | `case_id:string`, `origin_kind:enum`, `source_dataset:string?`, `source_record_ids:list`, `split_group_id:string`, `language_tags:list`, `region_context:string?`, `setting:enum`, `observation_scope:enum`, `consent_ref:string?` | R/public_observed, R/consented_real, historical_decoy, human_authored_fiction, llm_synthetic, staged_fixture, mixed, unknown. Unknown cannot enter validated real gold |
 | Participant | `participant_id:string`, `case_id:string`, `role_annotations:list`, `relationship_report:object?`, `identity_link_status:enum` | Opaque per-case IDs; roles are annotations with evidence and uncertainty, not immutable identities. Cross-case links only under separate consent; protected demographics optional/consented |
-| Event | `event_id:string`, `case_id:string`, `session_id:string?`, `actor_id:string?`, `recipient_ids:list`, `reply_to_event_id:string?`, `sequence_index:int`, `source_time:object`, `observed_at:UTC?`, `available_from:UTC?`, `channel:enum`, `source_evidence_ids:list` | `source_time` stores value, precision, timezone, origin and uncertainty; separate event occurrence from device capture and availability. Do not invent exact timestamps |
+| Event | `event_id:string`, `case_id:string`, `revision:int`, `session_id:string?`, `actor_id:string?`, `recipient_ids:list`, `reply_to_event_id:string?`, `sequence_index:int`, `source_time:object`, `observed_at:UTC?`, `available_at:UTC?`, `channel:enum`, `source_evidence_ids:list` | `source_time` stores earliest/latest bounds, precision, timezone, basis and uncertainty; separate event occurrence from capture and availability. Revision is immutable; null research availability is not permission to use future annotations |
 | Observation | `observation_id:string`, `event_id:string?`, `acquisition_method:enum`, `visible_text:string?`, `truncation:enum`, `missing_modalities:list`, `redactions:list`, `dedup_group_id:string?` | Supported notification/share/SAF/manual-reported/staged. Multiple notifications can be one event; redacted text is unknown, not benign |
 | EvidenceAsset | `evidence_id:string`, `media_type:string`, `encrypted_reference:string`, `sha256:string`, `rights_ref:string`, `privacy_tier:enum`, `source_status:enum`, `parent_ids:list` | Encrypted private original/reference; report/notification/screenshot distinctions. Research release excludes originals by default and does not expose reversible local paths |
 | Derivative | `derivative_id:string`, `evidence_id:string`, `kind:enum`, `text:string?`, `tool_version:string`, `language_segments:list`, `alignment_map:list`, `quality:object`, `transform_family_id:string` | OCR/transcript/normalization/transliteration/translation. Native originals immutable. Map char offsets to OCR boxes, audio/video intervals; retain extraction uncertainty |
-| BehaviorAnnotation | `annotation_id:string`, `event_ids:list`, `as_of_event_id:string`, `label:string`, `status:enum`, `epistemic_kind:enum`, `speaker_stance:enum`, `evidence_anchors:list`, `context_event_ids:list`, `missing_context:list`, `annotator_id:string`, `rubric_version:string` | status present/absent/insufficient_context/not_applicable/unannotated. epistemic observed_text/inferred_behavior/supported_pattern/unknown. speaker stance enacted/endorsed/quoted/reported/rejected/unclear |
-| BoundaryAnnotation | `boundary_id:string`, `as_of_event_id:string`, `boundary_kind:string`, `status:enum`, `evidence_anchors:list`, `source_kind:enum` | Refusal/stop-contact request/consent withdrawal, direct evidence vs user report. Silence not consent and not proof of refusal either |
-| PatternAnnotation | `pattern_id:string`, `case_id:string`, `as_of_event_id:string`, `window:object`, `label:string`, `event_ids:list`, `boundary_ids:list`, `observation_completeness:enum`, `change_points:list`, `unknown_factors:list` | Requires multiple distinct events where repetition is claimed; dedup groups excluded. Record partial/no-complete-history rather than asserting exhaustiveness |
+| BehaviorAnnotation | `annotation_id:string`, `revision:int`, `available_at:UTC?`, `event_ids:list`, `as_of_event_id:string`, `label:string`, `status:enum`, `epistemic_kind:enum`, `speaker_stance:enum`, `evidence_anchors:list`, `context_event_ids:list`, `missing_context:list`, `annotator_id:string`, `rubric_version:string` | status present/absent/insufficient_context/not_applicable/unannotated. epistemic observed_text/inferred_behavior/supported_pattern/unknown. speaker stance enacted/endorsed/quoted/reported/rejected/unclear. Prefix scope and annotation availability are separate |
+| BoundaryAnnotation | `boundary_id:string`, `revision:int`, `available_at:UTC?`, `as_of_event_id:string`, `boundary_kind:string`, `status:enum`, `evidence_anchors:list`, `source_kind:enum`, `communication_status:enum`, `actor_id:string?` | Refusal/stop-contact request/consent withdrawal, direct evidence vs user report. Match temporal communication states supported_by_selected_evidence/user_reported/not_communicated/unknown/not_applicable. Private disengagement is not a communicated stop request |
+| PatternAnnotation | `pattern_id:string`, `revision:int`, `available_at:UTC?`, `case_id:string`, `as_of_event_id:string`, `window:object`, `label:string`, `event_ids:list`, `boundary_ids:list`, `observation_completeness:enum`, `change_points:list`, `unknown_factors:list` | Requires multiple distinct events where repetition is claimed; duplicate representations excluded. Possible duplicates remain uncertain; record partial/no-complete-history rather than asserting exhaustiveness |
 | AnnotationReview | `review_id:string`, `annotation_id:string`, `independent_responses:list`, `adjudication:object?`, `skip_reason:string?`, `agreement_summary:object` | Preserve disagreement, annotator skip rights, distinction between adjudicated labels and a user's app confirmation |
 | ArtificialProvenance | `author_or_generator:string?`, `generator_revision:string?`, `prompt_template_id:string?`, `prompt_hash:string?`, `parameters:object?`, `seed:string?`, `scenario_family_id:string`, `human_edits:list`, `is_time_fabricated:boolean` | Required for H/L/staged. A reviewed synthetic record never becomes R through editing |
 | SplitAssignment | `split:enum`, `case_group:string`, `participant_group:string?`, `duplicate_cluster:string`, `source_family:string`, `scenario_family:string?`, `split_protocol_version:string` | Train/development/calibration/test/diagnostic/quarantine. Entire linked families remain one partition |
@@ -393,9 +397,9 @@ Initial pattern labels:
 
 An escalation label describes a retrospective change **supported by supplied observations up to that prefix**, not future danger. Do not define a universal ladder where insults automatically progress to violence. Missing contact, silence, refusal, channel changes and source completeness affect what can be concluded.
 
-## E3. Illustrative valid record
+## E3. Illustrative research record
 
-This is a **human-authored fictional structural example**, not an incident or dataset row already collected. Non-sensitive text avoids reproducing real survivor evidence. Nulls mean not available, not invented.
+This is a **human-authored fictional structural example**, not an incident or dataset row already collected. It illustrates a research case envelope; it is not a complete record under `data/sakshi-event-schema.json` or a validated production interchange format. Non-sensitive text avoids reproducing real survivor evidence. Nulls mean not available, not invented.
 
 ```json
 {
@@ -409,30 +413,44 @@ This is a **human-authored fictional structural example**, not an incident or da
   "events": [
     {
       "event_id": "event-001",
+      "revision": 1,
+      "observed_at": null,
+      "available_at": null,
       "actor_id": "person-a",
       "recipient_ids": ["person-b"],
       "sequence_index": 0,
-      "source_time": {"value": null, "precision": "unknown", "origin": "fiction"},
+      "source_time": {"earliest": null, "latest": null, "basis": "unknown", "precision": "unknown", "source_timezone": null},
+      "derivative_id": "fiction-text-001-v1",
       "text": "Please stop contacting me."
     },
     {
       "event_id": "event-002",
+      "revision": 1,
+      "observed_at": null,
+      "available_at": null,
       "actor_id": "person-b",
       "recipient_ids": ["person-a"],
       "sequence_index": 1,
-      "source_time": {"value": null, "precision": "unknown", "origin": "fiction"},
+      "source_time": {"earliest": null, "latest": null, "basis": "unknown", "precision": "unknown", "source_timezone": null},
+      "derivative_id": "fiction-text-002-v1",
       "text": "Understood. I will not contact you again."
     }
   ],
   "annotations": [
     {
+      "annotation_id": "fiction-annotation-001",
+      "revision": 1,
+      "available_at": null,
       "label": "contact_boundary_statement",
       "status": "present",
       "epistemic_kind": "observed_text",
       "as_of_event_id": "event-001",
-      "evidence_anchors": [{"event_id": "event-001", "start": 0, "end": 26}]
+      "evidence_anchors": [{"event_id": "event-001", "derivative_id": "fiction-text-001-v1", "start": 0, "end": 26, "unit": "unicode_code_points"}]
     },
     {
+      "annotation_id": "fiction-annotation-002",
+      "revision": 1,
+      "available_at": null,
       "label": "contact_after_explicit_boundary",
       "status": "insufficient_context",
       "epistemic_kind": "unknown",
@@ -444,6 +462,43 @@ This is a **human-authored fictional structural example**, not an incident or da
 ```
 
 The example does not turn a one-turn acknowledgement into continued harassment or assert that no future contact occurred. A fuller benign sequence can document respected boundaries within a specified observation window.
+
+## E4. Reconciliation with the temporal event contract
+
+`data/sakshi-event-schema.json` is the proposed **single-event version-1 contract**. Section E is a **research case/release envelope**, with independent annotations, governance, splits and provenance. They serve different purposes; neither is an implemented Android database. Future adapters must validate complete event records with date-time format checking, then enforce the application invariants in temporal-report section 6.4. The E3 example intentionally cannot be imported directly as a version-1 event.
+
+The following covers all 20 required top-level event fields. Keep the richer research fields outside the event object, whose schema rejects additional properties.
+
+| Temporal target | Research source / adapter obligation |
+|---|---|
+| `schema_version` | Set integer `1` for a validated temporal event; retain `sakshi-research-0.1-proposed` on the research envelope, not this field |
+| `event_id` | Map the research event to a stable case-scoped ID with immutable source-row lineage |
+| `case_id` | Preserve the selected case scope; forbid cross-case event links and implicit participant merges |
+| `revision` | Map an immutable event revision; retain independently versioned annotation/review dependencies |
+| `event_kind` | Classify contact observation, boundary, note, reported external event or notification lifecycle from provenance. Mentioned acts and lifecycle callbacks do not become extra contacts |
+| `observed_at` | Actual supported capture/import time. Null research capture requires a recorded importer observation time, never a fabricated historic observation |
+| `available_at` | First availability of this revision to analysis, separate from source time and review time. Rename the earlier proposal's `available_from` to this shared name |
+| `timestamp` | Map `source_time` bounds/basis/precision/timezone plus clock-session metadata where supported. Unknown times remain null bounds with unknown basis/precision; sequence index is order, not a clock |
+| `sender` | Case-scoped participant association with explicit identity basis/review; dataset IDs and display names are not authenticated identities |
+| `source` | Supported acquisition kind, source-app/profile/conversation claims, original record ID and parser version. External dataset lineage stays in the research manifest |
+| `direction` | Derive incoming/outgoing/system only relative to the selected case owner and supplied source; otherwise unknown |
+| `categories` | Versioned partial mapping from behavior annotations; preserve unmapped labels, stance and absent/unannotated/insufficient-context states in the research envelope. Do not turn every unmapped annotation into `ordinary` |
+| `severity` | Explicit review priority/basis, unknown unless supplied under app policy or user review. Research threat/gold labels never create a danger score |
+| `evidence_references` | Resolve original or derivative assets, representation and owned locator. Hash actual retained bytes when available; never use a made-up digest as integrity proof |
+| `user_confirmation` | App user's actual decision, scope and review time. Research annotation/adjudication is not user confirmation; default pending/not_reviewed when no app review occurred |
+| `deduplication` | Explicit source-supported distinct/same-representation/possible-duplicate/lifecycle status, canonical target and method version. Equal text or hash alone is insufficient |
+| `coverage` | Observation scope, truncation/extraction status, outgoing coverage and gap refs. A complete research file is not necessarily complete conversation history |
+| `boundary` | Marker, affected actor, review, unwantedness and communication status. Private disengagement cannot support "sender ignored a communicated stop request"; resumption/limited contact keeps its reviewed scope |
+| `relationship_to_previous_events` | Source-explicit reply/quote links and reviewed/rule candidates with basis and confidence semantics. Pattern gold is a separate annotation, not proof of sender intent |
+| `retention` | Current authorized app retention, candidate expiry and consent generation. Research release rights or donation consent do not imply confirmed-vault preservation |
+
+**Availability and leakage:** `as_of_event_id` limits the evidence prefix; it does not establish when a label became available. Every annotation/review revision needs its own `available_at` or actual review time before it can enter an online run. Unknown research availability permits retrospective evaluation with declared scope, not an invented online detection history. Import time is not original message time. Artificial replay clocks must remain explicitly fictional. Revisions arriving later must not rewrite earlier outputs; retrospective recomputation can use them while preserving detection history.
+
+**Partial label mapping:** person-directed degradation may propose `verbal_abuse`; reviewed speaker-originated explicit harm wording may propose `explicit_threat`; autonomy-restricting demands may propose `controlling_request`; exposure indicators may propose `privacy_exposure_indicator`. These are conditional suggestions with source spans, not automatic equivalences. Quoted/reported/rejected content, sexualized wording without unwantedness, and missing context need separate review or abstention. Uncalibrated model scores remain uncalibrated; a manual annotation receives no invented probability. Pattern labels stay in PatternAnnotation and temporal result records, not message categories.
+
+**Provenance and governance:** R/D/H/L/U, split families, rights, consent and annotation gold stay in the research envelope. A staged fixture can additionally be H or L; fixture purpose never overwrites origin. Mixed-origin cases retain per-event/derivative origin. A reviewed synthetic example never becomes R. Route H/L/staged cases only to a visibly synthetic diagnostic environment, never the real-evidence vault/report flow. Unknown-origin cases remain quarantined.
+
+**Implementation gates:** test source-row and derivative lineage, Unicode code-point/UTF-16 conversion (including emoji and combining marks), unknown clocks, private/communicated boundaries, actor/case collisions, duplicate callbacks versus identical distinct contacts, annotation-availability cutoffs, revisions, expiry and late-import replay. Both schema validation and these domain checks are required; no adapter or acceptance result is claimed in this report.
 
 # F. Data collection and annotation protocol
 
@@ -523,7 +578,7 @@ This is engineering guidance, not a legal opinion or an authorization to process
 
 1. Preserve the supplied Davidson CSV, register its local hash and build explicit label-code adapters. It is an English auxiliary resource, not Sakshi's ground truth.
 2. Maintain a **rights-aware dataset registry** and separate research-only from product-cleared artifacts/checkpoints. Ask MACD authors for the intended license version and commercial permission if product training is planned.
-3. Use DravidianCodeMix and Uli as the first permissive-release candidates after underlying-rights review; prioritize CAD for evidence spans/context. Add Bengali/Telugu/Hinglish only after obtaining exact release terms and usable gold labels.
+3. Prioritize the Malayalam DravidianCodeMix subset, English/Hindi Uli subsets and CAD context/spans after exact release and underlying-rights review. Hinglish is current scope, using permission-cleared Hindi-English resources and independently reviewed supplementary cases. Tamil, Telugu, Kannada, Bengali and Marathi expansion requires a later scope decision.
 4. Request metadata/terms for BullyBlocker temporal releases and Insta-CTSR, and inspect InViS's Dataverse grant. These are promising follow-ups, not verified ready imports.
 5. Freeze a small behavioral ontology and supplementary-data protocol before large collection. Build authored/staged diagnostic cases immediately without representing them as real incidents; real-data collection waits for ethics/legal/safety clearance.
 6. Evaluate a compact multilingual classifier and simple temporal rules separately. No claim of stalking/coercion/escalation support until independently held-out, appropriately contextualized real cases are available.
@@ -568,9 +623,9 @@ All sources below were consulted or located on 2 October 2026. Statistics are re
 - **S33:** HateCheckHIn paper: https://aclanthology.org/2022.lrec-1.575.pdf ; original repo/MIT: https://github.com/hate-alert/HateCheckHIn . Authored/template expansion, not LLM text.
 - **S34:** ToxiGen paper: https://aclanthology.org/2022.acl-long.234/ ; author HF data: https://huggingface.co/datasets/toxigen/toxigen-data ; generation README: https://github.com/microsoft/ToxiGen ; actual dual software/data license: https://github.com/microsoft/TOXIGEN/blob/main/LICENSE.txt . Human annotations do not convert L origin into R.
 - **S35:** NSW police-narrative study: https://link.springer.com/article/10.1186/s40163-024-00200-2 . Restricted data, rule-based behavioral extraction, Australia not India.
-- **S36:** Mendeley stalking-labeled candidate, origin unverified: https://data.mendeley.com/datasets/x5rpmydktp/1 . Listing establishes a claimed dataset and CC BY terms, not authenticity/consent or valid stalking gold.
+- **S36:** Mendeley multi-platform cyberbullying/toxic-span candidate, with a harassment/stalking label and unverified origin: https://data.mendeley.com/datasets/x5rpmydktp/1 . Listing establishes a claimed dataset and CC BY terms, not authenticity/consent or valid stalking gold. Listing and automatic-span description rechecked during handoff completion; no raw file imported.
 - **S37:** IndicAbusive aggregation: https://github.com/hate-alert/IndicAbusive ; paper: https://dl.acm.org/doi/fullHtml/10.1145/3511095.3531277 . Treat source reuse/bootstrapping separately from new observations.
 - **S38:** ACTSA sentiment paper: https://aclanthology.org/W17-5408.pdf . Not abuse-labeled; included to prevent wrong task substitution.
 - **S39:** Unverified coercion collections: https://huggingface.co/datasets/haseebakhlaq2000/claude-data ; https://huggingface.co/datasets/codingwithdidemm/AbusivePatterns ; questionable multilingual metadata example: https://github.com/tiya1012/safeguardAI/blob/main/domestic_violence_harmful_discourse_detailed_5000.csv . No positive real-data provenance conclusion drawn.
 - **S40:** Government notification summary and phased compliance: https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190014 ; MeitY current rules/timeline listing: https://www.meity.gov.in/documents/act-and-policies/digital-personal-data-protection-rules-2025-gDOxUjMtQWa?pageTitle=Digital-Personal-Data-Protection-Rules-2025686cadad39.pdf . Counsel must consult Gazette/commencement details, not summary wording alone.
-- **S41:** India Code, Bharatiya Sakshya Adhiniyam 2023, electronic-record section 63: https://www.indiacode.nic.in/handle/123456789/20063 . No guarantee of admissibility is made.
+- **S41:** India Code, Bharatiya Sakshya Adhiniyam 2023, electronic-record section 63: https://www.indiacode.nic.in/handle/123456789/20063 ; official compiled text (as on 6 October 2025): https://www.indiacode.nic.in/indiacode/bitstream/123456789/20063/1/aa202347.pdf . Alternate official PDF was accessible during completion after the original URL failed; this is not a comprehensive current-law review. No guarantee of admissibility is made.
