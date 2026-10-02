@@ -102,7 +102,7 @@ def font_paths():
 
 def generate_screenshots(root, rows):
     from PIL import Image, ImageDraw, ImageFilter, ImageFont
-    from .render import shaped_text
+    from .render import font_runs, shaped_text
     fonts = font_paths()
     if not fonts:
         raise RuntimeError('Supply fonts supporting Latin, Devanagari and Malayalam')
@@ -141,9 +141,13 @@ def generate_screenshots(root, rows):
         path.parent.mkdir(parents=True, exist_ok=True)
         quality = [50, 75, 95][i % 3]
         image.save(path, quality=quality)
+        ocr_text = platform + ' | ' + row['sender'] + '\n' + '\n'.join(lines) + '\n' + row['sender'] + ' ' + stamp
+        used_fonts = sorted({p for p, _ in font_runs(font_path, ocr_text)})
         items.append({'id': path.stem, 'path': path.as_posix(), 'sha256': digest(path),
                       'message_id': row['id'], 'split': row['split'], 'language': row['language'],
-                      'text': row['text'].strip(), 'ocr_text': platform + ' | ' + row['sender'] + '\n' + '\n'.join(lines) + '\n' + row['sender'] + ' ' + stamp,
+                      'text': row['text'].strip(), 'ocr_text': ocr_text,
+                      'fonts_used': used_fonts, 'font_hashes': {p: digest(p) for p in used_fonts},
+                      'render_backend': 'HarfBuzz/FreeType with glyph-checked monochrome font fallback',
                       'sender': row['sender'], 'timestamp': stamp, 'platform': platform, 'dark': dark,
                       'font': str(font_path), 'font_sha256': digest(font_path), 'width': width, 'height': height,
                       'jpeg_quality': quality, 'blur': blur, 'rotation': angle, 'synthetic': True,
@@ -173,6 +177,8 @@ def validate(root):
     assert {s['split'] for s in screenshots} == {'train', 'val', 'test'}
     assert {s['language'] for s in screenshots if s['split'] == 'test'} == set(LANGUAGES)
     assert all(digest(s['path']) == s['sha256'] for s in screenshots)
+    from .render import missing_glyphs
+    assert all(not missing_glyphs(s.get('fonts_used', [s['font']]), s['ocr_text']) for s in screenshots)
     return {'text': len(rows), 'screenshots': len(screenshots), 'extraction': len(threads),
             'splits': {s: sum(r['split'] == s for r in rows) for s in ['train', 'val', 'test']},
             'split_note': '600 messages: 420/90/90 (70/15/15), all variants grouped. Parallel translations span splits: residual semantic-template leakage, synthetic sanity checks only.',

@@ -6,3 +6,4 @@ soundfile==0.13.1
 pyarrow==21.0.0
 uharfbuzz==0.51.0
 freetype-py==2.5.1
+fonttools==4.66.0
