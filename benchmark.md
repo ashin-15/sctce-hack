@@ -42,4 +42,16 @@ A milestone is recorded as complete only for work actually performed. This ledge
 
 - Integrated committed benchmark history from `main` (`586e4bf`) into existing `master` (`7718e72`) using a merge of the two independent histories, without rewriting either history.
 - Preserved existing research, presentation and dataset files on master. Resolved the AGENTS.md add/add conflict by retaining Sakshi's complete operating contract and appending the benchmark verification guidance.
-- Uncommitted runner fixes and preliminary measurement outputs in the original main worktree are intentionally not part of this branch merge; their benchmark milestone publication is still pending.
+- At this initial merge, uncommitted runner fixes and preliminary outputs were intentionally excluded. The subsequent M3a publication below now adds those completed results.
+
+## M3a: measured baseline publication — completed subset, not the full matrix
+
+- Audited and summarized fourteen full applicable-data candidate runs: three classifier baselines, script language ID, template extraction, sender/time linking, SQLite AES-GCM, Argon2id, four integrity schemes, ReportLab and the export-parser fixture. Component CSVs, per-run metadata/trials/predictions, descriptive Pareto plots, language error counts and RECOMMENDATION.md contain actual laptop observations.
+- On the synthetic held-out fixtures, measured macro-F1 was 0.4063 for TF-IDF/logistic regression, 0.9851 for authored rules, and 0.9938 for their ensemble. The rules know the fourteen generation templates; these scores do NOT establish real-world harassment accuracy.
+- Weighted scores/top-three shortlists and stacks A–E remain withheld: integration, energy/thermal, some licences and native measurements are missing. Empty plot panels and pending stack rows are intentional, not zero-valued results.
+- RapidOCR and faster-whisper base (with/without Silero VAD) passed one-item smoke subsets, each with one warmup and five repeats. Smoke rows are tagged and excluded from full-data summaries. Full OCR/STT results are still pending at this milestone.
+- The offline guard exposed an implicit RapidOCR visualization-font download; supplying explicit local weights and a local font fixed it without allowing inference networking. PyAV 19 was incompatible with faster-whisper 1.2.1; the reproducible lock pins PyAV 15.1.0.
+- OneDrive repeatedly denied environment replacement. With user-approved access, installed all sixty-four hash-locked dependencies outside OneDrive at %LOCALAPPDATA%/SakshiBench/venv. Twenty tests passed in that environment; the codec and metadata-link regressions passed, and offline OCR/STT smoke runs completed.
+- Fixed CSV links to point to committed metadata rather than ignored raw output; the publication audit checks five finite timed runs, one warmup, predictions and device fields. Link repairs do not change measured numeric values.
+- The CSVs preserve dependency versions, source/data/model hashes and dirty-source status of the original runs. Initial measurements were taken during development; future full runs should use the committed source version. Battery consumption and thermal state are not inferred from laptop timings.
+- Ingestion permissions/effort/policy notes are documentation assessments, not native feasibility tests. Natural Hinglish/Manglish audio, native-speaker label/font review, realistic multi-message linking fixtures, neural/LLM/export adapters and Android energy/lifecycle validation remain open.

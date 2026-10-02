@@ -1,0 +1,97 @@
+[
+  {
+    "run": 1,
+    "utc": "2026-10-02T09:13:39.368512+00:00",
+    "seconds": 0.27909479988738894,
+    "metrics": {
+      "all": {
+        "unlock_seconds": 0.2790767000988126,
+        "derived_bytes": 32
+      }
+    },
+    "peak_rss_bytes": 188518400,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 2,
+    "utc": "2026-10-02T09:13:39.641601+00:00",
+    "seconds": 0.2728937999345362,
+    "metrics": {
+      "all": {
+        "unlock_seconds": 0.27287539979442954,
+        "derived_bytes": 32
+      }
+    },
+    "peak_rss_bytes": 188518400,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 3,
+    "utc": "2026-10-02T09:13:39.902834+00:00",
+    "seconds": 0.26080619962885976,
+    "metrics": {
+      "all": {
+        "unlock_seconds": 0.2607903000898659,
+        "derived_bytes": 32
+      }
+    },
+    "peak_rss_bytes": 188518400,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 4,
+    "utc": "2026-10-02T09:13:40.155093+00:00",
+    "seconds": 0.2525275000371039,
+    "metrics": {
+      "all": {
+        "unlock_seconds": 0.25251400005072355,
+        "derived_bytes": 32
+      }
+    },
+    "peak_rss_bytes": 188518400,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  },
+  {
+    "run": 5,
+    "utc": "2026-10-02T09:13:40.434292+00:00",
+    "seconds": 0.2787154000252485,
+    "metrics": {
+      "all": {
+        "unlock_seconds": 0.27870019990950823,
+        "derived_bytes": 32
+      }
+    },
+    "peak_rss_bytes": 188518400,
+    "device": {
+      "device_model": "LENOVO 83ER",
+      "soc_cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+      "ram_bytes": 16857817088,
+      "os_version": "Microsoft Windows 11 Home Single Language 10.0.26200",
+      "thermal_state": "unknown: no accessible thermal sensor"
+    }
+  }
+]

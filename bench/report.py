@@ -32,7 +32,53 @@ def latest_runs():
     return list(latest.values())
 
 
+def audit_results(root=Path('results')):
+    runs = []
+    for path in sorted((root / 'metadata').glob('*.json')):
+        metadata = json.loads(path.read_text(encoding='utf-8'))
+        trials = json.loads((root / 'trials' / path.name).read_text(encoding='utf-8'))
+        if metadata['warmups'] != 1 or metadata['timed_runs'] != 5 or len(trials) != 5:
+            raise ValueError(f'{path.name}: incomplete measurement protocol')
+        if not (root / 'predictions' / path.name).exists():
+            raise ValueError(f'{path.name}: missing predictions')
+        for trial in trials:
+            if not np.isfinite(trial['seconds']) or trial['seconds'] < 0 or trial['peak_rss_bytes'] <= 0:
+                raise ValueError(f'{path.name}: invalid timing/RSS')
+            for metrics in trial['metrics'].values():
+                if not all(np.isfinite(value) for value in metrics.values()):
+                    raise ValueError(f'{path.name}: non-finite metric')
+            if not all(k in trial['device'] for k in ['device_model', 'soc_cpu', 'ram_bytes', 'os_version', 'thermal_state']):
+                raise ValueError(f'{path.name}: missing per-run device metadata')
+        runs.append({'run_id': path.stem, 'candidate': metadata['candidate'], 'component': metadata['component'],
+                     'subset_limit': metadata['subset_limit'], 'protocol_valid': True})
+    repaired = 0
+    for path in root.glob('*.csv'):
+        with path.open(newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            fields = reader.fieldnames
+            records = list(reader)
+        if not fields or 'metadata_path' not in fields:
+            continue
+        changed = False
+        for record in records:
+            if record.get('status') != 'measured':
+                continue
+            target = root / 'metadata' / (record['run_id'] + '.json')
+            if not target.exists():
+                raise ValueError(f'{path.name}: measured CSV row lacks committed metadata')
+            if record['metadata_path'] != target.as_posix():
+                record['metadata_path'] = target.as_posix()
+                repaired += 1
+                changed = True
+        if changed:
+            csv_file(path, records, fields)
+    dump(root / 'audit.json', {'runs': runs, 'validated_runs': len(runs),
+         'metadata_links_repaired': repaired, 'note': 'Only metadata links repaired; measured numeric CSV values unchanged. Audit validates protocol/completeness, not model quality.'})
+    return runs
+
+
 def report():
+    audit_results()
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -106,7 +152,7 @@ def report():
         fig.tight_layout()
         fig.savefig(Path('results/plots') / f'{slot}-pareto.png')
         plt.close(fig)
-    Path('results/SUMMARY.md').write_text('\n'.join(text) + '\n', encoding='utf-8')
+    Path('results/SUMMARY.md').write_text('\n'.join(text).rstrip() + '\n', encoding='utf-8')
     csv_file('results/stack_ranking.csv', [{'stack': s, 'rank': '', 'status': 'pending', 'reason': 'Actual requested native/model components unavailable; not replaced by proxy pipeline'} for s in ['A', 'B', 'C', 'D', 'E']], ['stack', 'rank', 'status', 'reason'])
     manual = []
     for path, metadata in latest_runs():

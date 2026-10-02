@@ -164,12 +164,14 @@ def proxy_trial(ram_guard=None):
             with tempfile.TemporaryDirectory() as tmp:
                 SimpleDocTemplate(str(Path(tmp) / 'preview.pdf')).build(story)
         stage('synthetic-preview-PDF-not-export', synthetic_preview)
-    y = np.array([bool(r['truth']) for r in records])
-    predicted = np.array([bool(r['labels']) for r in records])
+    y = np.array([bool(r['truth']) for r in records[:len(screens)]])
+    predicted = np.array([bool(r['labels']) for r in records[:len(screens)]])
     tp = int((y & predicted).sum())
+    quote_errors = sum(r['quote'] not in r['text'] for r in flagged)
     return {'seconds': time.perf_counter() - start_all, 'peak_rss_bytes': overall.peak, 'stages': stages,
-            'screenshots': len(screens), 'voice_notes': len(audio), 'flag_precision': tp / max(1, int(predicted.sum())),
-            'flag_recall': tp / max(1, int(y.sum())), 'hallucinated_quote_rate_vs_recognized_text': 0.,
+            'screenshots': len(screens), 'voice_notes': len(audio), 'screen_flag_precision': tp / max(1, int(predicted.sum())),
+            'screen_flag_recall': tp / max(1, int(y.sum())), 'hallucinated_quote_rate_vs_recognized_text': quote_errors / max(1, len(flagged)),
+            'accuracy_scope': 'screens only; public read speech has no harassment annotations and is excluded from flag accuracy',
             'source_integrity_root': chain([bytes.fromhex(h) for h in hashes]).hex(),
             'scope': 'extra proxy-P0 only; OCR Latin-only, no LLM, no metadata extraction, ephemeral encrypted store, no escalation, no real user/PDF export; not stacks A–E',
             'source_quote_note': 'Quotes copy recognized text exactly, not necessarily original evidence: OCR/STT errors remain.',
