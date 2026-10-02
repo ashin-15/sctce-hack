@@ -1,0 +1,123 @@
+{
+  "checked_at": "2026-10-02T12:07:31.900127+00:00",
+  "csv": {
+    "path": "data/labeled_data.csv",
+    "sha256": "fcb8bc7c68120ae4af04a5b9acd58585513ede11e1548ebf36a5c2040b6f6281",
+    "rows": 24783,
+    "columns": [
+      "",
+      "count",
+      "hate_speech",
+      "offensive_language",
+      "neither",
+      "class",
+      "tweet"
+    ],
+    "classes": {
+      "0": 1430,
+      "1": 19190,
+      "2": 4163
+    },
+    "class_percentages": {
+      "0": 5.77,
+      "1": 77.432,
+      "2": 16.798
+    },
+    "empty_texts": 0,
+    "exact_duplicate_excess": 0,
+    "vote_range": [
+      3,
+      9
+    ],
+    "vote_sum_mismatches": 0,
+    "unchanged": true
+  },
+  "sections": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G"
+  ],
+  "source_keys_resolved": [
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S06",
+    "S07",
+    "S08",
+    "S09",
+    "S10",
+    "S11",
+    "S12",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17",
+    "S18",
+    "S19",
+    "S20",
+    "S21",
+    "S22",
+    "S23",
+    "S24",
+    "S25",
+    "S26",
+    "S27",
+    "S28",
+    "S29",
+    "S30",
+    "S31",
+    "S32",
+    "S33",
+    "S34",
+    "S35",
+    "S36",
+    "S37",
+    "S38",
+    "S39",
+    "S40",
+    "S41"
+  ],
+  "dataset_rows_per_table": {
+    "A1": 39,
+    "A2": 39,
+    "A3": 39
+  },
+  "temporal_required_fields_covered": [
+    "available_at",
+    "boundary",
+    "case_id",
+    "categories",
+    "coverage",
+    "deduplication",
+    "direction",
+    "event_id",
+    "event_kind",
+    "evidence_references",
+    "observed_at",
+    "relationship_to_previous_events",
+    "retention",
+    "revision",
+    "schema_version",
+    "sender",
+    "severity",
+    "source",
+    "timestamp",
+    "user_confirmation"
+  ],
+  "fictional_example": "JSON parses; code-point anchors and prefix references pass",
+  "report_sha256": "efd881ec1dbf4dc3ab18f77e6fd117516202df0a9360793cc6f819f3efbe60c9",
+  "temporal_schema_sha256": "2cc0c5886f87e383394ea3b101ab603586c4a37623e0c39c07b535fce1ab1026",
+  "limits": [
+    "Source-reported external counts were spot-checked, not independently re-counted",
+    "Research envelope has no executable JSON Schema; example is not a temporal event",
+    "Field coverage does not implement or validate an adapter",
+    "No new corpus, training, inference or Android benchmark"
+  ]
+}

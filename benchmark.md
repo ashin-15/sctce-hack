@@ -69,3 +69,10 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Draft 2020-12 schema validation passed with date-time checks; the synthetic example had zero errors and six malformed variants were rejected. Cross-record application invariants are still engineering work.
 - Repository suite: 20 tests run, 19 passed and one optional faster-whisper decoder test skipped because the runtime is absent. No inference dependencies or existing measured results changed.
 - This milestone establishes artifact verification only. No temporal engine, Android runtime, detection-quality, latency, RAM, battery or real-evidence benchmark was executed. Android evidence acquisition remains the first engineering milestone; temporal implementation and its acceptance tests are specified in report sections 14 and 13.4.
+
+## Dataset research verification - 2 October 2026
+
+- Completed the dataset handoff's source-statistic spot checks and research/temporal schema reconciliation. All 41 source keys resolve; each of the three comparison tables contains D01-D39. Reproduction commands and evidence limits are in `research/verification/datasets-README.md`.
+- Re-counted the unchanged supplied Davidson CSV: 24,783 rows, class counts 1,430/19,190/4,163, zero empty or exact-duplicate texts and zero vote-sum mismatches. Its recorded SHA-256 still matches. External source counts are publisher-reported, not locally re-counted corpora.
+- Preserved documented arithmetic/access/license conflicts. Updated the proposed pilot to the current English/Malayalam/Hindi scope, including Romanized and mixed forms. Section E4 specifies conversion obligations for all 20 required temporal-event fields, separate annotation availability and research provenance/rights/gold controls.
+- Repository suite: 20 tests run, 19 passed, one optional faster-whisper decoder test skipped. No new corpus, model training, inference, dependency change, adapter implementation or Android benchmark occurred. Existing measured results remain unchanged.
