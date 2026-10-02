@@ -49,3 +49,9 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Fixed CSV links to point to committed metadata rather than ignored raw output; the publication audit checks five finite timed runs, one warmup, predictions and device fields. Link repairs do not change measured numeric values.
 - The CSVs preserve dependency versions, source/data/model hashes and dirty-source status of the original runs. Initial measurements were taken during development; future full runs should use the committed source version. Battery consumption and thermal state are not inferred from laptop timings.
 - Ingestion permissions/effort/policy notes are documentation assessments, not native feasibility tests. Natural Hinglish/Manglish audio, native-speaker label/font review, realistic multi-message linking fixtures, neural/LLM/export adapters and Android energy/lifecycle validation remain open.
+
+## M3b preparation: fixture and integrity audit — completed
+
+- A failing font-coverage regression identified twenty-three screenshots whose selected font lacked U+1F61F. Implemented glyph-checked local font fallback, recorded every used font and its SHA-256, and regenerated the 168 screenshots. The text, extraction and public-audio fixtures are unchanged. Glyph availability is verified; native-speaker visual shaping review is still pending.
+- A failing integrity regression reproduced duplicate-padding ambiguity in the original Merkle root, including the empty/single-empty-entry boundary. Merkle v2 now commits to the entry count with a separate root domain prefix. Existing M3a measurements remain historical and are not silently replaced; the revised method needs fresh timings.
+- Twenty-two tests passed after these fixes. Full OCR, full faster-whisper base with/without VAD, fresh Merkle timings, and the extra laptop proxy pipeline are the next measurement jobs. No results for those jobs are claimed at this preparation milestone.

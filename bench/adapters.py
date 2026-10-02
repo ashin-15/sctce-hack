@@ -265,14 +265,12 @@ def chain(entries):
 
 
 def merkle(entries):
-    nodes = [hashlib.sha256(b'\x00' + e).digest() for e in entries]
-    if not nodes:
-        return hashlib.sha256(b'\x00').digest()
+    nodes = [hashlib.sha256(b'\x00' + e).digest() for e in entries] or [hashlib.sha256(b'\x00').digest()]
     while len(nodes) > 1:
         if len(nodes) % 2:
             nodes.append(nodes[-1])
         nodes = [hashlib.sha256(b'\x01' + nodes[i] + nodes[i+1]).digest() for i in range(0, len(nodes), 2)]
-    return nodes[0]
+    return hashlib.sha256(b'\x02' + len(entries).to_bytes(8, 'big') + nodes[0]).digest()
 
 
 class Integrity:
@@ -285,6 +283,7 @@ class Integrity:
         from Crypto.Signature import eddsa
         self.entries = [json.dumps({'id': i, 'text': f'synthetic evidence {i}'}, sort_keys=True).encode() for i in range(10000)]
         self.candidate = candidate
+        self.quantization = 'none; count-bound Merkle v2' if candidate == 'Merkle-tree' else 'none'
         if candidate in ['SHA256-chain', 'Merkle-tree']:
             self.hash = chain if candidate == 'SHA256-chain' else merkle
             self.anchor = self.hash(self.entries)

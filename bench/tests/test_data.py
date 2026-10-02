@@ -6,6 +6,11 @@ from bench.data import LABELS, generate_extraction, generate_text, load
 
 
 class DatasetTests(unittest.TestCase):
+    def test_screenshot_text_has_renderable_glyphs(self):
+        from bench.render import missing_glyphs
+        issues = [(r['id'], missing_glyphs(r.get('fonts_used', [r['font']]), r['ocr_text'])) for r in load('data/screenshots.jsonl')]
+        self.assertEqual([(id_, missing) for id_, missing in issues if missing], [])
+
     def test_screenshot_manifest_has_held_out_languages(self):
         rows = load('data/screenshots.jsonl')
         self.assertEqual({r['split'] for r in rows}, {'train', 'val', 'test'})

@@ -11,6 +11,11 @@ class AdapterTests(unittest.TestCase):
             adapter = Classifier('tfidf-logreg')
             self.assertEqual(adapter.scores(['synthetic fixture']).shape, (1, 6))
 
+    def test_merkle_root_binds_entry_count(self):
+        entries = [b'first', b'second', b'third']
+        self.assertNotEqual(merkle(entries), merkle(entries + [entries[-1]]))
+        self.assertNotEqual(merkle([]), merkle([b'']))
+
     def test_integrity_flip_reorder_and_truncate(self):
         for function in [chain, merkle]:
             original = [b'first', b'second', b'third']
