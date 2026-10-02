@@ -173,3 +173,5 @@ TypeError: open() got an unexpected keyword argument 'metadata_errors'
 ",unmeasured,,,,,,,,,,,,,,
 ,ocr,RapidOCR-ONNX,hi,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
 ,ocr,RapidOCR-ONNX,ml,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,hi,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
+,ocr,RapidOCR-ONNX,ml,,,,,,unsupported_language,Bundled Chinese/Latin PP-OCRv4 recognition weights do not support this script; other multilingual weights are not evaluated.,unmeasured,,,,,,,,,,,,,,
