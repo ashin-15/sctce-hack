@@ -6,6 +6,11 @@ from bench.data import LABELS, generate_extraction, generate_text, load
 
 
 class DatasetTests(unittest.TestCase):
+    def test_screenshot_manifest_has_held_out_languages(self):
+        rows = load('data/screenshots.jsonl')
+        self.assertEqual({r['split'] for r in rows}, {'train', 'val', 'test'})
+        self.assertEqual({r['language'] for r in rows if r['split'] == 'test'}, {'en', 'hi', 'hinglish', 'ml', 'manglish', 'mixed'})
+
     def test_reproducible_exact_split_and_group_isolation(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -28,3 +28,12 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Data smoke test passed; regenerated output is deterministic on this host. Image/audio binaries are ignored by Git and reproduced with explicit preparation commands; manifests and public ground-truth text are committed.
 - Residual parallel-template leakage across languages and limited semantic diversity make these synthetic sanity checks, not evidence of production accuracy. Labels are authored, not native-speaker-adjudicated.
 - Prepared local faster-whisper base assets at exact upstream revision `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`; vocabulary filename corrected after an actual 404. This is an EXTRA budget-friendly candidate, not a substitute for the requested small/large tests.
+
+## M2: offline baseline harness — completed, full adapter matrix remains open
+
+- Added one-command component runners, fresh candidate processes, socket-blocked/local-only inference, one warmup and five repeats, median/p95 CSV output, high-water working-set/RSS sampling, exact asset/source/data hashes, versions, commit/dirty state and per-run hardware metadata.
+- Added 1,514 inventory entries spanning requested families, VAD variants, planned LLM quant/runtime/output combinations and export plans. Inventory counts are NOT execution counts. Missing adapters are pending, not unsupported-model skips.
+- Implemented sixteen baseline candidate adapters plus scoring/report generation. Full weighted ranking refuses unknown hard gates/missing dimensions instead of inventing battery or integration values.
+- Eighteen tests passed, including tamper/reorder/truncation detection, exact-quote checking, validation operating points, offline guard, user-review gate and real laptop process interruption/recovery of a synthetic hash queue.
+- Verification found and fixed two harness bugs: NumPy vocabulary indices were not JSON serializable; initial screenshot sampling accidentally omitted the text test split. Failing regression tests reproduced both. Screenshots were regenerated with 84 train / 24 validation / 60 test fixtures, covering every language in the held-out set. No OCR result from the defective initial fixture selection is used.
+- Current limits: load time is a single observation; per-language throughput can be pooled; model size excludes app/runtime packages; current queue is single-worker/fixture-only. Native Android, natural code-mixed speech, all neural/LLM adapters, exports, escalation and five actual stacks remain open.

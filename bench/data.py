@@ -109,8 +109,12 @@ def generate_screenshots(root, rows):
     indic_font = fonts[0]
     rng = random.Random(SEED)
     items = []
-    for i in range(168):
-        row = rows[i * 3 % len(rows)]
+    selected = []
+    for split, count in [('train', 84), ('val', 24), ('test', 60)]:
+        subset = [r for r in rows if r['split'] == split]
+        selected.extend(subset[j * len(subset) // count] for j in range(count))
+    rng.shuffle(selected)
+    for i, row in enumerate(selected):
         width = [720, 900, 1080][i % 3]
         height = int(width * 1.5)
         dark = bool(i % 2)
@@ -166,6 +170,8 @@ def validate(root):
     assert all(t['fields']['quote'] in t['text'] for t in threads)
     screenshots = load(root / 'screenshots.jsonl')
     assert len(screenshots) >= 150
+    assert {s['split'] for s in screenshots} == {'train', 'val', 'test'}
+    assert {s['language'] for s in screenshots if s['split'] == 'test'} == set(LANGUAGES)
     assert all(digest(s['path']) == s['sha256'] for s in screenshots)
     return {'text': len(rows), 'screenshots': len(screenshots), 'extraction': len(threads),
             'splits': {s: sum(r['split'] == s for r in rows) for s in ['train', 'val', 'test']},
