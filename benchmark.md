@@ -1,4 +1,4 @@
-# Sakshi benchmark — milestone ledger
+# Sakshi benchmark - milestone ledger
 
 ## M0: repository and resource audit
 
@@ -19,7 +19,7 @@ Completed: cloned the empty requested repository; verified Python, Git, baseline
 
 A milestone is recorded as complete only for work actually performed. This ledger is updated and pushed with each milestone. The complete model/runtime matrix cannot be represented as completed by a handful of baselines.
 
-## M1: data fixtures and preparation — completed with coverage gaps
+## M1: data fixtures and preparation - completed with coverage gaps
 
 - Generated and validated 600 synthetic multi-label messages in six language categories; fixed seed 1729; exactly 420/90/90 train/validation/test. Orthographic variants stay within their group/split.
 - Rendered 168 synthetic chat screenshots with two layouts, light/dark modes, font/resolution/JPEG/blur/rotation variants. Windows Pillow lacked RAQM, so rendering now uses HarfBuzz + FreeType. Native-speaker/visual validation remains pending.
@@ -29,7 +29,7 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Residual parallel-template leakage across languages and limited semantic diversity make these synthetic sanity checks, not evidence of production accuracy. Labels are authored, not native-speaker-adjudicated.
 - Prepared local faster-whisper base assets at exact upstream revision `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`; vocabulary filename corrected after an actual 404. This is an EXTRA budget-friendly candidate, not a substitute for the requested small/large tests.
 
-## M2: offline baseline harness — completed, full adapter matrix remains open
+## M2: offline baseline harness - completed, full adapter matrix remains open
 
 - Added one-command component runners, fresh candidate processes, socket-blocked/local-only inference, one warmup and five repeats, median/p95 CSV output, high-water working-set/RSS sampling, exact asset/source/data hashes, versions, commit/dirty state and per-run hardware metadata.
 - Added 1,514 inventory entries spanning requested families, VAD variants, planned LLM quant/runtime/output combinations and export plans. Inventory counts are NOT execution counts. Missing adapters are pending, not unsupported-model skips.
@@ -44,7 +44,7 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Preserved existing research, presentation and dataset files on master. Resolved the AGENTS.md add/add conflict by retaining Sakshi's complete operating contract and appending the benchmark verification guidance.
 - At this initial merge, uncommitted runner fixes and preliminary outputs were intentionally excluded. The subsequent M3a publication below now adds those completed results.
 
-## M3a: measured baseline publication — completed subset, not the full matrix
+## M3a: measured baseline publication - completed subset, not the full matrix
 
 - Audited and summarized fourteen full applicable-data candidate runs: three classifier baselines, script language ID, template extraction, sender/time linking, SQLite AES-GCM, Argon2id, four integrity schemes, ReportLab and the export-parser fixture. Component CSVs, per-run metadata/trials/predictions, descriptive Pareto plots, language error counts and RECOMMENDATION.md contain actual laptop observations.
 - On the synthetic held-out fixtures, measured macro-F1 was 0.4063 for TF-IDF/logistic regression, 0.9851 for authored rules, and 0.9938 for their ensemble. The rules know the fourteen generation templates; these scores do NOT establish real-world harassment accuracy.
@@ -56,7 +56,7 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - The CSVs preserve dependency versions, source/data/model hashes and dirty-source status of the original runs. Initial measurements were taken during development; future full runs should use the committed source version. Battery consumption and thermal state are not inferred from laptop timings.
 - Ingestion permissions/effort/policy notes are documentation assessments, not native feasibility tests. Natural Hinglish/Manglish audio, native-speaker label/font review, realistic multi-message linking fixtures, neural/LLM/export adapters and Android energy/lifecycle validation remain open.
 
-## M3b preparation: fixture and integrity audit — completed
+## M3b preparation: fixture and integrity audit - completed
 
 - A failing font-coverage regression identified twenty-three screenshots whose selected font lacked U+1F61F. Implemented glyph-checked local font fallback, recorded every used font and its SHA-256, and regenerated the 168 screenshots. The text, extraction and public-audio fixtures are unchanged. Glyph availability is verified; native-speaker visual shaping review is still pending.
 - A failing integrity regression reproduced duplicate-padding ambiguity in the original Merkle root, including the empty/single-empty-entry boundary. Merkle v2 now commits to the entry count with a separate root domain prefix. Existing M3a measurements remain historical and are not silently replaced; the revised method needs fresh timings.
@@ -77,7 +77,7 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - Preserved documented arithmetic/access/license conflicts. Updated the proposed pilot to the current English/Malayalam/Hindi scope, including Romanized and mixed forms. Section E4 specifies conversion obligations for all 20 required temporal-event fields, separate annotation availability and research provenance/rights/gold controls.
 - Repository suite: 20 tests run, 19 passed, one optional faster-whisper decoder test skipped. No new corpus, model training, inference, dependency change, adapter implementation or Android benchmark occurred. Existing measured results remain unchanged.
 
-## M3b results: full applicable OCR and revised Merkle — completed subset
+## M3b results: full applicable OCR and revised Merkle - completed subset
 
 - Completed one warmup plus five full runs of RapidOCR on all 36 applicable held-out Latin/romanized screenshots. Hindi and Malayalam scripts remain unsupported by these specific bundled weights and are logged separately; this is not a claim about other multilingual OCR weights.
 - Measured aggregate CER: 0.03266; WER: 0.29348. Median full-batch elapsed time: 96.68 seconds; peak process RAM: 545.1 MB. These are laptop measurements, not Android forecasts. Per-language metrics and p95 are in results/ocr.csv and committed trial records.
@@ -91,3 +91,12 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - At this publication checkpoint, the full sixty-clip faster-whisper base run without VAD completed its warmup and three of five timed batches. Observed completed-batch elapsed times were 800.053, 338.818 and 405.267 seconds. These partial observations are not a final median/p95 or a completion-time estimate. The full VAD run remains queued.
 - Committed measured CSVs, plots, trial records, candidate inventory, data manifests, licence/provenance notes, weaknesses, source/runtime hashes, and fixed benchmark code. Model/audio/image binaries and Python environments remain excluded and are recreated by preparation commands.
 - Still open: the full requested neural/embedding/LLM/export/runtime matrix, natural code-mixed speech, native-speaker adjudication, native Android/energy/thermal tests, actual stacks A–E and a defensible final weighted ranking. Missing implementation is not recorded as a model-unavailable skip.
+
+## Android slice 1: JVM foundations - 2 October 2026
+
+- Started the Android project under `android/` following `MEGAPLAN.md` section 39: Gradle skeleton (AGP 9.4.1, Kotlin 2.4.20, Gradle 9.8.0, JDK 21 toolchain), a placeholder app shell, and two pure-Kotlin modules. No evidence feature exists yet.
+- `:core:integrity` ports the reference `chain` and count-bound `merkle` from `bench/adapters.py` and adds RFC 8785 canonical JSON. Kotlin output matches Python on twelve shared vectors generated at commit `7a18ef2`; 28 JVM tests passed. Canonical JSON was checked against its own listed cases only, not against an independent implementation.
+- `:core:model` is the typed form of `data/sakshi-event-schema.json` with code-point spans and application invariants; 42 JVM tests passed, including Draft 2020-12 validation with date-time checking and rejection of the six malformed variants. Section 6.4 invariants that need stored artefacts, consent or retention state are not implemented yet.
+- The debug APK builds; its merged manifest declares no permissions and excludes all backup and device-transfer domains. Android lint reports no errors and only version-availability warnings (API 37, newer Compose BOM); API 36 stays pinned per the megaplan.
+- No Android device was attached. The APK was not installed or launched, and no latency, memory, battery or thermal measurement was taken. Backup exclusion is configured, not verified on a device.
+- Python suite on this Linux host: 22 tests run, 20 passed, one optional faster-whisper test skipped, and `test_screenshot_text_has_renderable_glyphs` errored because the committed screenshot manifest references Windows font paths. The bench code is unchanged by this slice.

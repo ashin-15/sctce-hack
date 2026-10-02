@@ -1,0 +1,77 @@
+{
+  "bench_git_commit": "7a18ef204f17a1ed5c678077eb3716eea32845a9",
+  "entry_rule": "utf8('sakshi synthetic entry ' + decimal index)",
+  "explicit": [
+    {
+      "chain_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "entries_hex": [],
+      "merkle_hex": "c0e50f0d90d6e2fea1e6f53d4f758ed5fc9035a399a8eb215c29c6ff3ea05425"
+    },
+    {
+      "chain_hex": "2c34ce1df23b838c5abf2a7f6437cca3d3067ed509ff25f11df6b11b582b51eb",
+      "entries_hex": [
+        ""
+      ],
+      "merkle_hex": "5cc26cdeaf1949b023361937a0119ed5d1f0cd9fba7d5577f2da20280f29cc64"
+    },
+    {
+      "chain_hex": "86cc5452f325278560f790dd4066172f0d76e895ceca29406bd3c7ceb26f5797",
+      "entries_hex": [
+        "00"
+      ],
+      "merkle_hex": "ee8acb9cb20eaf4b807ef586e552774d803cc3dd837bf26e9f509500cc2604bd"
+    },
+    {
+      "chain_hex": "ad579e5830154045410cac2cf4e6cd608f8bfe808f73b016202572a34f5eb275",
+      "entries_hex": [
+        "e0b4b8e0b4be",
+        "f09f9882"
+      ],
+      "merkle_hex": "75592f978f38ae2859d2cab2636c88b53b24d08b2f9212e0311ea4d3854a16a2"
+    }
+  ],
+  "generated": [
+    {
+      "chain_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "count": 0,
+      "merkle_hex": "c0e50f0d90d6e2fea1e6f53d4f758ed5fc9035a399a8eb215c29c6ff3ea05425"
+    },
+    {
+      "chain_hex": "5089cd15582b6e16c6c38efed7335570a75b935eff91792161aa5ebad1c3534a",
+      "count": 1,
+      "merkle_hex": "0d43629e8007945880372eb7a1765a548a8ba6d492b3b7237cc99527a61f187f"
+    },
+    {
+      "chain_hex": "a4ed46c821cd58df2327b2b49adb5a8cdfba6f7135eef237673465ba1d077d1b",
+      "count": 2,
+      "merkle_hex": "27d518cb28525fdb36959a612b16c795927b98f69de103fd3d48731512c24f03"
+    },
+    {
+      "chain_hex": "cd4510eeb3f596d371801d06f879330719ab96aadb64e4d3fe571462772de86a",
+      "count": 3,
+      "merkle_hex": "00427ca25f0bfd2478e7579a027b13e1df952f57677ba4c010bad2e187d10f9e"
+    },
+    {
+      "chain_hex": "730141573fac2bd5e1aba6e4f4b2301923e11dd0613d9c4cc1227657c9f99c16",
+      "count": 4,
+      "merkle_hex": "103cf9faf039886d1cb53b046d2de8b044536306f43e1142140cfcca5a55ccc1"
+    },
+    {
+      "chain_hex": "4930ce282620c420933eabbc798d8e631dff72d1a123b33cd684132d78691565",
+      "count": 5,
+      "merkle_hex": "9ab8de86345c56e84a75012382f5cb83324e716add1ba47779fa8f19d7b45fea"
+    },
+    {
+      "chain_hex": "761076072d3163e1d8f0d3b0b9e4145e50074504cf08f1f6b90372cdf5accb3e",
+      "count": 8,
+      "merkle_hex": "64b3c41b1d397bab8906431eb1f4cef912c1945ba4828fc45d467d56e5e48c6c"
+    },
+    {
+      "chain_hex": "fd1fc35c9a3bc4828f267e426f59936fcf13ebe589ef6c73299cef5288bc0353",
+      "count": 1000,
+      "merkle_hex": "6ecdc60dbec7eb3f982ab5fc403c3033a3b083648b98c01d425d9a66dbf32060"
+    }
+  ],
+  "generated_from": "bench/adapters.py chain, merkle",
+  "synthetic": true
+}

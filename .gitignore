@@ -8,3 +8,7 @@ data/audio/
 data/screenshots/
 results/raw/
 results/*.sqlite*
+android/.gradle/
+android/.kotlin/
+android/**/build/
+android/local.properties

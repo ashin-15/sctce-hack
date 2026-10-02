@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "event_id": "demo-schema-1",
+  "case_id": "demo-case-a",
+  "revision": 1,
+  "event_kind": "message_observation",
+  "observed_at": "bad-date",
+  "available_at": "2026-10-01T09:05:00+05:30",
+  "timestamp": {
+    "earliest": "2026-10-01T09:05:00+05:30",
+    "latest": "2026-10-01T09:05:59.999+05:30",
+    "basis": "source_claim",
+    "precision": "minute",
+    "source_timezone": "+05:30",
+    "collector_session_id": null,
+    "monotonic_ms": null
+  },
+  "sender": {
+    "actor_id": "demo-actor-a",
+    "display_label": "Person A",
+    "identity_basis": "user_asserted",
+    "association_review": "confirmed"
+  },
+  "source": {
+    "kind": "selected_export",
+    "source_app": "user-selected-chat-export",
+    "profile_scope_id": null,
+    "conversation_scope_id": "demo-chat-a",
+    "source_record_id": "demo-row-2",
+    "parser_version": "demo-parser-v1"
+  },
+  "direction": "incoming",
+  "categories": [
+    {
+      "label": "ordinary",
+      "basis": "user_tag",
+      "confidence": {
+        "value": null,
+        "semantics": "not_applicable",
+        "calibration_version": null
+      },
+      "producer_version": "manual-review-v1",
+      "evidence_reference_ids": [
+        "demo-ref-schema-1"
+      ],
+      "review_status": "accepted"
+    }
+  ],
+  "severity": {
+    "review_priority": "review",
+    "basis": "user_set",
+    "evidence_reference_ids": [
+      "demo-ref-schema-1"
+    ]
+  },
+  "evidence_references": [
+    {
+      "reference_id": "demo-ref-schema-1",
+      "artifact_id": "demo-export-a",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "representation": "preserved_import",
+      "locator": {
+        "kind": "text",
+        "start": 0,
+        "end": 3,
+        "unit": "unicode_code_points"
+      }
+    }
+  ],
+  "user_confirmation": {
+    "status": "confirmed",
+    "reviewed_at": "2026-10-01T09:20:00+05:30",
+    "scope": "preservation_and_selected_annotations"
+  },
+  "deduplication": {
+    "status": "distinct_observation",
+    "canonical_event_id": null,
+    "method_version": "demo-dedup-v1"
+  },
+  "coverage": {
+    "context": "selection_partial",
+    "text_status": "available",
+    "outgoing_coverage": "unknown",
+    "gap_reference_ids": []
+  },
+  "boundary": {
+    "marker": "none",
+    "actor_id": null,
+    "review_status": "not_applicable",
+    "communication_status": "not_applicable",
+    "unwanted_contact": "user_marked_unwanted"
+  },
+  "relationship_to_previous_events": [],
+  "retention": {
+    "mode": "confirmed_vault",
+    "expires_at": null,
+    "consent_generation": 1
+  }
+}
