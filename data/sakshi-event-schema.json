@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sakshi:event:1",
+  "title": "Sakshi source-linked event, version 1",
+  "description": "Design contract, not an implemented Android storage format. JSON validation does not establish identity, authenticity, consent or calibration. Cross-record and interval invariants require application validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "case_id", "revision", "event_kind", "observed_at", "available_at", "timestamp", "sender", "source", "direction", "categories", "severity", "evidence_references", "user_confirmation", "deduplication", "coverage", "boundary", "relationship_to_previous_events", "retention"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "event_id": {"$ref": "#/$defs/id"},
+    "case_id": {"$ref": "#/$defs/id"},
+    "revision": {"type": "integer", "minimum": 1},
+    "event_kind": {"enum": ["message_observation", "contact_attempt_observation", "user_boundary", "user_note", "reported_external_event", "notification_lifecycle"]},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "available_at": {"type": "string", "format": "date-time"},
+    "timestamp": {"$ref": "#/$defs/time"},
+    "sender": {
+      "type": "object", "additionalProperties": false,
+      "required": ["actor_id", "display_label", "identity_basis", "association_review"],
+      "properties": {
+        "actor_id": {"$ref": "#/$defs/nullableId"},
+        "display_label": {"type": ["string", "null"], "maxLength": 256},
+        "identity_basis": {"enum": ["unknown", "app_scoped_hint", "user_asserted"]},
+        "association_review": {"enum": ["unreviewed", "confirmed", "rejected", "unknown"]}
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "source_app", "profile_scope_id", "conversation_scope_id", "source_record_id", "parser_version"],
+      "properties": {
+        "kind": {"enum": ["notification_excerpt", "selected_export", "selected_text", "selected_image", "selected_audio", "selected_video", "selected_document", "manual_entry"]},
+        "source_app": {"type": ["string", "null"], "maxLength": 256},
+        "profile_scope_id": {"$ref": "#/$defs/nullableId"},
+        "conversation_scope_id": {"$ref": "#/$defs/nullableId"},
+        "source_record_id": {"$ref": "#/$defs/nullableId"},
+        "parser_version": {"$ref": "#/$defs/id"}
+      }
+    },
+    "direction": {"enum": ["incoming", "outgoing", "system", "unknown"]},
+    "categories": {
+      "type": "array", "maxItems": 16,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["label", "basis", "confidence", "producer_version", "evidence_reference_ids", "review_status"],
+        "properties": {
+          "label": {"enum": ["ordinary", "verbal_abuse", "explicit_threat", "implied_threat", "intimidation", "controlling_request", "sexual_pressure", "privacy_exposure_indicator", "contact_request", "unknown"]},
+          "basis": {"enum": ["rule_suggestion", "classifier_suggestion", "llm_suggestion", "user_tag"]},
+          "confidence": {"$ref": "#/$defs/confidence"},
+          "producer_version": {"$ref": "#/$defs/id"},
+          "evidence_reference_ids": {"$ref": "#/$defs/ids"},
+          "review_status": {"enum": ["unreviewed", "accepted", "rejected", "uncertain"]}
+        },
+        "allOf": [
+          {"if": {"properties": {"basis": {"const": "user_tag"}}}, "then": {"properties": {"confidence": {"properties": {"semantics": {"const": "not_applicable"}}}}}}
+        ]
+      }
+    },
+    "severity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["review_priority", "basis", "evidence_reference_ids"],
+      "properties": {
+        "review_priority": {"enum": ["ordinary", "review", "urgent_review", "unknown"]},
+        "basis": {"enum": ["policy_suggestion", "user_set", "unknown"]},
+        "evidence_reference_ids": {"type": "array", "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "evidence_references": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["reference_id", "artifact_id", "sha256", "representation", "locator"],
+        "properties": {
+          "reference_id": {"$ref": "#/$defs/id"},
+          "artifact_id": {"$ref": "#/$defs/id"},
+          "sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+          "representation": {"enum": ["preserved_import", "notification_excerpt", "manual_statement", "ocr_derivative", "transcript_derivative"]},
+          "locator": {"$ref": "#/$defs/locator"}
+        }
+      }
+    },
+    "user_confirmation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reviewed_at", "scope"],
+      "properties": {
+        "status": {"enum": ["pending", "confirmed", "rejected", "expired"]},
+        "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+        "scope": {"enum": ["not_reviewed", "preservation_only", "preservation_and_selected_annotations"]}
+      }
+    },
+    "deduplication": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "canonical_event_id", "method_version"],
+      "properties": {
+        "status": {"enum": ["distinct_observation", "same_representation", "possible_duplicate", "lifecycle_only"]},
+        "canonical_event_id": {"$ref": "#/$defs/nullableId"},
+        "method_version": {"$ref": "#/$defs/id"}
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["context", "text_status", "outgoing_coverage", "gap_reference_ids"],
+      "properties": {
+        "context": {"enum": ["complete_for_selected_range", "selection_partial", "notification_partial", "unknown"]},
+        "text_status": {"enum": ["available", "truncated", "redacted", "absent", "extraction_uncertain"]},
+        "outgoing_coverage": {"enum": ["included_for_selected_range", "partial", "unknown"]},
+        "gap_reference_ids": {"type": "array", "maxItems": 128, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
+      }
+    },
+    "boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["marker", "actor_id", "review_status", "communication_status", "unwanted_contact"],
+      "properties": {
+        "marker": {"enum": ["none", "do_not_contact", "user_disengagement", "limited_contact", "user_resumption", "unknown"]},
+        "actor_id": {"$ref": "#/$defs/nullableId"},
+        "review_status": {"enum": ["not_applicable", "unreviewed", "confirmed", "rejected", "unknown"]},
+        "communication_status": {"enum": ["supported_by_selected_evidence", "user_reported", "not_communicated", "unknown", "not_applicable"]},
+        "unwanted_contact": {"enum": ["user_marked_unwanted", "user_marked_wanted", "unknown", "not_applicable"]}
+      }
+    },
+    "relationship_to_previous_events": {
+      "type": "array", "maxItems": 32,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["target_event_id", "type", "basis", "confidence", "review_status"],
+        "properties": {
+          "target_event_id": {"$ref": "#/$defs/id"},
+          "type": {"enum": ["reply_to", "quotes", "possible_same_occurrence", "after_boundary", "same_topic_candidate", "recurrence_candidate", "category_transition_candidate", "user_linked"]},
+          "basis": {"enum": ["source_explicit", "rule", "model", "user_asserted"]},
+          "confidence": {"$ref": "#/$defs/confidence"},
+          "review_status": {"enum": ["unreviewed", "confirmed", "rejected", "unknown"]}
+        }
+      }
+    },
+    "retention": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "expires_at", "consent_generation"],
+      "properties": {
+        "mode": {"enum": ["session_only", "encrypted_candidate", "confirmed_vault"]},
+        "expires_at": {"type": ["string", "null"], "format": "date-time"},
+        "consent_generation": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"retention": {"properties": {"mode": {"const": "encrypted_candidate"}}}}},
+      "then": {"properties": {"retention": {"properties": {"expires_at": {"type": "string", "format": "date-time"}}}}}
+    },
+    {
+      "if": {"properties": {"retention": {"properties": {"mode": {"const": "confirmed_vault"}}}}},
+      "then": {"properties": {"user_confirmation": {"properties": {"status": {"const": "confirmed"}, "reviewed_at": {"type": "string", "format": "date-time"}, "scope": {"enum": ["preservation_only", "preservation_and_selected_annotations"]}}}}}
+    },
+    {
+      "if": {"properties": {"deduplication": {"properties": {"status": {"const": "same_representation"}}}}},
+      "then": {"properties": {"deduplication": {"properties": {"canonical_event_id": {"$ref": "#/$defs/id"}}}}}
+    },
+    {
+      "if": {"properties": {"event_kind": {"const": "user_boundary"}}},
+      "then": {"properties": {"boundary": {"properties": {"marker": {"enum": ["do_not_contact", "user_disengagement", "limited_contact", "user_resumption", "unknown"]}}}}}
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "nullableId": {"type": ["string", "null"], "minLength": 1, "maxLength": 128},
+    "ids": {"type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "confidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["value", "semantics", "calibration_version"],
+      "properties": {
+        "value": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "semantics": {"enum": ["calibrated_probability", "uncalibrated_bounded_score", "not_applicable", "unknown"]},
+        "calibration_version": {"$ref": "#/$defs/nullableId"}
+      },
+      "allOf": [
+        {"if": {"properties": {"semantics": {"const": "calibrated_probability"}}}, "then": {"properties": {"value": {"type": "number"}, "calibration_version": {"$ref": "#/$defs/id"}}}},
+        {"if": {"properties": {"semantics": {"enum": ["not_applicable", "unknown"]}}}, "then": {"properties": {"value": {"type": "null"}, "calibration_version": {"type": "null"}}}},
+        {"if": {"properties": {"semantics": {"const": "uncalibrated_bounded_score"}}}, "then": {"properties": {"value": {"type": "number"}, "calibration_version": {"type": "null"}}}}
+      ]
+    },
+    "time": {
+      "type": "object", "additionalProperties": false,
+      "required": ["earliest", "latest", "basis", "precision", "source_timezone", "collector_session_id", "monotonic_ms"],
+      "properties": {
+        "earliest": {"type": ["string", "null"], "format": "date-time"},
+        "latest": {"type": ["string", "null"], "format": "date-time"},
+        "basis": {"enum": ["source_claim", "collector_wall_clock", "user_reported", "unknown"]},
+        "precision": {"enum": ["millisecond", "second", "minute", "day", "range", "unknown"]},
+        "source_timezone": {"type": ["string", "null"], "maxLength": 64},
+        "collector_session_id": {"$ref": "#/$defs/nullableId"},
+        "monotonic_ms": {"type": ["integer", "null"], "minimum": 0}
+      },
+      "allOf": [
+        {"if": {"properties": {"basis": {"const": "unknown"}}}, "then": {"properties": {"earliest": {"type": "null"}, "latest": {"type": "null"}, "precision": {"const": "unknown"}}}},
+        {"if": {"properties": {"basis": {"enum": ["source_claim", "collector_wall_clock", "user_reported"]}}}, "then": {"properties": {"earliest": {"type": "string", "format": "date-time"}, "latest": {"type": "string", "format": "date-time"}}}}
+      ]
+    },
+    "locator": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind"], "properties": {"kind": {"const": "whole_artifact"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "start", "end", "unit"], "properties": {"kind": {"const": "text"}, "start": {"type": "integer", "minimum": 0}, "end": {"type": "integer", "minimum": 0}, "unit": {"const": "unicode_code_points"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "start_ms", "end_ms"], "properties": {"kind": {"const": "audio_time"}, "start_ms": {"type": "integer", "minimum": 0}, "end_ms": {"type": "integer", "minimum": 0}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "page_index", "region_id"], "properties": {"kind": {"const": "image_or_page_region"}, "page_index": {"type": ["integer", "null"], "minimum": 0}, "region_id": {"$ref": "#/$defs/id"}}}
+      ]
+    }
+  }
+}
