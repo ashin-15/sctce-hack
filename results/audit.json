@@ -43,6 +43,13 @@
       "protocol_valid": true
     },
     {
+      "run_id": "Merkle-tree-novad-20261002T120028729273",
+      "candidate": "Merkle-tree",
+      "component": "integrity",
+      "subset_limit": 0,
+      "protocol_valid": true
+    },
+    {
       "run_id": "RapidOCR-ONNX-novad-20261002T091946896967",
       "candidate": "RapidOCR-ONNX",
       "component": "ocr",
@@ -54,6 +61,13 @@
       "candidate": "RapidOCR-ONNX",
       "component": "ocr",
       "subset_limit": 1,
+      "protocol_valid": true
+    },
+    {
+      "run_id": "RapidOCR-ONNX-novad-20261002T120037370441",
+      "candidate": "RapidOCR-ONNX",
+      "component": "ocr",
+      "subset_limit": 0,
       "protocol_valid": true
     },
     {
@@ -134,7 +148,7 @@
       "protocol_valid": true
     }
   ],
-  "validated_runs": 19,
+  "validated_runs": 21,
   "metadata_links_repaired": 0,
   "note": "Only metadata links repaired; measured numeric CSV values unchanged. Audit validates protocol/completeness, not model quality."
 }

@@ -36,7 +36,7 @@ Top 3: withheld unless complete score inputs and gates exist. Planned options: s
 |---|---|---|---:|---:|---|
 | Ed25519 | tamper_detected: 1.0 | verify_10000_seconds: 18.550598700065166 | 124.26 | 0.000 | pending: missing integration_effort, battery_thermal, licence_openness |
 | HMAC | tamper_detected: 1.0 | verify_10000_seconds: 0.08221769984811544 | 123.79 | 0.000 | pending: missing integration_effort, battery_thermal, licence_openness |
-| Merkle-tree | tamper_detected: 1.0 | verify_10000_seconds: 0.04065999994054437 | 124.49 | 0.000 | pending: missing integration_effort, battery_thermal, licence_openness |
+| Merkle-tree | tamper_detected: 1.0 | verify_10000_seconds: 0.06659020017832518 | 124.60 | 0.000 | pending: missing integration_effort, battery_thermal, licence_openness |
 | SHA256-chain | tamper_detected: 1.0 | verify_10000_seconds: 0.017514199949800968 | 122.70 | 0.000 | pending: missing integration_effort, battery_thermal, licence_openness |
 
 Top 3: withheld unless complete score inputs and gates exist. Planned options: SHA256-chain, Merkle-tree, HMAC, Ed25519
@@ -77,7 +77,7 @@ Top 3: withheld unless complete score inputs and gates exist. Planned options: I
 
 | Candidate | Quality metric / value | Latency metric / value | Peak MB | Model MB | Weighted score |
 |---|---|---|---:|---:|---|
-| No measurements | unknown | unknown | unknown | unknown | pending |
+| RapidOCR-ONNX | cer: 0.03265993265993266 | seconds_per_screenshot: 2.6779317582776354 | 545.10 | 16.189 | pending: offline/licence hard gate unknown |
 
 Top 3: withheld unless complete score inputs and gates exist. Planned options: MLKit-Latin, MLKit-Devanagari, Tesseract-eng, Tesseract-hin, Tesseract-mal, PaddleOCR, RapidOCR-ONNX, EasyOCR, docTR, Surya, SmolVLM, Qwen2.5-VL-small, Florence2, MLKit-Tesseract-hybrid, MLKit-Paddle-hybrid
 
