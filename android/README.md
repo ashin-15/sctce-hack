@@ -1,6 +1,6 @@
 # Sakshi Android project
 
-Implementation follows `../MEGAPLAN.md`. This directory currently contains slice 1 only (megaplan section 39): the Gradle skeleton, an empty app shell, and two pure-Kotlin modules. No evidence feature is implemented yet and nothing here has been measured on an Android device.
+Implementation follows `../MEGAPLAN.md`. This directory currently contains megaplan phases 1 and 2: the Gradle skeleton, an empty app shell, and three pure-Kotlin modules. No evidence feature is implemented yet and nothing here has been measured on an Android device.
 
 ## Modules
 
@@ -8,6 +8,7 @@ Implementation follows `../MEGAPLAN.md`. This directory currently contains slice
 |---|---|---|
 | `:core:model` | Kotlin/JVM | Typed event contract for `../data/sakshi-event-schema.json`, code-point spans, schema adapter, application invariants |
 | `:core:integrity` | Kotlin/JVM | SHA-256, hash chain, count-bound Merkle v2, RFC 8785 canonical JSON |
+| `:core:temporal` | Kotlin/JVM | Deterministic pattern engine: contact canonicalisation with count bounds, partial-order time, coverage gaps, four demo pattern rules, template explanations. Synthetic timelines A-F ship as test fixtures |
 | `:app` | Android | Launcher activity with a placeholder screen; declares no permissions |
 
 ## Requirements
@@ -22,7 +23,7 @@ Run from this directory:
 
 ```sh
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
-./gradlew :core:model:test :core:integrity:test :app:assembleDebug
+./gradlew :core:model:test :core:integrity:test :core:temporal:test :app:assembleDebug
 ./gradlew :app:lintDebug
 ```
 

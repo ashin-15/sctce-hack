@@ -79,7 +79,7 @@ This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
 | 6 | Events | Each source message becomes an event under the event schema. | Planned. The typed model and validator exist as tested library code; no event is created by the app yet. |
 | 7 | Suggested findings | Rules-assisted highlighting first. A neural classifier only after licensed, native-reviewed data exists. | Planned |
 | 8 | Human review | Three separate targets: evidence association, signal, and pattern or explanation. Rejection never labels the text harmless. | Planned |
-| 9 | Temporal engine | Pure Kotlin, deterministic and idempotent. It counts only distinct incoming contacts and reports count bounds when duplicates are unresolved. | Planned (megaplan phase 2) |
+| 9 | Temporal engine | Pure Kotlin, deterministic and idempotent. It counts only distinct incoming contacts and reports count bounds when duplicates are unresolved. | Implemented as tested library code (`:core:temporal`, 56 JVM tests on synthetic timelines). Not yet connected to the app. |
 | 10 | Pattern review | The user reviews each pattern card with its supporting events, gaps and limitations. | Planned |
 | 11 | Report | Dates and counts are rendered from structured data. Observed evidence, user statements and inferred findings are kept in separate blocks. | Planned |
 | 12 | Export bundle | Canonical manifest, file hashes, signature and the items the user selected. Export is blocked while any included pattern is stale. | Planned |
@@ -148,7 +148,7 @@ The megaplan orders work by dependency, with the pure-Kotlin core first because 
 
 | Milestone | Contains | Demonstrates | State |
 |---|---|---|---|
-| M-A Core proven | Phases 1-2 | Event contract, integrity primitives and temporal rules, with no phone | In progress. Phase 1 (slice 1) done on the JVM, phase 2 (temporal engine) not started. |
+| M-A Core proven | Phases 1-2 | Event contract, integrity primitives and temporal rules, with no phone | Done on the JVM: event model, integrity primitives and temporal engine pass their unit tests. No phone involved, no UI. |
 | M-B Vault | Phases 3-4 | Evidence goes in encrypted, hashed, with provenance | Not started |
 | M-C Text MVP | Phases 5-7 | Import a chat export, review findings, see pattern cards, correct one and watch counts change | Not started |
 | M-D Verifiable report | Phase 9 (+8) | Export, verify offline, tamper and fail | Not started |
@@ -165,7 +165,7 @@ Run from `android/`. Gradle needs JDK 21 (the default JDK on the development hos
 ```sh
 cd android
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
-./gradlew :core:model:test :core:integrity:test :app:assembleDebug
+./gradlew :core:model:test :core:integrity:test :core:temporal:test :app:assembleDebug
 ./gradlew :app:lintDebug
 ```
 

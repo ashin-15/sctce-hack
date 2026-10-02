@@ -19,3 +19,4 @@ rootProject.name = "sakshi"
 include(":app")
 include(":core:model")
 include(":core:integrity")
+include(":core:temporal")
