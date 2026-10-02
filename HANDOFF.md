@@ -1,64 +1,99 @@
 # Handoff: Sakshi sentiment/emotion local-AI design
 
 **Date:** 2 October 2026
-**Scope:** Deep research + engineering design task "Sentiment / Emotion Analysis Integrated with Local AI for Sakshi Android". This handoff lets a new session or engineer resume without the prior conversation.
+**Status:** Research report and visual review deliverables completed. Android implementation and release qualification remain separate work.
+**Scope:** "Sentiment / Emotion Analysis Integrated with Local AI for Sakshi Android". This completion covers this handoff only; the sibling handoffs remain separate.
 
 ## Enduring objective
 
-Sakshi ("Evidence That Only You Can See") is a privacy-first Android app for harassment-evidence preservation, local pattern detection, human review, and user-controlled reporting. Sensitive evidence stays on-device; AI findings are suggestions linked to source evidence, never legal/clinical verdicts. Laya is **deferred** (recorded in `AGENTS.md`); do not reopen that decision.
+Sakshi ("Evidence That Only You Can See") is a privacy-first Android app for harassment-evidence preservation, local pattern detection, human review and user-controlled reporting. Sensitive evidence stays on-device. AI findings are suggestions linked to source evidence, never legal/clinical verdicts. Laya remains **deferred** as recorded in `AGENTS.md`.
 
-## Current state
+## Completed deliverables
 
-### Done
+- [Main report](research/sentiment-emotion-local-ai-android-design.md): all sections 1-23 populated. Section 23 reconstructs 58 source-register keys, covering all 56 keys cited in the body, including previously unlisted C1-C3 and T1-T5. Entries separate current primary-page verification, historical source inspection, local diagnostics and unresolved rights/device evidence.
+- Sections 1-22 reviewed for recommendation structure, task/runtime boundaries, source traceability and experiment claims. Added supporting WHY/WHAT/HOW/MODEL/RUNTIME/DATA/ANDROID/LIMITATIONS contracts; repaired merged prose and restored canonical product/model/API names.
+- Reconciled persisted text anchors with `data/sakshi-event-schema.json`: half-open Unicode code-point ranges. Kotlin UTF-16 conversion remains an explicit UI/tokenizer boundary with surrogate checks. The shared schema was not changed; the illustrative analysis result still requires a validated event adapter.
+- [Visual artifact](.lavish/sakshi-sentiment-emotion-architecture.html): architecture, decisions, evidence-status distinctions, model/runtime comparisons and synthetic diagnostic examples. It follows the existing Sakshi review-artifact style and keeps phone/quality limitations visible.
+- Durable probes remain [extended emotion probe](research/probes/sakshi-emotion-probe.py) and [earlier AI probe](research/probes/sakshi-ai-probe.py).
 
-- Main report: `research/sentiment-emotion-local-ai-android-design.md` (995 lines). Sections 1-22 are written: executive summary, proposal mapping, existing systems (Vigil, Agent Hita, BullyAlert, BullyBlocker, TalkingParents, MELD/DialogueRNN, HASOC, UED), architecture comparison, candidate models, runtime comparison, pipeline schemas, router design, intensity/trajectory math, context/RAG, multilingual/code-mixed strategy, personalization, explainability, datasets, evaluation/benchmark plan, privacy, Android implementation plan (Kotlin components, ORT boundary code, LiteRT-LM/llama.cpp entry points, WorkManager quotas, lifecycle state machine), innovation table, MVP definition, roadmap.
-- Probe scripts preserved into the repo: `research/probes/sakshi-emotion-probe.py`, `research/probes/sakshi-ai-probe.py` (copied from `/tmp`, which is wiped on reboot).
-- Prior deliverables intact: `research/laya-source-analysis-and-sakshi-local-ai-architecture.md`, `.lavish/sakshi-laya-local-ai.html`, `AGENTS.md` Laya-deferral note.
+## Verification and reproducibility
 
-### Not done (in priority order)
+Run from the repository root. Current receipts and scripts:
 
-1. **Section 23 of the report is an empty heading** ("Source register, experiment boundaries and verification"). The body text cites keys `[M1]-[M12]`, `[R1]-[R11]`, `[D1]-[D7]`, `[U1]-[U3]`, `[P1]-[P4]`, `[E1]-[E9]` but the register itself was never written. Reconstruct it from the research notes and the conversation history file (see below); do not fabricate citations. Suggested grouping: M=model artifacts/cards, R=runtime/framework docs, D=datasets, U=Unicode/robustness studies, P=proposal/local probes, E=existing systems.
-2. **Lavish visual artifact missing.** The task requires `.lavish/` HTML with inline-SVG architecture diagram, comparison tables, decision cards, evidence-status labels, no horizontal overflow, verified in light/dark/narrow. Follow the style of `.lavish/sakshi-laya-local-ai.html`. Build with `lavish-axi` (installed at `~/.npm-global/bin/lavish-axi`; invoke the `lavish` skill for usage). Suggested name: `.lavish/sakshi-sentiment-emotion-architecture.html`.
-3. **Report verification pass:** confirm every required section from the task exists (the 22-section list in the task maps onto current sections 1-22), every major recommendation carries the WHY → WHAT → HOW → MODEL → RUNTIME → DATA → ANDROID → LIMITATIONS structure, and no claim presents Linux diagnostics or publisher benchmarks as Sakshi/Android measurements.
-4. **Commit.** Nothing is committed or pushed. Existing commits: `dd5abcc` (prior-art baseline), `0836200` (acquisition boundaries). Match that style; do not add a co-author trailer.
+- [Offline probe receipt](research/verification/sentiment-emotion-probe.json): 20 synthetic fixtures plus one NFKC view per model, 42 total forwards. Correct shapes, finite outputs, equation and original-preservation assertions passed. Records model/config/tokenizer hashes. The pinned model hashes match section 6.
+- [Browser receipt](research/verification/sentiment-emotion-browser.json) and [browser check](research/verification/sentiment-emotion-browser-check.mjs): actual Chromium at 1440 and 390 pixels in light/dark modes. Checked five fixture selections, filter including zero results, details, navigation and theme. No page/SVG-text overflow, runtime exceptions or remote requests observed.
+- Report checks: numbered sections 1-23, all citation keys resolved, illustrative JSON parses, local links resolve, no em dashes, no preferred reproduction path referencing a temporary-only script.
+- Baseline regression: 20 unittest cases, 19 passed and one optional faster-whisper case skipped. No production code or dependency changes were required.
+- [Final validation record](research/verification/sentiment-emotion-validation.json): report checks, regression result, artifact digests and explicit qualification limits. Reproduction instructions are in [verification notes](research/verification/README.md).
 
-## Reproduce the local experiments
+Local visual review: [Sakshi sentiment/emotion architecture](http://127.0.0.1:4387/session/39e734f716e3b30e). The page uses the existing Sakshi plum/cream/gold design system. Its screenshots were inspected in desktop dark and narrow light views in addition to the automated four-theme/width checks.
 
-Model dirs live in `/tmp` and will not survive reboot. Re-fetch if gone:
+Current offline reproduction command:
 
 ```bash
-hf download minuva/MiniLMv2-toxic-jigsaw-onnx --local-dir /tmp/sakshi-minilm-tox
-hf download minuva/MiniLMv2-goemotions-v2-onnx --local-dir /tmp/sakshi-minilm-emotion
-uv run --no-project \
-  --with onnxruntime==1.22.1 --with tokenizers==0.22.0 --with numpy==2.3.3 \
+uv run --no-project --offline --with onnxruntime==1.22.1 \
+  --with tokenizers==0.22.0 --with numpy==2.3.3 \
   python research/probes/sakshi-emotion-probe.py
 ```
 
-Key probe findings already encoded in the report: raw scores shift with padding (anger 0.571 padded vs 0.723 unpadded on one fixture), the English tokenizer emits 5 UNKs on Malayalam, quoted/negated abuse scores high, conditional photo-exposure scores low on threat, "Fine." scores 0.94 approval. All are Linux x86 synthetic diagnostics, not quality, calibration, or device results.
+Baseline regression command used with isolated pinned dependencies:
+
+```bash
+uv run --no-project --python 3.12 --with scikit-learn==1.7.2 \
+  --with numpy==2.2.6 --with pycryptodome==3.23.0 --with psutil==7.0.0 \
+  python -m unittest discover -s bench/tests -v
+```
+
+Model assets remain under `/tmp` and may disappear after reboot. Re-fetch only in an explicit preparation step, pinning the revisions recorded in section 6:
+
+```bash
+hf download minuva/MiniLMv2-toxic-jigsaw-onnx \
+  --revision c035f27b6a6d68770f8069a4829f1715a48b8d51 \
+  --local-dir /tmp/sakshi-minilm-tox
+hf download minuva/MiniLMv2-goemotions-v2-onnx \
+  --revision 4fea72b9ec71ba8d84b88e0efa2ace3dcc733bfc \
+  --local-dir /tmp/sakshi-minilm-emotion
+```
+
+The current unpadded diagnostic reproduces anger 0.722891/insult 0.938573 on the literal fixture, threat 0.000657 on conditional photo exposure, approval 0.941967 on "Fine.", and five unknown tokens among eight behaviour tokens for a Malayalam fixture. These are Linux x86 synthetic diagnostics, **not** accuracy, calibration, emotion intensity, real evidence or Android resource results.
+
+The 64-token padded anger comparison (0.570579 versus 0.722891 unpadded) and earlier laptop p50/RSS timings remain **historical observations**, not rerun measurements. The padding root cause is unisolated. Published device benchmark numbers belong to their authors' exact models/devices/workloads.
 
 ## Decisions that must survive editing
 
-- Emotion is an independent branch, never a gate on evidence preservation; low emotion/toxicity cannot suppress evidence.
-- Behaviour detection is the primary safety signal; the Jigsaw baseline is narrow (misses coercion/stalking categories) and must be labelled as such.
-- Intensity is `null` in MVP; raw sigmoid scores are not probabilities and not intensity.
-- No mandatory LLM; optional reasoner tier is Qwen3-0.6B LiteRT-LM first, Qwen3.5-2B GGUF/llama.cpp as benchmark challenger. LLM never counts events or owns chronology/provenance.
-- Temporal engine is deterministic Kotlin over distinct reviewed events; trajectories show source IDs, gaps, uncertainty; trajectories never claim escalation.
-- Unsupported languages route to explicit `unknown`, never a confident English-model label; no translation-before-classification default.
-- No on-device training/LoRA/federation in MVP despite ORT Android training support.
-- Originals immutable; normalization produces versioned derivative views with source-span maps.
+- Emotion is independent and optional; it never gates preservation or behaviour review.
+- Behaviour is the primary safety-related signal. The six-label Jigsaw baseline lacks comprehensive control, stalking, blackmail and sexual-harassment coverage.
+- Intensity is `null` in MVP; raw sigmoid scores are neither calibrated probabilities nor intensity.
+- No mandatory LLM. Qwen3-0.6B LiteRT-LM is the first optional integration experiment; Qwen3.5-2B GGUF/llama.cpp is a richer benchmark challenger. No reasoner is qualified by this documentation.
+- Kotlin temporal logic owns distinct reviewed-event counts, chronology and provenance. Expressed-language trajectories show source IDs, gaps and uncertainty, never escalation/danger verdicts.
+- Unsupported languages route to explicit unknown; no translation-before-classification default or confident English-model result for Indic input.
+- No automatic training, LoRA or federation in MVP.
+- Originals remain immutable; normalized/extracted text is a versioned derivative with source maps and canonical code-point anchors.
 
-## File map
+## Open qualification work
 
-- `research/sentiment-emotion-local-ai-android-design.md` - the deliverable being finished.
-- `research/probes/` - preserved probe scripts (paths inside still point at `/tmp/sakshi-minilm-*`).
-- `research/local-ai-architecture.md`, `research/laya-source-analysis-and-sakshi-local-ai-architecture.md` - prior reports this one builds on.
-- `research/existing-systems-survey.md`, `research/harassment-detection-datasets.md`, `research/temporal-harassment-patterns.md`, `data/sakshi-event-schema.json` - sibling research (some authored in parallel sessions).
-- `.lavish/*.html` - existing visual artifacts to match for theme/style.
-- `Harassment_Pattern_Guard.pptx.pdf` - product proposal (binary; extract text, do not read as UTF-8).
-- Full conversation history: `/home/ashin/.local/share/devin/cli/summaries/history_d0e509aea77644fd.md` - contains the source list needed to reconstruct section 23.
+The documentation handoff is complete, not a claim that the app or model pack is production-ready. Before implementation/release:
+
+1. Create/verify the Android shell and supported user-mediated evidence acquisition on physical devices, including vendor/version restrictions and notification partial capture.
+2. Qualify native tokenizers, graph/padding/backend parity, asset manifests, error states, lifecycle/cancellation and canonical anchor conversion.
+3. Collect licensed/consented representative evaluation data with native-speaker review and leakage-safe partitions. Establish per-task/language quality, calibration and router criteria; synthetic fixtures are insufficient.
+4. Benchmark actual Android cold/warm latency, peak memory, energy, battery, thermal and scheduling constraints. Proposed budgets are targets, not measurements.
+5. Implement/audit vault encryption, nonce/key lifecycle, backup/recovery, logs, correction/deletion propagation and explicit export. Hashes alone cannot establish authenticity or admissibility.
+6. Resolve release-specific model/dataset/code rights and refresh mutable primary APIs/source details. Gated Gemma assets, HateXplain license discrepancy, NRC commercial rights and some dataset terms remain unqualified.
+
+No Android implementation, model training, representative quality/calibration experiment, private-data upload or Laya integration was performed in this completion.
+
+## File map and investigation provenance
+
+- `research/sentiment-emotion-local-ai-android-design.md` - completed report and source register.
+- `.lavish/sakshi-sentiment-emotion-architecture.html` - completed review artifact.
+- `research/verification/` - reproducible diagnostics and browser evidence for this deliverable.
+- `research/laya-source-analysis-and-sakshi-local-ai-architecture.md`, `research/local-ai-architecture.md` - prior research boundaries.
+- `research/android-evidence-acquisition-specification.md`, `research/whatsapp-view-once-feasibility.md` - supported acquisition design.
+- `research/temporal-harassment-patterns.md`, `data/sakshi-event-schema.json` - shared temporal contract; unchanged in this handoff.
+- `Harassment_Pattern_Guard.pptx.pdf` - product proposal, not a working application specification.
+- Original research history: `/home/ashin/.local/share/devin/cli/summaries/history_d0e509aea77644fd.md`. Used to recover citations, not as a substitute for primary-source or device evidence.
 
 ## Style constraints
 
-- No em dashes (project rule; the report intentionally avoids them - keep it that way).
-- British spelling of "behaviour" is used throughout the report; stay consistent.
-- Cite repository files rather than pasting long excerpts; keep code excerpts under ~20 lines.
+Use British "behaviour" consistently. No em dashes or automatic agent co-author trailers. Link durable repository artifacts; preserve explicit unknowns and source/measurement status when extending the report.

@@ -1,0 +1,94 @@
+{
+  "checked_at": "2026-10-02T11:15:51.881019+00:00",
+  "platform": "Linux-7.2.8-1-cachyos-x86_64-with-glibc2.44",
+  "command": "uv run --no-project --offline --with onnxruntime==1.22.1 --with tokenizers==0.22.0 --with numpy==2.3.3 python research/probes/sakshi-emotion-probe.py",
+  "capture_method": "Same script via runpy and redirected stdout in the same uv dependency environment",
+  "summary": {
+    "fixture_count": 20,
+    "inference_rows_per_model": 21,
+    "runtime": "1.22.1",
+    "padding": "disabled",
+    "math_normalization_assertions": "passed",
+    "scope": "Linux x86 CPU synthetic diagnostics, no labeled quality/calibration/device measurements"
+  },
+  "models": {
+    "emotion": {
+      "model_optimized_quantized.onnx": {
+        "bytes": 30458927,
+        "sha256": "594ac3bf3c82e2ea187e50982ea2f811ede5377eaad0c8ad23bc04ee8a2486c6"
+      },
+      "tokenizer.json": {
+        "bytes": 2108882,
+        "sha256": "b374924beb422033e02af444719785d778d2511bc7aaa4e9741cb9d580d6567e"
+      },
+      "config.json": {
+        "bytes": 2011,
+        "sha256": "62e826b2e9194c01a14fccdf801cfb3642911af153ff9e08e8823599e3a954a0"
+      }
+    },
+    "behaviour": {
+      "model_optimized_quantized.onnx": {
+        "bytes": 22864978,
+        "sha256": "bcd9dfb48cad802ac8f7cd789e1294f1f0b22d532797bd41f5a11694e3c269a0"
+      },
+      "tokenizer.json": {
+        "bytes": 711649,
+        "sha256": "91f1def9b9391fdabe028cd3f3fcc4efd34e5d1f08c3bf2de513ebb5911a1854"
+      },
+      "config.json": {
+        "bytes": 1007,
+        "sha256": "b88eee194c1b62a0163979f1b3eab319817e5e51a358b15edebb867b03c7c9e9"
+      }
+    }
+  },
+  "diagnostic_stdout": [
+    "behaviour insult original tokens 7 unk 0 {\"toxic\": 0.986682, \"insult\": 0.938573, \"obscene\": 0.700681, \"threat\": 0.00308}",
+    "behaviour spacing original tokens 11 unk 0 {\"toxic\": 0.89734, \"insult\": 0.527758, \"obscene\": 0.272219, \"threat\": 0.001254}",
+    "behaviour leet original tokens 10 unk 0 {\"toxic\": 0.563772, \"insult\": 0.160123, \"obscene\": 0.023975, \"threat\": 0.000531}",
+    "behaviour punctuation original tokens 15 unk 0 {\"toxic\": 0.772602, \"insult\": 0.350435, \"obscene\": 0.133505, \"threat\": 0.001058}",
+    "behaviour zero_width_latin original tokens 7 unk 0 {\"toxic\": 0.986682, \"insult\": 0.938573, \"obscene\": 0.700681, \"threat\": 0.00308}",
+    "behaviour compatibility original tokens 7 unk 1 {\"toxic\": 0.215221, \"insult\": 0.017269, \"obscene\": 0.003562, \"threat\": 0.000475}",
+    "behaviour compatibility NFKC_diagnostic_not_production_default tokens 7 unk 0 {\"toxic\": 0.986682, \"insult\": 0.938573, \"obscene\": 0.700681, \"threat\": 0.00308}",
+    "behaviour quotation original tokens 18 unk 0 {\"toxic\": 0.950333, \"insult\": 0.858545, \"obscene\": 0.464141, \"threat\": 0.000965}",
+    "behaviour negation original tokens 8 unk 0 {\"toxic\": 0.926357, \"insult\": 0.738144, \"obscene\": 0.162994, \"threat\": 0.00119}",
+    "behaviour benign_anger original tokens 14 unk 0 {\"toxic\": 0.003029, \"obscene\": 0.000656, \"insult\": 0.000597, \"threat\": 0.000376}",
+    "behaviour explicit_harm original tokens 8 unk 0 {\"toxic\": 0.829548, \"threat\": 0.823279, \"severe_toxic\": 0.108316}",
+    "behaviour polite_control_candidate original tokens 18 unk 0 {\"toxic\": 0.002755, \"obscene\": 0.000589, \"insult\": 0.00058, \"threat\": 0.000463}",
+    "behaviour conditional_exposure original tokens 12 unk 0 {\"toxic\": 0.011282, \"obscene\": 0.000692, \"threat\": 0.000657}",
+    "behaviour sarcasm_ambiguous original tokens 9 unk 0 {\"toxic\": 0.002682, \"obscene\": 0.000821, \"insult\": 0.000651, \"threat\": 0.00041}",
+    "behaviour context_ambiguous original tokens 4 unk 0 {\"toxic\": 0.003271, \"obscene\": 0.000717, \"insult\": 0.000624, \"threat\": 0.000332}",
+    "behaviour gratitude original tokens 8 unk 0 {\"toxic\": 0.002255, \"obscene\": 0.000761, \"insult\": 0.000662, \"threat\": 0.000551}",
+    "behaviour manglish_a original tokens 10 unk 0 {\"toxic\": 0.033051, \"obscene\": 0.002043, \"insult\": 0.001639, \"threat\": 0.000314}",
+    "behaviour code_mix_a original tokens 8 unk 0 {\"toxic\": 0.034211, \"insult\": 0.001007, \"obscene\": 0.000972, \"threat\": 0.000468}",
+    "behaviour hinglish_a original tokens 7 unk 0 {\"toxic\": 0.013514, \"obscene\": 0.000965, \"insult\": 0.000747, \"threat\": 0.000272}",
+    "behaviour manglish_b original tokens 13 unk 0 {\"toxic\": 0.008047, \"obscene\": 0.000708, \"insult\": 0.000606, \"threat\": 0.000245}",
+    "behaviour malayalam original tokens 8 unk 5 {\"toxic\": 0.005964, \"obscene\": 0.000714, \"insult\": 0.00054, \"threat\": 0.000267}",
+    "emotion insult original tokens 7 unk None {\"anger\": 0.722891, \"annoyance\": 0.67741, \"neutral\": 0.017603}",
+    "emotion spacing original tokens 11 unk None {\"neutral\": 0.989407, \"admiration\": 0.003127, \"annoyance\": 0.003}",
+    "emotion leet original tokens 10 unk None {\"neutral\": 0.99048, \"annoyance\": 0.003412, \"admiration\": 0.003299}",
+    "emotion punctuation original tokens 15 unk None {\"neutral\": 0.988136, \"annoyance\": 0.00325, \"admiration\": 0.003127}",
+    "emotion zero_width_latin original tokens 15 unk None {\"neutral\": 0.944961, \"admiration\": 0.011139, \"approval\": 0.008921}",
+    "emotion compatibility original tokens 21 unk None {\"neutral\": 0.612624, \"approval\": 0.277389, \"admiration\": 0.099329}",
+    "emotion compatibility NFKC_diagnostic_not_production_default tokens 7 unk None {\"anger\": 0.722891, \"annoyance\": 0.67741, \"neutral\": 0.017603}",
+    "emotion quotation original tokens 18 unk None {\"annoyance\": 0.849726, \"anger\": 0.083721, \"neutral\": 0.054317}",
+    "emotion negation original tokens 8 unk None {\"approval\": 0.480675, \"annoyance\": 0.215219, \"neutral\": 0.126797}",
+    "emotion benign_anger original tokens 14 unk None {\"anger\": 0.97809, \"annoyance\": 0.121738, \"confusion\": 0.024713}",
+    "emotion explicit_harm original tokens 8 unk None {\"anger\": 0.964981, \"annoyance\": 0.057791, \"fear\": 0.031576}",
+    "emotion polite_control_candidate original tokens 18 unk None {\"caring\": 0.670918, \"approval\": 0.56507, \"disapproval\": 0.053099}",
+    "emotion conditional_exposure original tokens 12 unk None {\"neutral\": 0.985485, \"approval\": 0.004305, \"annoyance\": 0.002358}",
+    "emotion sarcasm_ambiguous original tokens 9 unk None {\"admiration\": 0.987232, \"approval\": 0.082942, \"gratitude\": 0.020728}",
+    "emotion context_ambiguous original tokens 4 unk None {\"approval\": 0.941967, \"neutral\": 0.248116, \"realization\": 0.008634}",
+    "emotion gratitude original tokens 8 unk None {\"gratitude\": 0.99588, \"approval\": 0.013619, \"admiration\": 0.00947}",
+    "emotion manglish_a original tokens 13 unk None {\"neutral\": 0.988114, \"approval\": 0.003209, \"annoyance\": 0.003111}",
+    "emotion code_mix_a original tokens 7 unk None {\"neutral\": 0.987651, \"annoyance\": 0.005425, \"disapproval\": 0.00324}",
+    "emotion hinglish_a original tokens 8 unk None {\"neutral\": 0.981287, \"annoyance\": 0.003744, \"admiration\": 0.002913}",
+    "emotion manglish_b original tokens 14 unk None {\"neutral\": 0.922116, \"curiosity\": 0.16226, \"confusion\": 0.047051}",
+    "emotion malayalam original tokens 130 unk None {\"neutral\": 0.510789, \"approval\": 0.16798, \"love\": 0.051123}"
+  ],
+  "limitations": [
+    "Authored synthetic fixtures only",
+    "Linux CPU only; no Android execution",
+    "No representative labeled dataset, quality metric or calibration",
+    "No new latency, memory, battery or padded-input measurements"
+  ]
+}
