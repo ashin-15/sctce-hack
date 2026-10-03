@@ -113,7 +113,7 @@ fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewM
         is SessionScreen.ReportSelection -> ReportSelectionRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ReportPreview -> ReportPreviewRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ExportResult -> ExportResultRoute(screen.caseId, services, owner, navigator, container)
-        SessionScreen.AiModel -> AiModelRoute(owner, navigator)
+        SessionScreen.AiModel -> AiModelRoute(owner, navigator, container)
         SessionScreen.DeleteEverything -> DeleteEverythingScreen(
             onConfirm = {
                 // Everything that holds saved data is released first; the deletion then outlives this screen and session.
@@ -157,6 +157,7 @@ private fun CaseListRoute(
 private fun AiModelRoute(
     owner: ViewModelStoreOwner,
     navigator: SessionNavigator,
+    container: AppContainer,
 ) {
     val context = LocalContext.current
     val modelManager = remember { ModelManager(context) }
@@ -167,10 +168,17 @@ private fun AiModelRoute(
     AiModelScreen(
         state = state,
         onBack = navigator::back,
-        onDownloadPreset = { preset -> model.downloadPreset(preset, context) },
+        onDownloadPreset = { preset ->
+            container.pickerGrace.begin()
+            model.downloadPreset(preset, context)
+        },
+        onPickerOpening = container.pickerGrace::begin,
+        onPickerClosed = container.pickerGrace::end,
         onImportUri = { uri -> model.importFromUri(uri, context) },
+        onImportDetected = model::importDetectedDownload,
         onDeleteModel = model::deleteModel,
         onClearNotice = model::clearNotice,
+        onTestInference = model::testInference,
     )
 }
 

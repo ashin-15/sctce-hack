@@ -77,6 +77,15 @@ public class ModelManager public constructor(
         return if (file.exists()) file.delete() else false
     }
 
+    public fun importModelFile(
+        sourceFile: File,
+        targetFileName: String = sourceFile.name,
+        onProgress: ((bytesRead: Long) -> Unit)? = null,
+    ): File {
+        require(sourceFile.exists() && sourceFile.isFile) { "Source file does not exist: ${sourceFile.absolutePath}" }
+        return importModelStream(FileInputStream(sourceFile), targetFileName, onProgress)
+    }
+
     public fun importModelStream(
         sourceStream: InputStream,
         targetFileName: String,
@@ -85,6 +94,8 @@ public class ModelManager public constructor(
         val tempFile = File(modelsDir, "$targetFileName.tmp")
         val targetFile = File(modelsDir, targetFileName)
         if (tempFile.exists()) tempFile.delete()
+        val step = 4 * 1024 * 1024L
+        var lastReported = 0L
         sourceStream.use { input ->
             FileOutputStream(tempFile).use { output ->
                 val buffer = ByteArray(65536)
@@ -93,9 +104,13 @@ public class ModelManager public constructor(
                 while (input.read(buffer).also { read = it } != -1) {
                     output.write(buffer, 0, read)
                     total += read
-                    onProgress?.invoke(total)
+                    if (total - lastReported >= step) {
+                        lastReported = total
+                        onProgress?.invoke(total)
+                    }
                 }
                 output.flush()
+                onProgress?.invoke(total)
             }
         }
         if (targetFile.exists()) targetFile.delete()

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -43,15 +44,20 @@ fun AiModelScreen(
     state: AiModelUiState,
     onBack: () -> Unit,
     onDownloadPreset: (ModelPreset) -> Unit,
+    onPickerOpening: () -> Unit,
+    onPickerClosed: () -> Unit,
     onImportUri: (Uri) -> Unit,
+    onImportDetected: (ModelPreset) -> Unit,
     onDeleteModel: (String) -> Unit,
     onClearNotice: () -> Unit,
+    onTestInference: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var confirmDeleteFor by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        onPickerClosed()
         if (uri != null) {
             onImportUri(uri)
         }
@@ -85,14 +91,24 @@ fun AiModelScreen(
             item {
                 InstalledModelCard(
                     installed = state.installedModel,
+                    isTesting = state.isTestingInference,
+                    testOutput = state.testOutput,
                     onDelete = { confirmDeleteFor = state.installedModel?.filename },
+                    onTestInference = onTestInference,
                 )
             }
 
             item {
                 DownloadInstructionsCard(
                     isImporting = state.isImporting,
-                    onPickFile = { filePicker.launch(arrayOf("*/*")) },
+                    importedBytes = state.importedBytes,
+                    totalBytes = state.totalBytesToImport,
+                    detectedPreset = state.detectedInDownloads,
+                    onPickFile = {
+                        onPickerOpening()
+                        filePicker.launch(arrayOf("*/*"))
+                    },
+                    onImportDetected = onImportDetected,
                 )
             }
 
@@ -125,7 +141,10 @@ fun AiModelScreen(
 @Composable
 private fun InstalledModelCard(
     installed: InstalledModel?,
+    isTesting: Boolean,
+    testOutput: String?,
     onDelete: () -> Unit,
+    onTestInference: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SakshiCard(modifier = modifier) {
@@ -135,9 +154,34 @@ private fun InstalledModelCard(
         ) {
             SectionHeader(stringResource(R.string.ai_model_installed_heading))
             if (installed != null) {
+                LabelValue("Model", installed.displayName)
+                LabelValue("Status", installed.statusDescription)
                 LabelValue(stringResource(R.string.ai_model_file_label, ""), installed.filename)
                 LabelValue(stringResource(R.string.ai_model_size_label, ""), installed.formattedSize)
                 LabelValue("Hash", installed.sha256Prefix)
+
+                PrimaryButton(
+                    text = if (isTesting) stringResource(R.string.ai_model_testing) else stringResource(R.string.ai_model_btn_test),
+                    onClick = onTestInference,
+                    enabled = !isTesting,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                if (testOutput != null) {
+                    SakshiCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.padding(Spacing.md),
+                            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ai_model_test_result_label),
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            SupportingText(testOutput)
+                        }
+                    }
+                }
+
                 DestructiveButton(
                     text = stringResource(R.string.ai_model_btn_delete),
                     onClick = onDelete,
@@ -153,7 +197,11 @@ private fun InstalledModelCard(
 @Composable
 private fun DownloadInstructionsCard(
     isImporting: Boolean,
+    importedBytes: Long,
+    totalBytes: Long,
+    detectedPreset: ModelPreset?,
     onPickFile: () -> Unit,
+    onImportDetected: (ModelPreset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SakshiCard(modifier = modifier) {
@@ -163,13 +211,46 @@ private fun DownloadInstructionsCard(
         ) {
             SectionHeader("Step 2: Install downloaded model")
             SupportingText(stringResource(R.string.ai_model_download_body))
-            PrimaryButton(
+
+            if (detectedPreset != null) {
+                Text(
+                    text = stringResource(R.string.ai_model_detected_in_downloads, detectedPreset.displayName),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                PrimaryButton(
+                    text = stringResource(R.string.ai_model_btn_import_detected),
+                    onClick = { onImportDetected(detectedPreset) },
+                    enabled = !isImporting,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            SecondaryButton(
                 text = stringResource(R.string.ai_model_btn_import),
                 onClick = onPickFile,
                 enabled = !isImporting,
+                modifier = Modifier.fillMaxWidth(),
             )
+
             if (isImporting) {
-                SupportingText(stringResource(R.string.ai_model_importing))
+                if (totalBytes > 0L) {
+                    val progress = (importedBytes.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f)
+                    val currentMb = importedBytes / (1024 * 1024)
+                    val totalMb = totalBytes / (1024 * 1024)
+                    val percent = (progress * 100).toInt()
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    SupportingText("$currentMb MB / $totalMb MB ($percent%)")
+                } else {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    val currentMb = importedBytes / (1024 * 1024)
+                    SupportingText("$currentMb MB copied...")
+                }
             }
         }
     }

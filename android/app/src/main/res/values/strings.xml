@@ -839,4 +839,10 @@
     <string name="ai_model_notice_deleted">Model file deleted.</string>
     <string name="ai_model_size_label">Size: %1$s</string>
     <string name="ai_model_file_label">File: %1$s</string>
+    <string name="ai_model_status_label">Status: %1$s</string>
+    <string name="ai_model_btn_test">Test model inference</string>
+    <string name="ai_model_testing">Testing inference...</string>
+    <string name="ai_model_test_result_label">Inference result</string>
+    <string name="ai_model_detected_in_downloads">Detected in Downloads: %1$s</string>
+    <string name="ai_model_btn_import_detected">Install detected download</string>
 </resources>
