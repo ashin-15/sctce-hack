@@ -13,3 +13,4 @@ android/.kotlin/
 android/**/build/
 android/local.properties
 graphify-out/
+AgentHitaAndroid/

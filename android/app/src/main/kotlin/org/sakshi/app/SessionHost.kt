@@ -16,9 +16,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import org.sakshi.acquisition.importer.ImportMechanism
 import java.time.ZoneId
+import org.sakshi.app.aimodel.AiModelScreen
+import org.sakshi.app.aimodel.AiModelViewModel
 import org.sakshi.app.analysis.AnalysisActions
 import org.sakshi.app.analysis.AnalysisScreen
 import org.sakshi.app.analysis.AnalysisViewModel
+import org.sakshi.processing.llm.model.ModelManager
 import org.sakshi.app.cases.CaseListScreen
 import org.sakshi.app.cases.CaseListViewModel
 import org.sakshi.app.deletion.DeleteEverythingScreen
@@ -110,6 +113,7 @@ fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewM
         is SessionScreen.ReportSelection -> ReportSelectionRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ReportPreview -> ReportPreviewRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ExportResult -> ExportResultRoute(screen.caseId, services, owner, navigator, container)
+        SessionScreen.AiModel -> AiModelRoute(owner, navigator)
         SessionScreen.DeleteEverything -> DeleteEverythingScreen(
             onConfirm = {
                 // Everything that holds saved data is released first; the deletion then outlives this screen and session.
@@ -145,6 +149,28 @@ private fun CaseListRoute(
         onLock = container.session::lock,
         onOpen = navigator::openCase,
         onDeleteEverything = navigator::openDeleteEverything,
+        onOpenAiModel = navigator::openAiModel,
+    )
+}
+
+@Composable
+private fun AiModelRoute(
+    owner: ViewModelStoreOwner,
+    navigator: SessionNavigator,
+) {
+    val context = LocalContext.current
+    val modelManager = remember { ModelManager(context) }
+    val model = remember(modelManager) {
+        ViewModelProvider(owner, AiModelViewModel.factory(modelManager))[AiModelViewModel::class.java]
+    }
+    val state by model.uiState.collectAsState()
+    AiModelScreen(
+        state = state,
+        onBack = navigator::back,
+        onDownloadPreset = { preset -> model.downloadPreset(preset, context) },
+        onImportUri = { uri -> model.importFromUri(uri, context) },
+        onDeleteModel = model::deleteModel,
+        onClearNotice = model::clearNotice,
     )
 }
 

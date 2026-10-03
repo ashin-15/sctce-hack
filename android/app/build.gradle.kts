@@ -89,6 +89,7 @@ dependencies {
     implementation(project(":acquisition:importer"))
     implementation(project(":processing:analysis"))
     implementation(project(":processing:ocr"))
+    implementation(project(":processing:llm"))
     implementation(project(":export:report"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

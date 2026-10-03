@@ -56,6 +56,8 @@ class SessionNavigator : ViewModel() {
     fun openReportPreview(caseId: String) = push(SessionScreen.ReportPreview(caseId))
 
     fun openExportResult(caseId: String) = push(SessionScreen.ExportResult(caseId))
+ 
+    fun openAiModel() = push(SessionScreen.AiModel)
 
     /** Swaps the screen on top, for a step that should not be returned to (the analysis result becomes the timeline). */
     fun replaceTopWithTimeline(caseId: String) {

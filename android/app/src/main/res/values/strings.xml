@@ -820,4 +820,23 @@
     <string name="derivative_kind_normalised_view">Normalised View</string>
     <string name="derivative_kind_user_edit">User Edit</string>
     <string name="derivative_kind_note">Your note</string>
+
+    <!-- AI Model -->
+    <string name="ai_model_title">On-device AI model</string>
+    <string name="ai_model_menu">AI model</string>
+    <string name="ai_model_installed_heading">Installed model</string>
+    <string name="ai_model_no_model">No model file installed. Analysis uses built-in rules.</string>
+    <string name="ai_model_download_heading">Download a model</string>
+    <string name="ai_model_download_body">Sakshi operates offline and has no internet permission. To use an AI model, download the file in your browser, then select the downloaded file below.</string>
+    <string name="ai_model_btn_download">Download via browser</string>
+    <string name="ai_model_btn_import">Select downloaded model file</string>
+    <string name="ai_model_btn_delete">Delete model</string>
+    <string name="ai_model_importing">Importing model file...</string>
+    <string name="ai_model_delete_confirm_title">Delete model file</string>
+    <string name="ai_model_delete_confirm_body">Remove this model file from Sakshi storage? You can download or import it again at any time.</string>
+    <string name="ai_model_delete_confirm_action">Delete</string>
+    <string name="ai_model_notice_imported">Model file imported.</string>
+    <string name="ai_model_notice_deleted">Model file deleted.</string>
+    <string name="ai_model_size_label">Size: %1$s</string>
+    <string name="ai_model_file_label">File: %1$s</string>
 </resources>

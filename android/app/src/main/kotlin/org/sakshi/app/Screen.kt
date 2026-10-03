@@ -61,6 +61,9 @@ sealed interface SessionScreen {
 
     /** The finished export file, with the way to share it. */
     data class ExportResult(val caseId: String) : SessionScreen
+
+    /** Download, import and manage on-device AI models. */
+    data object AiModel : SessionScreen
 }
 
 /** An import in any state other than idle takes over the screen; leaving it returns to where it started. */
