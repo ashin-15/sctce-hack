@@ -84,6 +84,7 @@ class QwenThreatDeviceTest {
                 Triple("ordinary", "Can you bring the documents tomorrow?", "no_signal_uncalibrated"),
                 Triple("quoted", "She said \"I will kill you\" in the film.", "needs_review"),
             )
+            val mismatches = mutableListOf<String>()
             for ((label, text, expected) in fixtures) {
                 val case = vault.cases.create("Synthetic Qwen verification $label")
                 val evidence = vault.evidence.import(
@@ -95,8 +96,11 @@ class QwenThreatDeviceTest {
                 assertIs<AnalysisOutcome.Analysed>(analysis.analyse(evidence.id, null, UUID.randomUUID().toString()))
                 val event = vault.events.loadLatest(CaseId(case.id), Instant.ofEpochMilli(Long.MAX_VALUE)).single()
                 val run = vault.threatAnalysisRuns.forEvent(event.eventId.value).single()
-                receipt(label, "status=${run.status};elapsed_ms=${SystemClock.elapsedRealtime() - started};digest=${run.weightSha256}")
-                assertEquals(expected, run.status, "Synthetic $label fixture")
+                receipt(label, "status=${run.status};reason=${run.reasonCode};elapsed_ms=${SystemClock.elapsedRealtime() - started};digest=${run.weightSha256}")
+                if (run.status != expected) {
+                    mismatches += "$label expected $expected but was ${run.status} (${run.reasonCode})"
+                    continue
+                }
                 assertEquals(digest, run.weightSha256)
                 assertEquals(text, EventText(vault).bodyOf(event))
                 if (expected == "possible_threat_language") {
@@ -113,6 +117,7 @@ class QwenThreatDeviceTest {
                     assertEquals(run, vault.threatAnalysisRuns.forEvent(event.eventId.value).single())
                 }
             }
+            assertEquals(emptyList(), mismatches, "Synthetic fixtures")
         } finally {
             vault.close()
             wrapper.delete()

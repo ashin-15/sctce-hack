@@ -306,6 +306,7 @@ Java_org_sakshi_processing_llm_engine_NativeLlmBridge_nativeGenerate(
                     output.clear();
                     break;
                 }
+                // llama_sampler_sample accepts the token itself; a second accept would advance the grammar twice.
                 const llama_token token = llama_sampler_sample(sampler, session->context, -1);
                 if (llama_vocab_is_eog(vocab, token)) {
                     status = kSuccess;
@@ -319,7 +320,6 @@ Java_org_sakshi_processing_llm_engine_NativeLlmBridge_nativeGenerate(
                     break;
                 }
                 output.append(piece, static_cast<size_t>(piece_size));
-                llama_sampler_accept(sampler, token);
                 bool stop_hit = false;
                 for (const auto & stop : stops) {
                     if (!stop.empty() && output.size() >= stop.size() && output.compare(output.size() - stop.size(), stop.size(), stop) == 0) {
