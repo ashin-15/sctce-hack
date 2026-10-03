@@ -1,6 +1,7 @@
 package org.sakshi.app.aimodel
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,14 @@ fun AiModelScreen(
 ) {
     var confirmDeleteFor by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
+
+    BackHandler {
+        if (confirmDeleteFor != null) {
+            confirmDeleteFor = null
+        } else {
+            onBack()
+        }
+    }
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         onPickerClosed()

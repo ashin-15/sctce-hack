@@ -1,0 +1,35 @@
+{
+  "scope": "selected modules only; synthetic fixtures",
+  "modules": {
+    "app": {
+      "tests": 413,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 56
+    },
+    "acquisition/notifications": {
+      "tests": 128,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "acquisition/accessibility": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "processing/analysis": {
+      "tests": 87,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "tools/policy": {
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  }
+}

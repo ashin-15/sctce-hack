@@ -64,6 +64,10 @@ sealed interface SessionScreen {
 
     /** Download, import and manage on-device AI models. */
     data object AiModel : SessionScreen
+
+    data object Observation : SessionScreen
+
+    data object VisibleCapture : SessionScreen
 }
 
 /** An import in any state other than idle takes over the screen; leaving it returns to where it started. */

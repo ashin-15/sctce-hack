@@ -20,6 +20,10 @@ public data class NotificationSettingsState(
     val lockScreenPreviewsOptIn: Boolean = false,
     /** Report what is already shown when the listener connects. Off: it only seeds de-duplication state. */
     val includeActiveOnConnect: Boolean = false,
+    /** Separate consent for temporary memory-only observation while the vault is closed. */
+    val backgroundObservationOptIn: Boolean = false,
+    /** Separate choice to show neutral local cue alerts, never evidence content. */
+    val cueAlertsOptIn: Boolean = false,
 )
 
 /**
@@ -58,6 +62,8 @@ public class NotificationSettings internal constructor(private val file: File) {
             allowlist = PackageAllowlist.of(names),
             lockScreenPreviewsOptIn = properties.getProperty(KEY_LOCK_OPT_IN).toBoolean(),
             includeActiveOnConnect = properties.getProperty(KEY_INCLUDE_ACTIVE).toBoolean(),
+            backgroundObservationOptIn = properties.getProperty(KEY_BACKGROUND).toBoolean(),
+            cueAlertsOptIn = properties.getProperty(KEY_ALERTS).toBoolean(),
         )
     }
 
@@ -67,6 +73,8 @@ public class NotificationSettings internal constructor(private val file: File) {
         properties.setProperty(KEY_PAUSED, value.paused.toString())
         properties.setProperty(KEY_LOCK_OPT_IN, value.lockScreenPreviewsOptIn.toString())
         properties.setProperty(KEY_INCLUDE_ACTIVE, value.includeActiveOnConnect.toString())
+        properties.setProperty(KEY_BACKGROUND, value.backgroundObservationOptIn.toString())
+        properties.setProperty(KEY_ALERTS, value.cueAlertsOptIn.toString())
         properties.setProperty(KEY_ALLOWLIST, value.allowlist.names.sorted().joinToString(SEPARATOR))
         file.parentFile?.mkdirs()
         val temporary = File(file.parentFile, file.name + ".tmp")
@@ -84,6 +92,8 @@ public class NotificationSettings internal constructor(private val file: File) {
         private const val KEY_PAUSED = "paused"
         private const val KEY_LOCK_OPT_IN = "lock_screen_previews_opt_in"
         private const val KEY_INCLUDE_ACTIVE = "include_active_on_connect"
+        private const val KEY_BACKGROUND = "background_observation_opt_in"
+        private const val KEY_ALERTS = "cue_alerts_opt_in"
         private const val KEY_ALLOWLIST = "allowlist"
 
         /** Settings kept in the app's no-backup directory. */

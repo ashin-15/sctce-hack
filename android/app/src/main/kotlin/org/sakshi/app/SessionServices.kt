@@ -22,7 +22,16 @@ import org.sakshi.app.review.VaultImageLoader
 import org.sakshi.processing.analysis.CasePatterns
 import org.sakshi.processing.analysis.RulesEngineFactory
 import org.sakshi.processing.analysis.TextAnalysis
+import org.sakshi.processing.llm.engine.InferenceLock
 import org.sakshi.processing.ocr.MlKitOcrProcessor
+import org.sakshi.processing.stt.HeavyModelLock
+import org.sakshi.processing.stt.ModelProvisioner
+import org.sakshi.processing.stt.ModelSessionManager
+import org.sakshi.processing.stt.ModelSpec
+import org.sakshi.processing.stt.SpeechEngine
+import org.sakshi.processing.stt.SttProcessor
+import org.sakshi.processing.stt.ThermalStatusProvider
+import org.sakshi.processing.stt.WhisperEngine
 import org.sakshi.processing.text.BenchCueList
 
 /**
@@ -33,7 +42,11 @@ import org.sakshi.processing.text.BenchCueList
  * opened vault, so that happens once per session.
  *
  * Creating the services wipes the export folder, so a file left behind by an earlier run never outlives the next unlock.
- * [close] releases the text recognition engine when the session ends.
+ * [close] releases the text recognition engine and the speech model when the session ends.
+ *
+ * Speech recognition runs the whisper.cpp base model from [speechProvisioner]'s file. The model is never bundled or
+ * downloaded; it is in memory only while a recording is being read. It shares one lock with the local language model,
+ * so the two heavy models are never loaded at the same time.
  */
 class SessionServices(
     val vault: Vault,
@@ -44,7 +57,10 @@ class SessionServices(
     signer: ManifestSigner = KeystoreManifestSigner(),
     renderer: ReportRenderer = ReportPdfRenderer(),
     appVersion: String = BuildConfig.VERSION_NAME,
+    speechEngine: SpeechEngine = WhisperEngine(),
+    val speechProvisioner: ModelProvisioner = ModelProvisioner.forContext(context),
 ) : AutoCloseable {
+    val appContext: Context = context.applicationContext
     init {
         vault.enableNoteSearch()
     }
@@ -56,11 +72,20 @@ class SessionServices(
     /** Bundled Latin-script text recognition; the engine is loaded on first use, on the phone, with no download. */
     private val ocr = MlKitOcrProcessor()
 
+    private val speechSessions = ModelSessionManager(
+        ModelSpec.WHISPER_BASE_Q5_1,
+        speechProvisioner.modelFile,
+        speechEngine,
+        lock = LanguageModelLock,
+    )
+
+    private val speech = SttProcessor(speechSessions, ThermalStatusProvider.system(context))
+
     /**
-     * Reads saved text, and text recognised in screenshots and photos, into events. Uses the demonstration word list,
-     * so every match is only a suggestion.
+     * Reads saved text, text recognised in screenshots and photos, and speech in recordings into events. Uses the
+     * demonstration word list, so every match is only a suggestion.
      */
-    val textAnalysis: TextAnalysis = TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, ocr = ocr)
+    val textAnalysis: TextAnalysis = TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, ocr = ocr, stt = speech)
 
     /** Decodes a saved picture in memory for the review screen; nothing is written to storage. */
     val images: EvidenceImageLoader = VaultImageLoader(vault.evidence, io)
@@ -83,5 +108,17 @@ class SessionServices(
         it.clearExports()
     }
 
-    override fun close() = ocr.close()
+    /** Frees the speech model when the phone is short of memory. Forward `onTrimMemory` here. */
+    fun onTrimMemory(level: Int) = speechSessions.onTrimMemory(level)
+
+    override fun close() {
+        speech.cancelCurrent()
+        speechSessions.release()
+        ocr.close()
+    }
+}
+
+/** The speech model waits for the local language model, and the other way round, so only one is loaded at a time. */
+private object LanguageModelLock : HeavyModelLock {
+    override suspend fun <T> withExclusive(block: suspend () -> T): T = InferenceLock.withLock(block)
 }

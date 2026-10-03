@@ -1,0 +1,5 @@
+org.sakshi.acquisition.notifications.SyntheticNotificationDeviceTest:.
+
+Time: 9.751
+
+OK (1 test)

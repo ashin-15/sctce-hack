@@ -23,18 +23,25 @@ public class SakshiNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         val observation = NotificationObservation.from(applicationContext)
-        observation.onListenerConnected()
-        // Only packages on the allowlist are read, and only once the person has enabled the lane.
-        val active = try {
-            activeNotifications
-        } catch (ignored: SecurityException) {
-            null
-        }
-        observation.intake.onActiveSnapshot(active.orEmpty().map { it.toSource() })
+        observation.onListenerConnected(::readActiveSources)
+    }
+
+    /** A denied or unavailable platform snapshot is unknown, never an invented empty successful batch. */
+    private fun readActiveSources(): List<NotificationSource>? = try {
+        activeNotifications?.map { it.toSource() }
+    } catch (_: SecurityException) {
+        null
+    } catch (_: IllegalStateException) {
+        null
     }
 
     override fun onListenerDisconnected() {
         NotificationObservation.from(applicationContext).onListenerDisconnected()
+    }
+
+    override fun onDestroy() {
+        NotificationObservation.from(applicationContext).onListenerDisconnected()
+        super.onDestroy()
     }
 
     private fun StatusBarNotification.toSource(): NotificationSource =

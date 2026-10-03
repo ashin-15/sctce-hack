@@ -87,7 +87,13 @@ private sealed interface ReviewDialog {
 fun EventReviewScreen(state: EventReviewState, zone: ZoneId, actions: EventReviewActions, modifier: Modifier = Modifier) {
     var dialog by remember { mutableStateOf<ReviewDialog?>(null) }
     var pictureLarge by rememberSaveable { mutableStateOf(false) }
-    BackHandler(onBack = actions.back)
+    BackHandler {
+        if (dialog != null) {
+            dialog = null
+        } else {
+            actions.back()
+        }
+    }
     val ready = state.picture as? PictureState.Ready
     if (pictureLarge && ready != null) {
         PictureLargeView(state, ready, onClose = { pictureLarge = false }, modifier)

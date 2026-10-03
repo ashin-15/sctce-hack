@@ -68,7 +68,13 @@ private sealed interface PeopleDialog {
 @Composable
 fun WhoIsWhoScreen(state: WhoIsWhoState, zone: ZoneId, actions: WhoIsWhoActions, modifier: Modifier = Modifier) {
     var dialog by remember { mutableStateOf<PeopleDialog?>(null) }
-    BackHandler(onBack = actions.back)
+    BackHandler {
+        if (dialog != null) {
+            dialog = null
+        } else {
+            actions.back()
+        }
+    }
     SakshiScaffold(
         title = stringResource(R.string.people_title),
         modifier = modifier,

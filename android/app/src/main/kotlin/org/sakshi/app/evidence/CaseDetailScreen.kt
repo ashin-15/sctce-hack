@@ -58,7 +58,13 @@ class CaseDetailActions(
 fun CaseDetailScreen(state: CaseDetailUiState, actions: CaseDetailActions, modifier: Modifier = Modifier) {
     var dialog by remember { mutableStateOf<Dialog?>(null) }
     val snackbar = remember { SnackbarHostState() }
-    BackHandler(onBack = actions.back)
+    BackHandler {
+        if (dialog != null) {
+            dialog = null
+        } else {
+            actions.back()
+        }
+    }
 
     val notice = state.message?.let { stringResource(R.string.message_delete_failed) }
     LaunchedEffect(state.message) {

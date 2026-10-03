@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Calm Sanctuary Sakshi Brand Emblem -->
+    <!-- Background rounded squircle / rect -->
+    <path
+        android:fillColor="#0F766E"
+        android:pathData="M24,0 L76,0 A24,24 0 0,1 100,24 L100,76 A24,24 0 0,1 76,100 L24,100 A24,24 0 0,1 0,76 L0,24 A24,24 0 0,1 24,0 Z" />
+    <!-- Shield of privacy outline -->
+    <path
+        android:strokeColor="#E6FFFA"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M50,22 C36,22 28,29 28,42 C28,62 46,74 50,78 C54,74 72,62 72,42 C72,29 64,22 50,22 Z" />
+    <!-- Eye witness circle ring -->
+    <path
+        android:strokeColor="#E6FFFA"
+        android:strokeWidth="4.5"
+        android:fillColor="#00000000"
+        android:pathData="M50,36 A10,10 0 1,0 50,56 A10,10 0 1,0 50,36" />
+    <!-- Eye pupil iris -->
+    <path
+        android:fillColor="#2DD4BF"
+        android:pathData="M50,41.5 A4.5,4.5 0 1,0 50,50.5 A4.5,4.5 0 1,0 50,41.5" />
+</vector>

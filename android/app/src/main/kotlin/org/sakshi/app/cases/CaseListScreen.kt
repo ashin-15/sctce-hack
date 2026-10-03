@@ -1,5 +1,6 @@
 package org.sakshi.app.cases
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -30,10 +31,16 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import java.time.ZoneId
 import org.sakshi.app.BuildConfig
 import org.sakshi.app.R
 import org.sakshi.app.ui.catalog.DesignCatalog
+import org.sakshi.app.ui.components.Workspace
+import org.sakshi.app.ui.components.WorkspaceNavigation
+import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.LocalVaultBadge
+import org.sakshi.app.ui.components.SakshiBrandLogo
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.MenuAction
 import org.sakshi.app.ui.components.OverflowMenuButton
@@ -70,11 +77,28 @@ fun CaseListScreen(
     onDeleteEverything: () -> Unit,
     onOpenAiModel: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenEvidence: (String) -> Unit = onOpen,
+    onOpenTimeline: (String) -> Unit = onOpen,
+    onOpenReports: (String) -> Unit = onOpen,
+    onObservationSettings: (() -> Unit)? = null,
+    onCaptureSettings: (() -> Unit)? = null,
+    initialWorkspace: Workspace = Workspace.Home,
 ) {
+    var workspace by rememberSaveable { mutableStateOf(initialWorkspace) }
     var dialog by remember { mutableStateOf<Dialog?>(null) }
     var archivedExpanded by rememberSaveable { mutableStateOf(false) }
     var catalogOpen by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
+
+    BackHandler(enabled = dialog != null || archivedExpanded || workspace != Workspace.Home) {
+        if (dialog != null) {
+            dialog = null
+        } else if (archivedExpanded) {
+            archivedExpanded = false
+        } else {
+            workspace = Workspace.Home
+        }
+    }
 
     val notice = state.message?.let { messageText(it) }
     LaunchedEffect(state.message) {
@@ -101,11 +125,14 @@ fun CaseListScreen(
         onTitleLongPress = if (BuildConfig.DEBUG) ({ catalogOpen = true }) else null,
         snackbarHostState = snackbar,
         bottomBar = {
-            PrimaryButton(
-                stringResource(R.string.cases_new),
-                { dialog = Dialog.Create },
-                Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
-            )
+            Column {
+                PrimaryButton(
+                    stringResource(R.string.cases_new),
+                    { dialog = Dialog.Create },
+                    Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.sm),
+                )
+                WorkspaceNavigation(workspace, { workspace = it })
+            }
         },
     ) {
         CaseList(
@@ -116,7 +143,15 @@ fun CaseListScreen(
             onArchive = onArchive,
             onUnarchive = onUnarchive,
             onDelete = { dialog = Dialog.Delete(it) },
-            onOpen = onOpen,
+            onOpen = when (workspace) {
+                Workspace.Evidence -> onOpenEvidence
+                Workspace.Incidents -> onOpenTimeline
+                Workspace.Reports -> onOpenReports
+                Workspace.Home, Workspace.Vault -> onOpen
+            },
+            workspace = workspace,
+            onObservationSettings = onObservationSettings,
+            onCaptureSettings = onCaptureSettings,
         )
     }
 
@@ -161,12 +196,18 @@ private fun CaseList(
     onUnarchive: (String) -> Unit,
     onDelete: (CaseSummary) -> Unit,
     onOpen: (String) -> Unit,
+    workspace: Workspace,
+    onObservationSettings: (() -> Unit)?,
+    onCaptureSettings: (() -> Unit)?,
 ) {
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
+        item(key = "workspace-header") {
+            WorkspaceHeader(workspace, state, onObservationSettings, onCaptureSettings)
+        }
         if (state.active.isEmpty()) {
             item(key = "empty") {
                 EmptyState(stringResource(R.string.cases_empty_title), stringResource(R.string.cases_empty_body))
@@ -243,6 +284,60 @@ private fun CaseRow(
                     MenuAction(stringResource(R.string.case_delete), destructive = true) { onDelete(case) },
                 ),
                 modifier = Modifier.padding(horizontal = Spacing.xs),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WorkspaceHeader(
+    workspace: Workspace,
+    state: CaseListUiState,
+    onObservationSettings: (() -> Unit)?,
+    onCaptureSettings: (() -> Unit)?,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.lg), modifier = Modifier.padding(vertical = Spacing.sm)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+            SakshiBrandLogo(size = 40.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                Text(stringResource(workspace.title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
+                LocalVaultBadge(text = stringResource(R.string.stitch_local))
+            }
+        }
+        when (workspace) {
+            Workspace.Home -> {
+                SectionHeader(stringResource(R.string.stitch_welcome))
+                SupportingText(stringResource(R.string.stitch_welcome_body))
+                VaultSummary(state)
+                if (onObservationSettings != null || onCaptureSettings != null) {
+                    SectionHeader(stringResource(R.string.stitch_collection_heading))
+                    SupportingText(stringResource(R.string.stitch_collection_body))
+                    onObservationSettings?.let { PrimaryButton(stringResource(R.string.stitch_notifications), it) }
+                    onCaptureSettings?.let { PrimaryButton(stringResource(R.string.stitch_capture), it) }
+                }
+            }
+            Workspace.Vault -> VaultSummary(state)
+            Workspace.Evidence -> SupportingText(stringResource(R.string.stitch_evidence_body))
+            Workspace.Incidents -> SupportingText(stringResource(R.string.stitch_incidents_body))
+            Workspace.Reports -> SupportingText(stringResource(R.string.stitch_reports_body))
+        }
+        SectionHeader(stringResource(R.string.stitch_cases_heading))
+    }
+}
+
+@Composable
+private fun VaultSummary(state: CaseListUiState) {
+    SakshiCard {
+        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            SectionHeader(stringResource(R.string.stitch_vault_title))
+            SupportingText(stringResource(R.string.stitch_vault_body))
+            val evidenceCount = state.active.sumOf { it.evidenceCount }
+            SupportingText(
+                stringResource(
+                    R.string.stitch_cases_summary,
+                    pluralStringResource(R.plurals.stitch_active_cases, state.active.size, state.active.size),
+                    pluralStringResource(R.plurals.stitch_evidence_items, evidenceCount, evidenceCount),
+                ),
             )
         }
     }

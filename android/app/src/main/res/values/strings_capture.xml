@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="projection_disclosure">Screen capture copies only the visible pixels Android permits. Choose an app window in the Android prompt when available. On older devices, the whole display may be captured. Do not open password fields, disappearing content or screens you do not want saved. Captures are encrypted temporarily; return to Sakshi, unlock, review each frame, then choose a case to save. Screen lock, expiry or process death removes unreviewed drafts.</string>
+    <string name="projection_notifications_disabled">Enable Sakshi notifications to keep Android’s visible Stop control available during capture.</string>
+    <string name="projection_snapshot">Capture one screen</string>
+    <string name="projection_start_burst">Start burst capture</string>
+    <string name="projection_stop">Stop screen capture</string>
+    <string name="projection_capture_failed">Screen capture could not start. Enable Sakshi notifications and try again.</string>
+    <string name="projection_active">Capture starts in five seconds. Switch to the screen you want; scroll manually during a burst.</string>
+    <string name="projection_ready">Capture stopped. Review or discard drafts within five minutes.</string>
+    <string name="projection_failed">Capture stopped early. Any complete frames are ready for review.</string>
+    <string name="projection_no_drafts">No screen captures are waiting for review.</string>
+    <string name="projection_draft_title">Captured frame %1$d</string>
+    <string name="projection_draft_details">%1$d × %2$d · %3$d KB · observed %4$s</string>
+    <string name="projection_blank_frame">This frame appears blank. Its cause is unknown.</string>
+    <string name="projection_preview">Preview</string>
+    <string name="projection_save">Save to selected case</string>
+    <string name="projection_discard">Discard frame</string>
+    <string name="projection_review_title">Review screen captures</string>
+    <string name="projection_preview_unavailable">Preview is unavailable. The encrypted draft remains for another attempt.</string>
+    <string name="projection_need_case">Choose an active case below before saving a capture.</string>
+    <string name="capture_title">Capture visible text</string>
+    <string name="capture_disclosure">Accessibility access can expose text from other apps. With your consent, Sakshi reads only visible text exposed by selected chat apps during a session of up to five minutes. Open ordinary conversations yourself; do not open View Once or disappearing-content screens during capture. No tapping, scrolling, replying or screenshots are automated. The vault locks when you leave Sakshi; temporary drafts stay in memory until review. Screen lock, revocation or process exit clears them. Recognisable restricted or sensitive screens stop capture, but detection is incomplete. Inaccessible content is never recovered. This cannot capture every message or authenticate the sender.</string>
+    <string name="capture_access">I agree - open Accessibility settings</string>
+    <string name="capture_start">Start five-minute capture</string>
+    <string name="capture_switch_apps">Capture started. Switch to a selected chat app, then return and unlock Sakshi to review.</string>
+    <string name="capture_stop">Stop capture</string>
+    <string name="capture_revoke">Disable access and clear drafts</string>
+    <string name="capture_not_ready">Grant Accessibility access, wait for connection, and select an app before starting.</string>
+    <string name="capture_choose_case">Choose a case to save into</string>
+    <string name="capture_no_case">Create a case from Home before saving a snapshot.</string>
+    <string name="capture_empty">No visible text snapshots waiting for review.</string>
+    <string name="capture_uncertain">Visible window excerpt. Sender, direction, message boundaries and message time are unknown. Interface labels may be included.</string>
+    <string name="capture_save_analyse">Save excerpt and analyse locally</string>
+    <string name="capture_discard">Discard excerpt</string>
+    <string name="capture_failed">The action failed. Check access and storage, then try again.</string>
+    <string name="capture_settings_unavailable">System access settings are unavailable on this device.</string>
+    <string name="capture_alert_channel">Local review reminders</string>
+    <string name="capture_alert_title">Something to review</string>
+    <string name="capture_alert_body">A local phrase cue matched an observed excerpt. Unlock Sakshi to review. This may be a false match.</string>
+</resources>

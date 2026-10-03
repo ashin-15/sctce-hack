@@ -7,9 +7,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-/** Line height as a multiple of the font size. Indic scripts need the taller end, so nothing here is below 1.4. */
-private fun style(size: Int, lineHeight: Int, weight: FontWeight, letterSpacing: TextUnit = 0.sp) = TextStyle(
-    fontFamily = FontFamily.Default,
+/** Explicit Android sp measurements preserve user font scaling. Tracking is converted from the design's em values. */
+private fun style(
+    size: Int,
+    lineHeight: Int,
+    weight: FontWeight,
+    letterSpacing: TextUnit = 0.sp,
+    fontFamily: FontFamily = FontFamily.Default,
+) = TextStyle(
+    fontFamily = fontFamily,
     fontSize = size.sp,
     lineHeight = lineHeight.sp,
     fontWeight = weight,
@@ -17,29 +23,39 @@ private fun style(size: Int, lineHeight: Int, weight: FontWeight, letterSpacing:
 )
 
 /**
- * The type scale, on the platform sans family.
+ * The type scale for Calm Sanctuary:
  *
- * - screen title: `headlineSmall` 24/34 semibold (`headlineMedium` 28/40 for the lock screen)
- * - top row title: `titleMedium` 17/26 semibold
- * - section title: `titleMedium` 17/26 semibold, `titleSmall` 15/23 semibold for item headings
- * - body: `bodyLarge` 17/26 regular
- * - supporting: `bodyMedium` 15/23 regular, `bodySmall` 13/20
- * - label: `labelLarge` 15/23 medium (buttons), `labelMedium` 13/20 medium, `labelSmall` 12/18
+ * - display/hero: `displayLarge` 30/38 bold (-0.02em)
+ * - screen title: `headlineSmall` 24/32 bold (-0.01em), `headlineMedium` 28/38 bold
+ * - section title: `titleLarge` 20/28 semibold, `titleMedium` 17/24 semibold
+ * - item headings: `titleSmall` 15/22 semibold
+ * - body: `bodyLarge` 16/24 regular, `bodyMedium` 14/20 regular, `bodySmall` 12/16 regular
+ * - label: `labelLarge` 14/20 semibold (+0.01em), `labelMedium` 12/16 medium (+0.02em), `labelSmall` 11/14 semibold (+0.04em)
+ * - code/hashes: `codeSmall` 11/14 medium monospaced
  */
 internal val SakshiTypography = Typography(
-    displayLarge = style(40, 56, FontWeight.SemiBold),
-    displayMedium = style(34, 48, FontWeight.SemiBold),
-    displaySmall = style(30, 42, FontWeight.SemiBold),
-    headlineLarge = style(30, 42, FontWeight.SemiBold),
-    headlineMedium = style(28, 40, FontWeight.SemiBold),
-    headlineSmall = style(24, 34, FontWeight.SemiBold),
-    titleLarge = style(20, 30, FontWeight.SemiBold),
-    titleMedium = style(17, 26, FontWeight.SemiBold),
-    titleSmall = style(15, 23, FontWeight.SemiBold),
-    bodyLarge = style(17, 26, FontWeight.Normal, 0.1.sp),
-    bodyMedium = style(15, 23, FontWeight.Normal, 0.1.sp),
-    bodySmall = style(13, 20, FontWeight.Normal, 0.1.sp),
-    labelLarge = style(15, 23, FontWeight.Medium, 0.1.sp),
-    labelMedium = style(13, 20, FontWeight.Medium, 0.2.sp),
-    labelSmall = style(12, 18, FontWeight.Medium, 0.2.sp),
+    displayLarge = style(30, 38, FontWeight.Bold, (-0.6).sp),
+    displayMedium = style(24, 32, FontWeight.Bold, (-0.24).sp),
+    displaySmall = style(20, 28, FontWeight.SemiBold),
+    headlineLarge = style(30, 38, FontWeight.Bold, (-0.6).sp),
+    headlineMedium = style(28, 38, FontWeight.Bold, (-0.28).sp),
+    headlineSmall = style(24, 32, FontWeight.Bold, (-0.24).sp),
+    titleLarge = style(20, 28, FontWeight.SemiBold),
+    titleMedium = style(17, 24, FontWeight.SemiBold),
+    titleSmall = style(15, 22, FontWeight.SemiBold),
+    bodyLarge = style(16, 24, FontWeight.Normal, 0.sp),
+    bodyMedium = style(14, 20, FontWeight.Normal, 0.sp),
+    bodySmall = style(12, 16, FontWeight.Normal, 0.sp),
+    labelLarge = style(14, 20, FontWeight.SemiBold, 0.14.sp),
+    labelMedium = style(12, 16, FontWeight.Medium, 0.24.sp),
+    labelSmall = style(11, 14, FontWeight.SemiBold, 0.44.sp),
 )
+
+/** Monospaced code style for SHA-256 tokens and integrity hashes. */
+val Typography.codeSmall: TextStyle
+    get() = TextStyle(
+        fontFamily = FontFamily.Monospace,
+        fontSize = 11.sp,
+        lineHeight = 14.sp,
+        fontWeight = FontWeight.Medium,
+    )

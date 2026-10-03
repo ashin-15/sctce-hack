@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 fun SakshiCard(modifier: Modifier = Modifier, quiet: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.large,
         color = if (quiet) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 0.dp,

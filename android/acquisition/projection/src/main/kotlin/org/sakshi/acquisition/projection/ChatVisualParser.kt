@@ -4,9 +4,8 @@ import org.sakshi.processing.ocr.OcrLine
 import org.sakshi.processing.ocr.OcrResult
 
 /**
- * Parses OCR lines into structured conversation messages using spatial layout heuristics
- * inspired by AgentHita's messaging analysis, but operating directly on visual bounding boxes
- * rather than brittle view hierarchy node IDs.
+ * Produces unreviewed OCR layout proposals. Header, group and date classifications are heuristic;
+ * message authorship and direction remain unknown until a person reviews them.
  */
 public object ChatVisualParser {
 
@@ -171,12 +170,10 @@ public object ChatVisualParser {
             val direction = when {
                 DATE_SEPARATOR_REGEX.matches(combinedText.trim()) -> MessageDirection.SYSTEM_BANNER
                 combinedText.contains("end-to-end encrypted", ignoreCase = true) -> MessageDirection.SYSTEM_BANNER
-                leftMarginRatio > 0.55f -> MessageDirection.OUTGOING
-                leftMarginRatio < 0.45f -> MessageDirection.INCOMING
-                else -> MessageDirection.SYSTEM_BANNER
+                else -> MessageDirection.UNKNOWN
             }
 
-            // Calculate mean confidence
+            // OCR engine score is retained as an uncalibrated recognition score, not truth confidence.
             val confidences = blockLines.mapNotNull { it.confidence }
             val avgConfidence = if (confidences.isNotEmpty()) confidences.average().toFloat() else null
 

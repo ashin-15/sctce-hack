@@ -20,6 +20,9 @@ abstract class VerifyManifestPermissions : DefaultTask() {
     @get:Input
     abstract val allowedExported: ListProperty<String>
 
+    @get:Input
+    abstract val systemBoundServices: MapProperty<String, String>
+
     @TaskAction
     fun verify() {
         val document = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
@@ -39,6 +42,14 @@ abstract class VerifyManifestPermissions : DefaultTask() {
         val unexported = exported.filterNot { it in allowedExported.get() }
         check(unexported.isEmpty()) { "Merged manifest exports components outside the allowlist: $unexported" }
         exported.sorted().forEach { logger.lifecycle("exported component: $it") }
+        val services = document.getElementsByTagName("service").let { nodes ->
+            (0 until nodes.length).map { nodes.item(it) as org.w3c.dom.Element }
+        }
+        systemBoundServices.get().forEach { (name, bindingPermission) ->
+            val service = services.single { it.getAttributeNS(namespace, "name") == name }
+            check(service.getAttributeNS(namespace, "permission") == bindingPermission) { "Service $name lost its system binding permission" }
+            check(service.getAttributeNS(namespace, "enabled") == "false") { "Service $name must be disabled before explicit consent" }
+        }
     }
 }
 
@@ -87,8 +98,12 @@ dependencies {
     implementation(project(":core:integrity"))
     implementation(project(":core:vault"))
     implementation(project(":acquisition:importer"))
+    implementation(project(":acquisition:notifications"))
+    implementation(project(":acquisition:accessibility"))
+    implementation(project(":acquisition:projection"))
     implementation(project(":processing:analysis"))
     implementation(project(":processing:ocr"))
+    implementation(project(":processing:stt"))
     implementation(project(":processing:llm"))
     implementation(project(":export:report"))
     implementation(platform(libs.androidx.compose.bom))
@@ -106,6 +121,9 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 val verifyManifestPermissions = tasks.register<VerifyManifestPermissions>("verifyManifestPermissions") {
@@ -116,6 +134,9 @@ val verifyManifestPermissions = tasks.register<VerifyManifestPermissions>("verif
         listOf(
             "android.permission.USE_BIOMETRIC",
             "android.permission.USE_FINGERPRINT",
+            "android.permission.POST_NOTIFICATIONS",
+            "android.permission.FOREGROUND_SERVICE",
+            "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
             "org.sakshi.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
         ),
     )
@@ -124,6 +145,14 @@ val verifyManifestPermissions = tasks.register<VerifyManifestPermissions>("verif
             "org.sakshi.app.MainActivity",
             "org.sakshi.app.ShareTargetActivity",
             "androidx.profileinstaller.ProfileInstallReceiver",
+            "org.sakshi.acquisition.notifications.SakshiNotificationListener",
+            "org.sakshi.acquisition.accessibility.SakshiVisibleTextService",
+        ),
+    )
+    systemBoundServices.set(
+        mapOf(
+            "org.sakshi.acquisition.notifications.SakshiNotificationListener" to "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE",
+            "org.sakshi.acquisition.accessibility.SakshiVisibleTextService" to "android.permission.BIND_ACCESSIBILITY_SERVICE",
         ),
     )
     dependsOn("processDebugMainManifest")

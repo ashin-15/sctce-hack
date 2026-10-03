@@ -40,60 +40,89 @@ internal class Palette(
 )
 
 internal val LightPalette = Palette(
-    background = 0xFAF7F0,
-    surface = 0xFFFDF8,
-    surfaceQuiet = 0xF1ECE0,
-    ink = 0x25212A,
-    muted = 0x655C6E,
-    outlineVariant = 0xCEC6B9,
-    outlineStrong = 0x857C8F,
-    gold = 0x78551B,
-    green = 0x27644E,
-    red = 0x983F39,
-    primary = 0x3D3346,
-    onPrimary = 0xFFFDF8,
-    primaryContainer = 0xE8E1EB,
-    onPrimaryContainer = 0x25212A,
-    onGold = 0xFFFDF8,
-    goldContainer = 0xF0E4C8,
-    onGoldContainer = 0x3B2A09,
-    onGreen = 0xFFFDF8,
-    greenContainer = 0xDCEDE3,
-    onGreenContainer = 0x11372A,
-    onRed = 0xFFFDF8,
-    redContainer = 0xF5DFDC,
-    onRedContainer = 0x5C1C17,
-    inverseSurface = 0x25212A,
-    inverseOnSurface = 0xFAF7F0,
+    background = 0xF8FAFC,
+    surface = 0xFFFFFF,
+    surfaceQuiet = 0xF1F5F9,
+    ink = 0x0F172A,
+    muted = 0x475569,
+    outlineVariant = 0xE2E8F0,
+    outlineStrong = 0x64748B,
+    gold = 0x92400E,
+    green = 0x15803D,
+    red = 0xB91C1C,
+    primary = 0x0F766E,
+    onPrimary = 0xFFFFFF,
+    primaryContainer = 0xCCFBF1,
+    onPrimaryContainer = 0x115E59,
+    onGold = 0xFFFFFF,
+    goldContainer = 0xFEF3C7,
+    onGoldContainer = 0x78350F,
+    onGreen = 0xFFFFFF,
+    greenContainer = 0xDCFCE7,
+    onGreenContainer = 0x14532D,
+    onRed = 0xFFFFFF,
+    redContainer = 0xFEE2E2,
+    onRedContainer = 0x7F1D1D,
+    inverseSurface = 0x2D3133,
+    inverseOnSurface = 0xEFF1F3,
 )
 
 internal val DarkPalette = Palette(
-    background = 0x17151A,
-    surface = 0x242129,
-    surfaceQuiet = 0x2E2A35,
-    ink = 0xEEE8DC,
-    muted = 0xC2BACA,
-    outlineVariant = 0x45404A,
-    outlineStrong = 0x8F8798,
-    gold = 0xDBBB79,
-    green = 0xA2D0BB,
-    red = 0xE1AAA5,
-    primary = 0xD8CEE0,
-    onPrimary = 0x17151A,
-    primaryContainer = 0x3D3446,
-    onPrimaryContainer = 0xEEE8DC,
-    onGold = 0x17151A,
-    goldContainer = 0x4A3B1C,
-    onGoldContainer = 0xF3E4BF,
-    onGreen = 0x17151A,
-    greenContainer = 0x24493A,
-    onGreenContainer = 0xD4ECDF,
-    onRed = 0x17151A,
-    redContainer = 0x5A2824,
-    onRedContainer = 0xF6D3CF,
-    inverseSurface = 0xEEE8DC,
-    inverseOnSurface = 0x17151A,
+    background = 0x0F172A,
+    surface = 0x1E293B,
+    surfaceQuiet = 0x2A384C,
+    ink = 0xF8FAFC,
+    muted = 0xCBD5E1,
+    outlineVariant = 0x475569,
+    outlineStrong = 0x94A3B8,
+    gold = 0xFCD34D,
+    green = 0x86EFAC,
+    red = 0xFCA5A5,
+    primary = 0x5EEAD4,
+    onPrimary = 0x0F172A,
+    primaryContainer = 0x115E59,
+    onPrimaryContainer = 0xCCFBF1,
+    onGold = 0x0F172A,
+    goldContainer = 0x451A03,
+    onGoldContainer = 0xFEF3C7,
+    onGreen = 0x0F172A,
+    greenContainer = 0x052E16,
+    onGreenContainer = 0xDCFCE7,
+    onRed = 0x0F172A,
+    redContainer = 0x450A0A,
+    onRedContainer = 0xFEE2E2,
+    inverseSurface = 0xF8FAFC,
+    inverseOnSurface = 0x0F172A,
 )
+
+/**
+ * Calm Sanctuary semantic color tokens.
+ */
+object CalmSanctuaryTokens {
+    val DeepTeal = Color(0xFF0F766E)
+    val DarkTeal = Color(0xFF115E59)
+    val MintIris = Color(0xFF2DD4BF)
+    val MintLight = Color(0xFFE6FFFA)
+
+    val StatusWarning = Color(0xFFD97706)
+    val StatusWarningSurface = Color(0xFFFEF3C7)
+    val StatusCritical = Color(0xFFB91C1C)
+    val StatusCriticalSurface = Color(0xFFFEE2E2)
+    val StatusSuccess = Color(0xFF15803D)
+    val StatusSuccessSurface = Color(0xFFDCFCE7)
+
+    val PrivacyBadgeBg = Color(0xFFE0F2FE)
+    val PrivacyBadgeText = Color(0xFF0369A1)
+
+    val SurfaceCard = Color(0xFFFFFFFF)
+    val SurfaceSubtle = Color(0xFFF1F5F9)
+    val BorderSubtle = Color(0xFFE2E8F0)
+    val BorderStrong = Color(0xFFCBD5E1)
+
+    val TextPrimary = Color(0xFF0F172A)
+    val TextSecondary = Color(0xFF475569)
+    val TextTertiary = Color(0xFF64748B)
+}
 
 private const val OPAQUE = 0xFF000000.toInt()
 

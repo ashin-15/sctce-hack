@@ -83,7 +83,7 @@ class ProjectionEvidenceCoordinatorTest {
     }
 
     @Test
-    fun `stores secure content frame as proof of FLAG_SECURE interception`() = runBlocking {
+    fun `stores blank output without claiming why Android returned a blank frame`() = runBlocking {
         val frame = createSyntheticFrame(isBlack = true)
         val coordinator = ProjectionEvidenceCoordinator(
             evidenceRepository = vault.evidence,
@@ -91,14 +91,13 @@ class ProjectionEvidenceCoordinatorTest {
         )
 
         val outcome = coordinator.processAndStore(caseId, frame)
-        val secureOutcome = assertIs<ProjectionEvidenceOutcome.SecureContentRecorded>(outcome)
+        val blankOutcome = assertIs<ProjectionEvidenceOutcome.NoTextDetected>(outcome)
 
-        assertEquals(frame.sha256Hex, secureOutcome.sha256)
-        assertTrue(secureOutcome.reason.contains("FLAG_SECURE"))
+        assertEquals(frame.sha256Hex, blankOutcome.sha256)
 
         val stored = vault.evidence.observeForCase(caseId).first()
         assertEquals(1, stored.size)
-        val details = vault.evidence.details(secureOutcome.evidenceId)
+        val details = vault.evidence.details(blankOutcome.evidenceId)
         assertEquals(frame.sha256Hex, details?.sha256)
     }
 

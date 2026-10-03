@@ -13,24 +13,14 @@ import org.sakshi.processing.ocr.OcrOutcome
 import org.sakshi.processing.ocr.OcrProcessor
 
 /**
- * Outcome of processing and storing a captured visual frame into the encrypted evidence vault.
+ * Outcome of processing a captured frame after a user explicitly saves it to the vault.
  */
 public sealed interface ProjectionEvidenceOutcome {
-    /** Frame stored and chat messages successfully extracted via OCR and spatial heuristics. */
+    /** Frame stored; OCR layout output is an unreviewed proposal with unverified attribution. */
     public data class Success(
         public val evidenceId: String,
         public val sha256: String,
         public val parsedChat: ParsedChatScreen,
-    ) : ProjectionEvidenceOutcome
-
-    /**
-     * Frame stored as proof of secure content interception (FLAG_SECURE encountered).
-     * Raw bytes preserved as tamper-evident audit record.
-     */
-    public data class SecureContentRecorded(
-        public val evidenceId: String,
-        public val sha256: String,
-        public val reason: String,
     ) : ProjectionEvidenceOutcome
 
     /** Frame stored, but no readable text was recognized. */
@@ -56,77 +46,37 @@ public class ProjectionEvidenceCoordinator(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     /**
-     * Stores the raw frame bytes into the vault with cryptographic SHA-256 verification,
-     * then extracts structured chat conversation bubbles using local OCR.
+     * Stores the original frame bytes into the vault with cryptographic SHA-256 verification,
+     * then runs local OCR. Layout guesses are uncertain derivatives.
      */
     public suspend fun processAndStore(
         caseId: String,
         frame: CapturedFrame,
     ): ProjectionEvidenceOutcome = withContext(dispatcher) {
-        val stream = ByteArrayInputStream(frame.imageBytes)
+        val request = ImportRequest(
+            caseId = caseId,
+            acquisitionKind = AcquisitionKind.SELECTED_VISUAL_MEDIA,
+            accessClass = AccessClass.USER_MEDIATED,
+            importerMechanism = "media_projection",
+            declaredMime = "image/png",
+            claimedOrigin = if (frame.kind == FrameKind.BLANK) "BLANK_OR_UNAVAILABLE_SCREEN_OBSERVATION" else "SCREEN_OBSERVATION",
+            displayNameClaim = "screen_capture_" + frame.frameIndex + ".png",
+            uriAuthorityClaim = null,
+            maxPlaintextBytes = frame.imageBytes.size.toLong(),
+        )
+        val imported = ByteArrayInputStream(frame.imageBytes).use { evidenceRepository.import(request, it) }
 
-        when (frame.kind) {
-            FrameKind.SECURE_CONTENT_DETECTED -> {
-                val request = ImportRequest(
-                    caseId = caseId,
-                    acquisitionKind = AcquisitionKind.SELECTED_VISUAL_MEDIA,
-                    accessClass = AccessClass.USER_MEDIATED,
-                    importerMechanism = "media_projection",
-                    declaredMime = "image/png",
-                    claimedOrigin = "FLAG_SECURE_ENCOUNTERED",
-                    displayNameClaim = "screen_capture_secure_blocked_${frame.frameIndex}.png",
-                    uriAuthorityClaim = null,
-                    maxPlaintextBytes = frame.imageBytes.size.toLong(),
+        when (val ocrOutcome = ocrProcessor.process(frame.imageBytes)) {
+            is OcrOutcome.Success -> {
+                val parsed = ChatVisualParser.parse(
+                    result = ocrOutcome.result,
+                    frameWidth = frame.width,
+                    frameHeight = frame.height,
                 )
-                val imported = evidenceRepository.import(request, stream)
-                ProjectionEvidenceOutcome.SecureContentRecorded(
-                    evidenceId = imported.id,
-                    sha256 = imported.sha256,
-                    reason = "Android OS FLAG_SECURE policy active; buffer contained zero luminosity",
-                )
+                ProjectionEvidenceOutcome.Success(imported.id, imported.sha256, parsed)
             }
-            FrameKind.NORMAL, FrameKind.BLANK -> {
-                val request = ImportRequest(
-                    caseId = caseId,
-                    acquisitionKind = AcquisitionKind.SELECTED_VISUAL_MEDIA,
-                    accessClass = AccessClass.USER_MEDIATED,
-                    importerMechanism = "media_projection",
-                    declaredMime = "image/png",
-                    claimedOrigin = "MEDIA_PROJECTION",
-                    displayNameClaim = "screen_capture_${frame.frameIndex}.png",
-                    uriAuthorityClaim = null,
-                    maxPlaintextBytes = frame.imageBytes.size.toLong(),
-                )
-                val imported = evidenceRepository.import(request, stream)
-
-                when (val ocrOutcome = ocrProcessor.process(frame.imageBytes)) {
-                    is OcrOutcome.Success -> {
-                        val parsed = ChatVisualParser.parse(
-                            result = ocrOutcome.result,
-                            frameWidth = frame.width,
-                            frameHeight = frame.height,
-                        )
-                        ProjectionEvidenceOutcome.Success(
-                            evidenceId = imported.id,
-                            sha256 = imported.sha256,
-                            parsedChat = parsed,
-                        )
-                    }
-                    is OcrOutcome.NoText -> {
-                        ProjectionEvidenceOutcome.NoTextDetected(
-                            evidenceId = imported.id,
-                            sha256 = imported.sha256,
-                        )
-                    }
-                    is OcrOutcome.Failed -> {
-                        ProjectionEvidenceOutcome.OcrFailed(
-                            evidenceId = imported.id,
-                            sha256 = imported.sha256,
-                            failure = ocrOutcome.failure,
-                        )
-                    }
-                }
-            }
+            is OcrOutcome.NoText -> ProjectionEvidenceOutcome.NoTextDetected(imported.id, imported.sha256)
+            is OcrOutcome.Failed -> ProjectionEvidenceOutcome.OcrFailed(imported.id, imported.sha256, ocrOutcome.failure)
         }
     }
 }

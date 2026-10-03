@@ -22,6 +22,7 @@ import org.sakshi.core.model.TimePrecision
 import org.sakshi.core.model.Timestamp
 import org.sakshi.core.vault.NotificationClaims
 import org.sakshi.processing.ocr.OcrEngine
+import org.sakshi.processing.stt.AudioEventPlan
 import org.sakshi.processing.text.DateOrder
 import org.sakshi.processing.text.ExportParse
 import org.sakshi.processing.text.ExportTime
@@ -67,6 +68,10 @@ internal class EventBuilder(
         return built(exportEvents(index, parse, options), InputKind.WHATSAPP_EXPORT)
     }
 
+    /** A window snapshot is one uncertain excerpt, never parsed into sender/time claims from chat-shaped text. */
+    fun buildVisibleSnapshot(text: String): BuildResult.Built =
+        built(listOf(plainEvent(text, CodePointIndex(text), TextStatus.EXTRACTION_UNCERTAIN)), InputKind.PLAIN_TEXT)
+
     /**
      * One event for the text read from one image. Who sent it, when and in which direction is not known from the
      * image: those stay unknown until the user says. The text is marked uncertain when any line scored low.
@@ -79,9 +84,17 @@ internal class EventBuilder(
         val low = image.regions.count { OcrRecord.isLow(it.confidence, limits.minOcrLineConfidence) }
         if (low > 0) warnings[AnalysisWarning.OCR_LOW_CONFIDENCE_LINES] = low
         val assessment = signals.takeIf { it.matches.isNotEmpty() }?.let {
-            CueReferences.assess(it, 0, EventFactory.BODY_REFERENCE, context.derivative, context.evidenceSha256, Representation.OCR_DERIVATIVE) { span ->
-                image.regions.filter { region -> region.start < span.end && span.start < region.end }.map { region -> region.id }
-            }
+            CueReferences.assess(
+                it,
+                0,
+                EventFactory.BODY_REFERENCE,
+                context.derivative,
+                context.evidenceSha256,
+                Representation.OCR_DERIVATIVE,
+                regionsOf = { span ->
+                    image.regions.filter { region -> region.start < span.end && span.start < region.end }.map { region -> region.id }
+                },
+            )
         }
         val parser = "${engine.id}-${engine.version}".take(MAX_ID_LENGTH)
         val draft = EventDraft(
@@ -97,6 +110,44 @@ internal class EventBuilder(
             representation = Representation.OCR_DERIVATIVE,
         )
         return built(listOf(EventFactory.build(context, draft)), InputKind.IMAGE_TEXT)
+    }
+
+    /**
+     * One event for the speech transcribed from one recording. Who spoke, in which direction and when stay unknown:
+     * transcription does not decide that, and a recording has no trustworthy clock. Each cue is anchored to its
+     * words in the transcript and to the time range of the recording it was heard in. The text is marked uncertain
+     * when any segment scored low; nothing is hidden. Every result carries the warning that the words can be wrong.
+     */
+    fun buildAudio(plan: AudioEventPlan, parserVersion: String): BuildResult.Built {
+        val text = plan.text
+        val signals = rules.analyse(text)
+        noteLanguage(signals)
+        note(AnalysisWarning.AUDIO_TRANSCRIPT_MAY_CONTAIN_ERRORS)
+        if (plan.lowConfidenceSegments > 0) warnings[AnalysisWarning.AUDIO_LOW_CONFIDENCE_SEGMENTS] = plan.lowConfidenceSegments
+        val assessment = signals.takeIf { it.matches.isNotEmpty() }?.let {
+            CueReferences.assess(
+                it,
+                0,
+                EventFactory.BODY_REFERENCE,
+                context.derivative,
+                context.evidenceSha256,
+                plan.representation,
+                audioOf = { span -> plan.anchorFor(span.start, span.end)?.audio },
+            )
+        }
+        val draft = EventDraft(
+            eventId = EventId(ids()),
+            timestamp = EventFactory.unknownTime(),
+            sender = EventFactory.claimedSender(null),
+            direction = Direction.UNKNOWN,
+            source = EventSource(plan.sourceKind, null, null, null, null, ScopeId(parserVersion.take(MAX_ID_LENGTH))),
+            bodySpan = CodePointSpan(0, CodePointIndex(text).length),
+            textStatus = plan.textStatus,
+            outgoingCoverage = OutgoingCoverage.UNKNOWN,
+            assessment = assessment,
+            representation = plan.representation,
+        )
+        return built(listOf(EventFactory.build(context, draft)), InputKind.AUDIO_TRANSCRIPT)
     }
 
     /**
@@ -160,7 +211,7 @@ internal class EventBuilder(
         sampleDates = parse.records.map { it.dateRaw }.distinct().take(MAX_SAMPLE_DATES),
     )
 
-    private fun plainEvent(text: String, index: CodePointIndex): Event {
+    private fun plainEvent(text: String, index: CodePointIndex, status: TextStatus = TextStatus.AVAILABLE): Event {
         val signals = rules.analyse(text)
         noteLanguage(signals)
         val source = EventSource(SourceKind.SELECTED_TEXT, null, null, null, null, ScopeId(PLAIN_PARSER_VERSION))
@@ -171,7 +222,7 @@ internal class EventBuilder(
             direction = Direction.UNKNOWN,
             source = source,
             bodySpan = CodePointSpan(0, index.length),
-            textStatus = TextStatus.AVAILABLE,
+            textStatus = status,
             outgoingCoverage = OutgoingCoverage.UNKNOWN,
             assessment = assess(signals, 0),
         )

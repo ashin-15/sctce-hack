@@ -1,6 +1,9 @@
 package org.sakshi.app.analysis
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,6 +46,7 @@ import org.sakshi.processing.analysis.AnalysisOutcome
 import org.sakshi.processing.text.DateOrder
 
 private const val MAX_SAMPLE_DATES = 5
+private const val PERCENT_TOTAL = 100
 
 class AnalysisActions(
     val back: () -> Unit,
@@ -54,6 +58,12 @@ class AnalysisActions(
     val continueWithAnswers: () -> Unit,
     val openTimeline: () -> Unit,
     val startOnce: () -> Unit,
+    /** Receives the speech model file the person chose. */
+    val importSpeechModel: (Uri) -> Unit = {},
+    /** Called just before the system file picker opens, so the session is not locked while it is showing. */
+    val onPickerOpening: () -> Unit = {},
+    /** Called when the file picker came back, with or without a file. */
+    val onPickerClosed: () -> Unit = {},
 )
 
 @Composable
@@ -82,6 +92,7 @@ fun AnalysisScreen(state: AnalysisUiState, actions: AnalysisActions, modifier: M
                 is AnalysisUiState.Questions -> QuestionsContent(state.questions, actions, onChangeZone = { pickingZone = true })
                 is AnalysisUiState.Done -> DoneContent(state.result, actions.openTimeline)
                 is AnalysisUiState.Refused -> MessageContent(refusalText(state.reason).text(), NoteKind.Info, actions.back)
+                is AnalysisUiState.SpeechSetupNeeded -> SpeechSetupContent(state.setup, actions)
                 AnalysisUiState.Failed -> MessageContent(stringResource(R.string.analysis_failed), NoteKind.Problem, actions.back)
             }
         }
@@ -103,6 +114,44 @@ private fun IdleContent(onAnalyse: () -> Unit) {
 private fun RunningContent(onCancel: () -> Unit) {
     Column(Modifier.fillMaxSize().padding(horizontal = Spacing.gutter, vertical = Spacing.xl)) {
         ProgressBlock(0, 0, stringResource(R.string.analysis_running), onCancel, indeterminate = true)
+    }
+}
+
+/** Explains the one-time speech model preparation and lets the person pick the file. Nothing is downloaded. */
+@Composable
+private fun SpeechSetupContent(setup: SpeechSetup, actions: AnalysisActions) {
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        actions.onPickerClosed()
+        if (uri != null) actions.importSpeechModel(uri)
+    }
+    val choose = {
+        actions.onPickerOpening()
+        picker.launch(arrayOf("*/*"))
+    }
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+    ) {
+        when (setup) {
+            is SpeechSetup.Installing -> ProgressBlock(setup.percent, PERCENT_TOTAL, stringResource(R.string.speech_setup_installing), actions.cancel)
+            SpeechSetup.Installed -> {
+                StatusNote(NoteKind.Info, stringResource(R.string.speech_setup_ready))
+                PrimaryButton(stringResource(R.string.speech_setup_analyse_again), actions.analyse)
+                SecondaryButton(stringResource(R.string.analysis_back_to_case), actions.back)
+            }
+            SpeechSetup.Needed, SpeechSetup.WrongFile, SpeechSetup.TooLarge, SpeechSetup.Failed -> {
+                ScreenTitle(stringResource(R.string.speech_setup_title))
+                Text(stringResource(R.string.speech_setup_body), style = MaterialTheme.typography.bodyLarge)
+                when (setup) {
+                    SpeechSetup.WrongFile -> StatusNote(NoteKind.Problem, stringResource(R.string.speech_setup_wrong_file))
+                    SpeechSetup.TooLarge -> StatusNote(NoteKind.Problem, stringResource(R.string.speech_setup_too_large))
+                    SpeechSetup.Failed -> StatusNote(NoteKind.Problem, stringResource(R.string.speech_setup_failed))
+                    else -> Unit
+                }
+                PrimaryButton(stringResource(R.string.speech_setup_choose), choose)
+                SecondaryButton(stringResource(R.string.analysis_back_to_case), actions.back)
+            }
+        }
     }
 }
 

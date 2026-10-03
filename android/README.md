@@ -115,3 +115,13 @@ Checks, each with its own test class and failure messages that name `file:line` 
 - `ForbiddenPhraseCheck`: no legal, guilt, danger-score or admissibility wording in `strings.xml` values or in `ReportText.kt`. Negated honesty statements must be listed in `ReviewedExceptions.kt` with their exact text; changing the text of a listed string fails the test until it is reviewed again.
 
 Comments are not exempt: a forbidden token in a comment is reported. The policy module is excluded from its own scans in `Repo.kt`. A real finding in another module may be recorded as a `KnownFinding` (one file, one pattern, no wildcards); the test fails when the entry becomes stale, so it is removed once the fix lands.
+
+## Optional message observation (3 October 2026)
+
+The app now exposes **Notification collection** and **Visible message capture** under Home's Collection controls. Each starts with its own disclosure and an explicit Android settings grant. Neither grant is automatic. Notification posting permission for neutral local cue reminders is separate from notification listener access.
+
+Notification candidates remain in a bounded memory inbox until the person selects an active case and saves them. Optional background observation continues while switching apps with the vault closed; screen lock clears drafts and alerts. The default observes only while the vault session is open. Reminders use the unreviewed demo cue list and can miss or misinterpret content.
+
+Visible capture starts only after choosing apps and pressing Start, lasts at most five minutes, and reads only exposed ordinary visible text. Stop/return/expiry retain snapshots for authenticated review. Screen lock, revocation and service loss clear them. Use ordinary chats only; do not open View Once/disappearing-content during capture. Protection detection is incomplete and no protected access is bypassed. Saved snapshots have unknown sender, direction, message time and boundaries, even when their text resembles a chat export.
+
+See `../docs/spec-driven/message-observation/` for scope, design, acceptance status and source references. Isolated synthetic device test receipts are under `../research/verification/android-observation-2026-10-03/`; they do not establish third-party app reliability. Accessibility service policy exception is confined to `:acquisition:accessibility`, and both system-bound services are verified disabled-by-default and binder-permission protected.

@@ -220,3 +220,19 @@ A milestone is recorded as complete only for work actually performed. This ledge
 
 - Silence (10 s) gave `NoSpeech` from the signal-level gate; a 440 Hz tone (5 s) gave `NoSpeech` from the model, with no invented words; a 70 s clip was refused as too long before full decoding; forcing Hindi on English speech returned English text, not a translation.
 - Not verified: Malayalam, Hindi, code-mixed or noisy real speech; repeats; release build; thermal behaviour over a sustained run; analysis integration (one event per clip with text and audio-time anchors) and the app screens, which are not built yet.
+
+## Android observation app integration - 3 October 2026
+
+Integrated optional NotificationObservation and independently implemented bounded Accessibility visible text capture into the actual Android app, alongside the local Stitch-export UI. This is functionality/test evidence, not latency, threat-quality, memory or battery benchmarking. AgentHita source was inspected but not copied.
+
+- Selected JVM suites: app 413 total (56 opt-in gallery skips), notifications 128, accessibility 7, processing/analysis 87, policy 36. Zero failures/errors: 615 passed, 56 skipped. Separate enabled gallery interaction run passed and rendered Home light/dark at font scales 1.0/1.5.
+- Android 16 device: three isolated synthetic Accessibility tests passed (visible text with editable/password exclusion, restricted marker clearing, API34 sensitive node clearing); one actual synthetic notification producer/listener test passed. Temporary grants applied to isolated test APKs only and removed afterwards. Actual app grants remained user-controlled. Receipts in `research/verification/android-observation-2026-10-03/`.
+- App build, selected-module lint, policy and merged manifest permission/export checks pass; exported collectors require their system binder permissions and start disabled. App lint reports 0 errors and 14 pre-existing version/resource warnings; no new collection/UI warnings. Existing Gradle deprecation notice remains.
+- Updated debug APK installed without clearing existing app data. No third-party chat compatibility, complete coverage, calibrated threat detection or end-user biometric/consent/save workflow acceptance is claimed. These remain manual device checks.
+- Python reference suite: offline cached uv Python 3.12 environment ran 22 tests; one error from existing screenshot manifest Windows-only font path `C:\Windows\Fonts\Nirmala.ttc`, one optional faster-whisper skip. Main Android changes do not alter this data. ENV-001: prepare cross-platform benchmark font assets and verify glyph coverage without changing raw datasets.
+
+## Android MediaProjection integration - 3 October 2026
+
+- Integrated user-started screenshots and bounded screenshot bursts behind fresh Android screen-capture consent, a visible foreground-service Stop control, encrypted temporary drafts, and unlock/review/save/discard UI. Video and audio remain deferred.
+- Verification: projection JVM suite 16 passed; app unit suite 413 tests (56 opt-in skips), policy suite 36 tests; 0 failures/errors. `:app:lintDebug`, `:app:assembleDebug`, and `:app:verifyManifestPermissions` passed. Debug APK installed with `adb install -r` on CPH2695 / Android 16 (API 36), existing app data preserved, launch verified. APK SHA-256: `70a94254109e60bbfe625a2aa81ac2d5ea5fe555946e3516036bd26680d83e19`.
+- This is not a capture or performance measurement: Android's consent prompt was not approved, no screen pixels were collected, and the on-device capture/review/save lifecycle remains unverified. Blocking device acceptance criteria remain open; see `research/verification/android-mediaprojection-2026-10-03/README.md`.

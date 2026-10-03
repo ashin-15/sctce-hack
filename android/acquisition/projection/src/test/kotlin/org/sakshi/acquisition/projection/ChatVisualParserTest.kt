@@ -30,7 +30,7 @@ class ChatVisualParserTest {
     )
 
     @Test
-    fun `extracts header contact name and identifies chat direction`() {
+    fun `extracts header text and keeps message direction unknown`() {
         val screenWidth = 1080
         val screenHeight = 2400
 
@@ -76,13 +76,13 @@ class ChatVisualParserTest {
         val incoming = parsed.messages[1]
         assertEquals("Where is the money?", incoming.text)
         assertEquals("10:45 AM", incoming.timestampText)
-        assertEquals(MessageDirection.INCOMING, incoming.direction)
+        assertEquals(MessageDirection.UNKNOWN, incoming.direction)
 
         // Verify Outgoing Bubble
         val outgoing = parsed.messages[2]
         assertEquals("I do not have it yet", outgoing.text)
         assertEquals("10:46 AM", outgoing.timestampText)
-        assertEquals(MessageDirection.OUTGOING, outgoing.direction)
+        assertEquals(MessageDirection.UNKNOWN, outgoing.direction)
     }
 
     @Test

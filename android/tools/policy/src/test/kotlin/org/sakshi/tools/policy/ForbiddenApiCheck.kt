@@ -37,6 +37,8 @@ internal object ForbiddenApiScanner {
      */
     val MODULE_EXCEPTIONS: Map<String, Set<String>> = mapOf(
         "acquisition/notifications" to setOf("NotificationListenerService"),
+        // D-26: explicit, bounded, user-started visible text capture only.
+        "acquisition/accessibility" to setOf("AccessibilityService"),
         // Owner decision D-25 (MEGAPLAN.md): user-started, user-visible screen capture lives in this one module.
         "acquisition/projection" to setOf("MediaProjection"),
     )

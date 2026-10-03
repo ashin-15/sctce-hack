@@ -17,6 +17,7 @@ import org.sakshi.app.session.KeystoreVaultDestroyer
 import org.sakshi.app.session.KeystoreVaultOpener
 import org.sakshi.app.session.SessionController
 import org.sakshi.app.session.SharedPreferencesDeletionMarker
+import org.sakshi.acquisition.projection.ProjectionCaptureRuntime
 
 data class AppDispatchers(val main: CoroutineDispatcher, val io: CoroutineDispatcher)
 
@@ -29,10 +30,12 @@ class AppContainer(
     val pickerGrace: PickerGrace,
     val shareIntake: ShareIntake,
     val deletion: DeletionController,
+    val projectionCapture: ProjectionCaptureRuntime,
 ) {
     companion object {
         fun create(context: Context, scope: CoroutineScope = defaultScope()): AppContainer {
             val session = SessionController(KeystoreVaultOpener(context), AndroidDeviceSecurity(context), scope)
+            val projectionCapture = ProjectionCaptureRuntime(context)
             val dispatchers = AppDispatchers(Dispatchers.Main, Dispatchers.IO)
             val coordinator = ImportCoordinator(Instant::now)
             val onboarding = SharedPreferencesOnboardingStore.create(context)
@@ -52,6 +55,7 @@ class AppContainer(
                 pickerGrace = PickerGrace(scope, session::lock),
                 shareIntake = ShareIntake(coordinator, context.contentResolver, scope, dispatchers.io),
                 deletion = deletion,
+                projectionCapture = projectionCapture,
             )
         }
 

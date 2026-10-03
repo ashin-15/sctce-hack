@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Two plain rounded cards, one behind the other. Inside the 66 dp safe zone of the 108 dp adaptive icon. -->
+<!-- Sakshi Calm Sanctuary Brand Emblem. Inside the 66 dp safe zone of the 108 dp adaptive icon. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#E8E1EB"
-        android:pathData="M42,32 L68,32 A6,6 0 0 1 74,38 L74,60 A6,6 0 0 1 68,66 L42,66 A6,6 0 0 1 36,60 L36,38 A6,6 0 0 1 42,32 Z" />
-    <path
-        android:fillColor="#FAF7F0"
-        android:pathData="M40,42 L66,42 A6,6 0 0 1 72,48 L72,70 A6,6 0 0 1 66,76 L40,76 A6,6 0 0 1 34,70 L34,48 A6,6 0 0 1 40,42 Z" />
+    <group
+        android:scaleX="0.6"
+        android:scaleY="0.6"
+        android:translateX="24"
+        android:translateY="24">
+        <!-- Rounded squircle container -->
+        <path
+            android:fillColor="#0F766E"
+            android:pathData="M24,0 L76,0 A24,24 0 0,1 100,24 L100,76 A24,24 0 0,1 76,100 L24,100 A24,24 0 0,1 0,76 L0,24 A24,24 0 0,1 24,0 Z" />
+        <!-- Shield of privacy outline -->
+        <path
+            android:strokeColor="#E6FFFA"
+            android:strokeWidth="4.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:fillColor="#00000000"
+            android:pathData="M50,22 C36,22 28,29 28,42 C28,62 46,74 50,78 C54,74 72,62 72,42 C72,29 64,22 50,22 Z" />
+        <!-- Eye witness circle ring -->
+        <path
+            android:strokeColor="#E6FFFA"
+            android:strokeWidth="4.5"
+            android:fillColor="#00000000"
+            android:pathData="M50,36 A10,10 0 1,0 50,56 A10,10 0 1,0 50,36" />
+        <!-- Eye pupil iris -->
+        <path
+            android:fillColor="#2DD4BF"
+            android:pathData="M50,41.5 A4.5,4.5 0 1,0 50,50.5 A4.5,4.5 0 1,0 50,41.5" />
+    </group>
 </vector>

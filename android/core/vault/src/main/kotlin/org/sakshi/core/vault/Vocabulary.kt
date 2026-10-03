@@ -16,6 +16,7 @@ public object AcquisitionKind {
 
     /** Text the person chose to keep from an observed notification. Always a claim by the publishing app. */
     public const val NOTIFICATION_EXCERPT: String = "notification_excerpt"
+    public const val VISIBLE_TEXT_SNAPSHOT: String = "visible_text_snapshot"
 
     internal val all: Set<String> = setOf(
         SHARED_TEXT,
@@ -25,6 +26,7 @@ public object AcquisitionKind {
         PASTED_TEXT,
         MANUAL_NOTE,
         NOTIFICATION_EXCERPT,
+        VISIBLE_TEXT_SNAPSHOT,
     )
 }
 

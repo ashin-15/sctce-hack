@@ -633,6 +633,13 @@
     <string name="catalog_field_label">A text field</string>
     <string name="catalog_open_form">Open form dialog</string>
     <string name="catalog_form_body">A form dialog holds any content, such as a list of choices.</string>
+    <string name="catalog_calm_sanctuary">Calm Sanctuary system</string>
+    <string name="catalog_badge_observed">Observed</string>
+    <string name="catalog_badge_inferred">AI Inferred</string>
+    <string name="catalog_badge_confirmed">User Confirmed</string>
+    <string name="catalog_timeline_anchors">Timeline progression anchors</string>
+    <string name="catalog_shield_preview">Shielded sensitive preview</string>
+    <string name="catalog_shield_sample_text">Confidential excerpt shielded behind local privacy gate.</string>
 
     <!-- Report and export -->
     <string name="detail_make_report">Make a report</string>
