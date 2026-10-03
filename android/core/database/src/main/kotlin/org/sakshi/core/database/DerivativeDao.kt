@@ -51,4 +51,13 @@ public abstract class DerivativeDao {
 
     @Query("SELECT * FROM region WHERE derivative_id = :derivativeId ORDER BY page_index, id")
     public abstract suspend fun getRegions(derivativeId: String): List<RegionEntity>
+
+    /** The newest revision of each kind for every evidence item of the case, oldest evidence first. */
+    @Query(
+        "SELECT d.* FROM derivative d INNER JOIN evidence e ON d.evidence_id = e.id " +
+            "WHERE e.case_id = :caseId AND d.revision = (SELECT MAX(d2.revision) FROM derivative d2 " +
+            "WHERE d2.evidence_id = d.evidence_id AND d2.kind = d.kind) " +
+            "ORDER BY e.received_at_epoch_ms, e.id, d.kind",
+    )
+    public abstract suspend fun getLatestInCase(caseId: String): List<DerivativeEntity>
 }

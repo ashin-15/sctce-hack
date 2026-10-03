@@ -31,7 +31,7 @@ public class KeystoreKeyWrapper(
     private val alias: String = DEFAULT_ALIAS,
     private val requireUserAuthentication: Boolean,
     private val authenticationValiditySeconds: Int = DEFAULT_VALIDITY_SECONDS,
-) : KeyWrapper {
+) : DestroyableKeyWrapper {
 
     override fun wrap(secret: ByteArray): ByteArray = translating {
         val cipher = Cipher.getInstance(TRANSFORMATION)
@@ -56,6 +56,10 @@ public class KeystoreKeyWrapper(
     /** Deletes the master key. Everything wrapped by it becomes permanently unreadable. */
     public fun delete() {
         translating { keyStore().deleteEntry(alias) }
+    }
+
+    override fun destroyKey() {
+        delete()
     }
 
     private fun key(): SecretKey {

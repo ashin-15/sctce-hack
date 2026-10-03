@@ -24,12 +24,16 @@ public class BundleContent(
     public val originals: List<BundleFile>,
     public val derivatives: List<BundleFile>,
     public val reportPdf: BundleFile?,
+    /** Counts of text the person removed from quotes. The removed text itself must not be anywhere in this content. */
+    public val redactions: RedactionSummary = RedactionSummary.NONE,
 )
 
-/** What the writer produced. */
+/** What the writer produced. [manifestSha256] is over the exact `manifest.json` bytes; [signatureHex] is the signature over them. */
 public data class BundleSummary(
     val snapshotId: String,
     val signerKeyId: String,
     val merkleRoot: String,
     val fileCount: Int,
+    val manifestSha256: String,
+    val signatureHex: String,
 )

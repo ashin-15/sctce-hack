@@ -167,3 +167,21 @@ A milestone is recorded as complete only for work actually performed. This ledge
   - Replaced ad-hoc JSON parsing in `HistoryRows` with typed `DecisionTargetKind` and `DecisionChange`.
   - Replaced ViewModel coroutine deadlocks in `ReportViewModelTest`.
 
+
+## Android phase 10: screenshot OCR, Latin script - 3 October 2026
+
+- Added `:processing:ocr`: bundled ML Kit Text Recognition v2 Latin model (`com.google.mlkit:text-recognition` 16.0.1; the model ships in the APK, nothing is downloaded), one region per recognised line with the engine's own line score and language tag, EXIF orientation passed to the engine as rotation (mirroring recorded, not undone), images above 16 megapixels decoded at a lower power-of-two resolution, and typed outcomes (`Success`, `NoText`, `Failed` with `UNDECODABLE`, `OUT_OF_MEMORY`, `ENGINE_FAILED`). The engine is created on first use and released when the session ends.
+- `:processing:analysis`: a detected JPEG, PNG or WebP becomes an OCR derivative (text exactly as recognised, lines joined in engine order) stored with its regions in one audited transaction, and one `selected_image` event whose references all carry `ocr_derivative`. Each rule cue is anchored both to its code-point span and to the image region of the line it was read from. Sender, direction and time stay unknown. A line scored below 0.5 or with no score marks the event `extraction_uncertain` and the evidence as analysed in part; 0.5 is a demonstration setting, not a calibrated threshold. Every image result carries a "Latin script only" warning. No readable Latin text gives `NO_TEXT_RECOGNISED` and writes nothing.
+- Network: ML Kit's telemetry dependency (`com.google.android.datatransport`) declares `INTERNET` and `ACCESS_NETWORK_STATE`; `:app:verifyManifestPermissions` caught it. Both are removed in the OCR module manifest, so neither the app nor the test APKs hold them. The bundled native library `libmlkit_google_ocr_pipeline.so` (arm64-v8a) has 16 KB aligned LOAD segments (0x4000), read with `readelf`.
+- JVM tests: 867 passed, 0 failed (new: 14 in `:processing:ocr`, 10 image analysis tests, 2 region storage tests, app row and import tests). Events with region anchors validate against `data/sakshi-event-schema.json`.
+- Device tests, synthetic images drawn in the test, debug build, one run each, so observations rather than V-10 numbers:
+
+| Device | Test | Result |
+|---|---|---|
+| SM-S928B, Android 16 | OCR suite (5 tests) | passed; Latin screenshot cold 141 ms, warm 89 ms, 3 lines, lowest line score 0.865, language `en`; Malayalam and Devanagari renders returned `NoText` (130 ms, 85 ms) |
+| CPH2695 (MT6835), Android 16 | OCR suite (5 tests) | passed; Latin cold 111 ms, warm 68 ms, lowest line score 0.851; Malayalam and Devanagari `NoText` |
+| CPH2695 | Image analysis (2 tests) | passed; import to stored event with region anchor 474 ms end to end; Malayalam screenshot refused with `NO_TEXT_RECOGNISED`, nothing written |
+| CPH2695 | Existing text analysis (2 tests) | passed; 1,000 messages 841 ms, 10,000 messages 24,486 ms (thermal status 3 during that run) |
+
+- V-08 status: partly verified. ML Kit returned text in a process whose package holds neither `INTERNET` nor `ACCESS_NETWORK_STATE` (asserted in the test), so the process could not open sockets. Not done: airplane-mode cold launch of the app and packet capture. No crash or `SecurityException` from the telemetry library was seen in logcat on either phone.
+- Not verified: OCR in the installed app with a person using it, release-build latency and memory (V-10), real screenshots from messaging apps, dark-mode and low-contrast screenshots, CER on the bench screenshot fixtures (the committed manifest still names Windows font paths, so the fixtures were not regenerated on Linux), Devanagari OCR (ML Kit Devanagari model not added) and Malayalam OCR (Tesseract not added).

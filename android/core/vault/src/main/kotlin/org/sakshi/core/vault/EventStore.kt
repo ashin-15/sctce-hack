@@ -60,6 +60,9 @@ public data class StoredCoverageGap(
  * that sort in list order (see [RowKeys]), and a category's reference ids are the insertion order of its
  * `finding_anchor` rows (`ORDER BY rowid`; rows are insert-only and SQLite's VACUUM renumbers rowids but keeps
  * their relative order).
+ *
+ * Every write that can change what the temporal engine computes for a case (a saved event or batch, a coverage gap)
+ * marks the case's stored patterns stale in the same transaction; see [PatternStore].
  */
 public class EventStore(
     private val database: SakshiDatabase,
@@ -77,7 +80,13 @@ public class EventStore(
      * text artifacts so text locators can be range checked.
      */
     public suspend fun save(event: Event, artifactLengths: (ArtifactId) -> Int? = { null }): SaveResult =
-        withContext(dispatcher) { database.withTransaction { saveInTransaction(event, artifactLengths) } }
+        withContext(dispatcher) {
+            database.withTransaction {
+                saveInTransaction(event, artifactLengths).also {
+                    if (it is SaveResult.Saved) database.patternDao().markStaleForCase(event.caseId.value)
+                }
+            }
+        }
 
     /**
      * Saves [events] in list order in ONE transaction with ONE `events.saved` audit row. Every event is checked
@@ -88,7 +97,13 @@ public class EventStore(
      */
     public suspend fun saveAll(events: List<Event>, artifactLengths: (ArtifactId) -> Int? = { null }): BatchSaveResult {
         if (events.isEmpty()) return BatchSaveResult.Saved(0)
-        return withContext(dispatcher) { database.withTransaction { saveAllInTransaction(events, artifactLengths) } }
+        return withContext(dispatcher) {
+            database.withTransaction {
+                saveAllInTransaction(events, artifactLengths).also {
+                    if (it is BatchSaveResult.Saved) database.patternDao().markStaleForCase(events.first().caseId.value)
+                }
+            }
+        }
     }
 
     /** Every stored revision of every event of the case, by event id and revision, rebuilt exactly as saved. */
@@ -198,6 +213,7 @@ public class EventStore(
             database.withTransaction {
                 requireNotNull(database.caseDao().get(caseId.value)) { "Unknown case" }
                 database.eventDao().insertCoverageGap(entity)
+                database.patternDao().markStaleForCase(caseId.value)
                 audit.append(
                     AuditActions.COVERAGE_GAP_ADDED,
                     "coverage_gap",

@@ -14,7 +14,8 @@ Implementation follows `../MEGAPLAN.md`. This directory contains the complete fo
 | `:core:vault` | Android library | Keystore key wrapper, blob store, audit hash chain, case/evidence repositories, event store, actor registry, review coordinator, derivative store |
 | `:acquisition:importer` | Android library | Share intent, picker and paste readers, streaming limits, manual note codec |
 | `:processing:text` | Kotlin/JVM | Script and language hints, rules cue engine, label mapping, WhatsApp text-export parser |
-| `:processing:analysis` | Android library | Text analysis pipeline, derivative storage, single-pass code-point body and quote extraction (`EventText`), on-demand pattern engine with supporting events |
+| `:processing:ocr` | Android library | Bundled ML Kit Latin text recognition (no download), line regions with engine scores, EXIF rotation, decode bounds. Its manifest removes the `INTERNET` and `ACCESS_NETWORK_STATE` permissions that ML Kit's telemetry library adds |
+| `:processing:analysis` | Android library | Text analysis pipeline, screenshot text (OCR derivative with regions, one event per image, cues anchored to text span and image region), derivative storage, single-pass code-point body and quote extraction (`EventText`), on-demand pattern engine with supporting events |
 | `:export:bundle` | Kotlin/JVM | Bundle writer, offline verifier, command-line tool (`./gradlew :export:bundle:run --args="verify <dir>"`) |
 | `:export:report` | Android library | Report model, PDF renderer, Keystore signer (ECDSA P-256), export service, export audit records |
 | `:app` | Android | Full screen suite: Onboarding, Biometric/Device Lock, Case Management, Import (ShareTargetActivity, pickers, paste, notes), Analysis Prompts, Timeline, Event Review, Who Is Who, Patterns, and Report Export. Permissions: `USE_BIOMETRIC`, legacy `USE_FINGERPRINT`, and dynamic receiver permission (no `INTERNET` permission) |
@@ -23,7 +24,7 @@ Implementation follows `../MEGAPLAN.md`. This directory contains the complete fo
 
 - JDK 21 for Gradle (`JAVA_HOME=/usr/lib/jvm/java-21-openjdk` on the development host; the default JDK 27 is not used).
 - Android SDK platform 36 (`ANDROID_HOME` or `local.properties`).
-- No NDK or model is needed yet. A device or emulator is needed to verify the parts listed under "Verified on a device, and what is not".
+- No NDK is needed. The only model is ML Kit's bundled Latin OCR model, which comes from Maven with the library. A device or emulator is needed to verify the parts listed under "Verified on a device, and what is not".
 
 ## Commands
 
@@ -33,7 +34,7 @@ Run from this directory:
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 ./gradlew test :app:assembleDebug
 ./gradlew :app:lintDebug :app:verifyManifestPermissions
-./gradlew :core:vault:connectedDebugAndroidTest :acquisition:importer:connectedDebugAndroidTest :processing:analysis:connectedDebugAndroidTest :export:report:connectedDebugAndroidTest   # needs a connected device
+./gradlew :core:vault:connectedDebugAndroidTest :acquisition:importer:connectedDebugAndroidTest :processing:ocr:connectedDebugAndroidTest :processing:analysis:connectedDebugAndroidTest :export:report:connectedDebugAndroidTest   # needs a connected device
 ```
 
 The Python reference suite is unchanged and still runs from the repository root:
@@ -60,8 +61,27 @@ uv run --no-project --with numpy --with scikit-learn python android/tools/gen_in
 
 ## Verified on a device, and what is not
 
-Instrumented tests on one Samsung SM-S928B (Android 16) cover the SQLCipher database, the Keystore key wrapper, on-disk confidentiality, tamper detection, event storage, import through a real content provider, text analysis and derivative generation, on-device Keystore report signing, and PDF report creation. Not yet verified: the unlock flow and every screen with a person using the app, a file share from another app, the pickers, lock on background, backup and device-transfer exclusion, Android versions below 16, and 16 KB page devices.
+Instrumented tests on one Samsung SM-S928B (Android 16) cover the SQLCipher database, the Keystore key wrapper, on-disk confidentiality, tamper detection, event storage, import through a real content provider, text analysis and derivative generation, on-device Keystore report signing, and PDF report creation. The OCR and image analysis tests also ran on a CPH2695 (Android 16): ML Kit reads synthetic Latin screenshots in a process without network permission and returns no text for Malayalam and Devanagari renders. Not yet verified: OCR in the app with a person using it, release-build OCR latency and memory, the unlock flow and every screen with a person using the app, a file share from another app, the pickers, lock on background, backup and device-transfer exclusion, Android versions below 16, and 16 KB page devices.
 
 ## Permissions check
 
 `./gradlew :app:verifyManifestPermissions` (part of `check`) fails the build if the merged manifest gains a permission outside the allowlist in `app/build.gradle.kts`.
+
+## Policy checks
+
+`:tools:policy` holds plain JVM unit tests that scan the repository's source files as text and fail `./gradlew test` when the code drifts into forbidden territory (AGENTS.md "Do Not Build", megaplan security tests). Run them alone with:
+
+```sh
+./gradlew :tools:policy:test
+```
+
+Checks, each with its own test class and failure messages that name `file:line` and the rule:
+
+- `ForbiddenApiCheck`: no AccessibilityService, MediaProjection, SMS, call log, contacts, broad storage or media permissions, `QUERY_ALL_PACKAGES`, `SYSTEM_ALERT_WINDOW`, `java.net`, `javax.net`, OkHttp, Retrofit, Ktor, `android.net.http`, WebView, DownloadManager or NotificationListenerService in any `src/main` tree. `INTERNET` and `ACCESS_NETWORK_STATE` may only appear as `tools:node="remove"`. A per-module exception for the notification listener is a one-line change in `ForbiddenApiScanner.MODULE_EXCEPTIONS`.
+- `ForbiddenDependencyCheck`: no networking, analytics, crash, ads, image-loader or cloud-AI dependency in `*.gradle.kts` or `gradle/libs.versions.toml`.
+- `NoLoggingCheck`: no `Log`, `println`, `printStackTrace`, `System.out`, `System.err` or Timber in main sources. Only the verifier command-line tool may print.
+- `NoSuppressionCheck`: no `@Suppress`, `@SuppressLint`, `@SuppressWarnings`, `tools:ignore`, `//noinspection` or weakened lint and warning settings.
+- `TypographyCheck`: no em dash or en dash in any source, resource, build or markdown file; `strings.xml` values use the ellipsis character, not three dots.
+- `ForbiddenPhraseCheck`: no legal, guilt, danger-score or admissibility wording in `strings.xml` values or in `ReportText.kt`. Negated honesty statements must be listed in `ReviewedExceptions.kt` with their exact text; changing the text of a listed string fails the test until it is reviewed again.
+
+Comments are not exempt: a forbidden token in a comment is reported. The policy module is excluded from its own scans in `Repo.kt`. A real finding in another module may be recorded as a `KnownFinding` (one file, one pattern, no wildcards); the test fails when the entry becomes stale, so it is removed once the fix lands.

@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.sakshi.app.R
 import org.sakshi.app.SessionServices
 import org.sakshi.app.ui.UiText
@@ -29,8 +33,11 @@ import org.sakshi.core.model.CategoryReviewStatus
 import org.sakshi.core.model.Direction
 import org.sakshi.core.model.Event
 import org.sakshi.core.model.EventId
+import org.sakshi.core.model.SourceKind
+import org.sakshi.core.model.TextStatus
 import org.sakshi.core.model.UnwantedContact
 import org.sakshi.core.vault.DecisionTargetKind
+import org.sakshi.core.vault.DerivativeKind
 import org.sakshi.core.vault.ReviewResult
 import org.sakshi.core.vault.SenderSelector
 import org.sakshi.core.vault.StoredActor
@@ -40,6 +47,20 @@ import org.sakshi.processing.analysis.EventText
 /** One category of the event with the cue words that make it a suggestion. */
 data class CategoryView(val index: Int, val category: CategoryAssessment, val cues: List<CueMark>) {
     val isOwnTag: Boolean get() = category.basis == CategoryBasis.USER_TAG
+}
+
+/** The saved picture an event's text was read from, as the review screen shows it. */
+sealed interface PictureState {
+    /** The event does not come from a picture. */
+    data object None : PictureState
+
+    data object Loading : PictureState
+
+    /** [image] is held in memory only and dropped when the review is closed. Outlines are drawn over it, never into it. */
+    class Ready(val image: LoadedImage, val outlines: List<RegionOutline>) : PictureState
+
+    /** The picture cannot be shown; [message] says why in plain words. The text review is not affected. */
+    data class Unavailable(val message: UiText) : PictureState
 }
 
 data class EventReviewState(
@@ -52,7 +73,16 @@ data class EventReviewState(
     val people: List<StoredActor> = emptyList(),
     val history: List<HistoryLine> = emptyList(),
     val notice: ReviewNotice? = null,
+    val picture: PictureState = PictureState.None,
+    /** How many recognised lines scored low, when the text came from a picture and that is known. */
+    val uncertainLines: Int? = null,
 ) {
+    /** The text was read from a screenshot or photo by software, so it can differ from what the picture says. */
+    val fromPicture: Boolean get() = event?.source?.kind == SourceKind.SELECTED_IMAGE
+
+    /** The recognised text is marked as uncertain. */
+    val textUncertain: Boolean get() = event?.coverage?.textStatus == TextStatus.EXTRACTION_UNCERTAIN
+
     /** Boundary actions are for the person's own outgoing messages only. */
     val boundaryOffered: Boolean get() = event?.direction == Direction.OUTGOING
 
@@ -66,17 +96,21 @@ data class EventReviewState(
 /**
  * Review of one event: what was saved, who and when, and the suggestions and tags. Every action goes through the
  * review coordinator and then reloads the latest revision. The view model lives in the activity's store, so the
- * loaded text is dropped when the session locks.
+ * loaded text and picture are dropped when the session locks. A picture is decoded once, only for an event read from
+ * an image, and [onCleared] only drops the reference (never recycles the bitmap, which a frame may still draw).
  */
 class EventReviewViewModel(
     private val caseId: String,
     private val eventId: String,
     private val vault: Vault,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
+    private val images: EvidenceImageLoader = VaultImageLoader(vault.evidence),
 ) : ViewModel(scope) {
     private val mutableState = MutableStateFlow(EventReviewState())
     val state: StateFlow<EventReviewState> = mutableState.asStateFlow()
     private val eventText = EventText(vault)
+    private var pictureRequested = false
+    private var cleared = false
 
     init {
         viewModelScope.launch { refresh() }
@@ -160,6 +194,49 @@ class EventReviewViewModel(
         mutableState.update {
             it.copy(loaded = true, event = latest, body = body, marks = marks, categories = categories, people = people, history = history)
         }
+        if (latest.source.kind == SourceKind.SELECTED_IMAGE && !pictureRequested) {
+            pictureRequested = true
+            viewModelScope.launch { loadPicture(latest) }
+        }
+    }
+
+    /** Finds the saved original behind the recognised text and decodes it. Failure leaves the text review as it is. */
+    private suspend fun loadPicture(event: Event) {
+        val derivativeId = event.evidenceReferences.firstOrNull()?.artifactId?.value
+        val derivative = derivativeId?.let { vault.derivatives.get(it) }?.takeIf { it.kind == DerivativeKind.OCR }
+        if (derivative == null) {
+            setPicture(PictureState.Unavailable(res(R.string.review_picture_unreadable)))
+            return
+        }
+        mutableState.update { it.copy(picture = PictureState.Loading, uncertainLines = lowLinesOf(derivative.qualityJson)) }
+        val regions = vault.derivatives.regions(derivative.id)
+        val state = when (val loaded = images.load(derivative.evidenceId)) {
+            is ImageLoadResult.Loaded -> {
+                val image = loaded.image
+                PictureState.Ready(image, RegionOutlines.of(event, derivative.id, regions, image.uprightWidth, image.uprightHeight))
+            }
+            ImageLoadResult.TooLarge -> PictureState.Unavailable(res(R.string.review_picture_too_large))
+            ImageLoadResult.Unreadable -> PictureState.Unavailable(res(R.string.review_picture_unreadable))
+        }
+        setPicture(state)
+    }
+
+    private fun setPicture(picture: PictureState) {
+        if (cleared) return
+        mutableState.update { it.copy(picture = picture) }
+    }
+
+    override fun onCleared() {
+        cleared = true
+        mutableState.update { it.copy(picture = PictureState.None) }
+        super.onCleared()
+    }
+
+    /** The recogniser's count of low scoring lines from the derivative's quality record, or null when it says none. */
+    private fun lowLinesOf(qualityJson: String?): Int? = try {
+        qualityJson?.let { Json.parseToJsonElement(it).jsonObject["low_confidence_lines"]?.jsonPrimitive?.intOrNull }?.takeIf { it > 0 }
+    } catch (_: IllegalArgumentException) {
+        null
     }
 
     private suspend fun historyOf(latest: Event): List<HistoryLine> {
@@ -173,6 +250,6 @@ class EventReviewViewModel(
 
     companion object {
         fun factory(caseId: String, eventId: String, services: SessionServices): ViewModelProvider.Factory =
-            viewModelFactory { initializer { EventReviewViewModel(caseId, eventId, services.vault) } }
+            viewModelFactory { initializer { EventReviewViewModel(caseId, eventId, services.vault, images = services.images) } }
     }
 }

@@ -103,6 +103,9 @@ private fun Content(state: ReportUiState, actions: ReportSelectionActions, onCha
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         item(key = "intro") { SupportingText(stringResource(R.string.report_select_intro)) }
+        state.earlierExport?.let { earlier ->
+            item(key = "earlier") { StatusNote(NoteKind.Info, ExportHistoryMapping.notice(earlier, state.zone, locale).text()) }
+        }
         item(key = "messages-heading") { SectionHeader(stringResource(R.string.report_messages_heading), Modifier.padding(top = Spacing.sm)) }
         if (state.rows.isEmpty()) {
             item(key = "empty") { EmptyState(stringResource(R.string.report_empty_title), stringResource(R.string.report_empty_body)) }

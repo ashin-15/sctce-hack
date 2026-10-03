@@ -33,6 +33,9 @@ public object AuditActions {
     public const val REVIEW_DUPLICATE: String = "review.duplicate"
     public const val ACTOR_RENAMED: String = "actor.renamed"
 
+    /** A person accepted, rejected, marked unknown or withdrew their response to a stored pattern description. */
+    public const val PATTERN_REVIEWED: String = "pattern.reviewed"
+
     /** An export bundle was written. See [AuditLog.recordExport] for the details recorded. */
     public const val EXPORT_CREATED: String = "export.created"
 }

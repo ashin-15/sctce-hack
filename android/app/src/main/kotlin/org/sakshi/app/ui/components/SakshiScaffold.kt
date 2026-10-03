@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -29,6 +30,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -41,14 +43,15 @@ import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
 import org.sakshi.app.ui.theme.Spacing
 
-/** A text action in the top row. */
-class TopAction(val label: String, val onClick: () -> Unit)
+/** An action in the top row, shown as an icon button or a text button. */
+class TopAction(val label: String, val onClick: () -> Unit, val icon: ImageVector? = null)
 
 /**
  * The frame of every screen: an optional top row (back arrow, [title] of up to two lines, at most two text [actions]),
  * the [content], an optional [bottomBar] pinned for one-handed reach, and a snackbar slot. It paints the background,
  * keeps clear of system bars, cutouts and the keyboard, and centres everything in a column no wider than
- * [Spacing.contentMaxWidth]. [onTitleLongPress] is only for the debug design catalogue.
+ * [Spacing.contentMaxWidth]. A non-empty [menu] adds a "more options" button, named [menuDescription], at the end of the top
+ * row. [onTitleLongPress] is only for the debug design catalogue.
  */
 @Composable
 fun SakshiScaffold(
@@ -56,6 +59,8 @@ fun SakshiScaffold(
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
     actions: List<TopAction> = emptyList(),
+    menuDescription: String? = null,
+    menu: List<MenuAction> = emptyList(),
     onTitleLongPress: (() -> Unit)? = null,
     snackbarHostState: SnackbarHostState? = null,
     bottomBar: (@Composable () -> Unit)? = null,
@@ -64,7 +69,9 @@ fun SakshiScaffold(
     Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
         Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = Spacing.contentMaxWidth).fillMaxWidth().fillMaxHeight()) {
-                if (title != null || onBack != null || actions.isNotEmpty()) TopRow(title, onBack, actions, onTitleLongPress)
+                if (title != null || onBack != null || actions.isNotEmpty() || menu.isNotEmpty()) {
+                    TopRow(title, onBack, actions, menuDescription, menu, onTitleLongPress)
+                }
                 Box(Modifier.weight(1f).fillMaxWidth()) { content() }
                 if (snackbarHostState != null) SnackbarHost(snackbarHostState, Modifier.padding(horizontal = Spacing.sm))
                 bottomBar?.invoke()
@@ -74,7 +81,14 @@ fun SakshiScaffold(
 }
 
 @Composable
-private fun TopRow(title: String?, onBack: (() -> Unit)?, actions: List<TopAction>, onTitleLongPress: (() -> Unit)?) {
+private fun TopRow(
+    title: String?,
+    onBack: (() -> Unit)?,
+    actions: List<TopAction>,
+    menuDescription: String?,
+    menu: List<MenuAction>,
+    onTitleLongPress: (() -> Unit)?,
+) {
     Row(
         modifier = Modifier.fillMaxWidth().heightIn(min = Spacing.topRow).padding(horizontal = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
@@ -98,7 +112,24 @@ private fun TopRow(title: String?, onBack: (() -> Unit)?, actions: List<TopActio
                 )
                 .semantics { heading() },
         )
-        actions.take(MAX_ACTIONS).forEach { QuietTextButton(it.label, it.onClick) }
+        actions.take(MAX_ACTIONS).forEach { action ->
+            if (action.icon != null) {
+                IconButton(
+                    onClick = action.onClick,
+                    modifier = Modifier.sizeIn(minWidth = Spacing.touchTarget, minHeight = Spacing.touchTarget)
+                        .semantics { contentDescription = action.label },
+                ) {
+                    Icon(
+                        imageVector = action.icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            } else {
+                QuietTextButton(action.label, action.onClick)
+            }
+        }
+        if (menu.isNotEmpty()) OverflowMenuButton(menuDescription.orEmpty(), menu)
     }
 }
 

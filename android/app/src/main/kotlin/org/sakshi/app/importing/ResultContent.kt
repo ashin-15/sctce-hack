@@ -122,12 +122,18 @@ private fun OutcomeRow(outcome: ItemOutcome, label: ItemLabel, onAnalyse: (Strin
     }
 }
 
-/** A saved text item that is waiting for text analysis: shared or pasted text, or a file that is declared as text. */
+/**
+ * A saved item that is waiting for text analysis: shared or pasted text, a file that is declared as text, or an image
+ * whose bytes are JPEG, PNG or WebP, which on-device text recognition reads.
+ */
 internal fun isAnalysableText(outcome: ItemOutcome.Saved, label: ItemLabel): Boolean {
     if (outcome.analysisState != AnalysisState.READY_FOR_TEXT_ANALYSIS) return false
     return when (label) {
         ItemLabel.SharedText, ItemLabel.PastedText -> true
-        is ItemLabel.File -> outcome.detectedMime == null && outcome.declaredMime?.trim()?.lowercase()?.startsWith("text/") == true
+        is ItemLabel.File -> outcome.detectedMime in RECOGNISED_IMAGE_TYPES ||
+            (outcome.detectedMime == null && outcome.declaredMime?.trim()?.lowercase()?.startsWith("text/") == true)
         ItemLabel.Unknown -> false
     }
 }
+
+private val RECOGNISED_IMAGE_TYPES = setOf("image/jpeg", "image/png", "image/webp")

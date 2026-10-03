@@ -87,7 +87,7 @@ Record dataset source, language, modality, labels, license, context, limitations
 
 ## Multilingual
 
-Current priority: English, Malayalam and Hindi, including Manglish, Hinglish, native scripts, Romanized text, slang and code mixing involving these languages. User decision on 2 October 2026: other languages are future scope.
+Current priority: English, Malayalam and Hindi, including Manglish, Hinglish, native scripts, Romanized text, slang and code mixing involving these languages. User decision on 2 October 2026: other languages are future scope. User decision on 3 October 2026: OCR for Devanagari and Malayalam script is deferred; text in these languages stays in scope.
 
 Report per-language performance. Prefer explicit uncertainty over overconfident unsupported results.
 

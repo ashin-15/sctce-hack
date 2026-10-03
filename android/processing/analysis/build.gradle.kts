@@ -43,6 +43,7 @@ kotlin {
 dependencies {
     api(project(":core:vault"))
     api(project(":processing:text"))
+    api(project(":processing:ocr"))
     api(project(":core:temporal"))
     implementation(project(":core:integrity"))
     implementation(libs.kotlinx.coroutines.core)

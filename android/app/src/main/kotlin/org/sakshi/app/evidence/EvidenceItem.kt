@@ -52,7 +52,10 @@ fun EvidenceItem(
                 SupportingText(stringResource(R.string.evidence_size_date, formatByteSize(row.byteSize, locale), received))
                 StatusNote(NoteKind.Info, analysisText(row.analysis), Modifier.padding(top = Spacing.xs))
                 if (integrity != null) StatusNote(integrityKind(integrity), integrityText(integrity))
-                if (row.canAnalyse) SecondaryButton(stringResource(R.string.evidence_analyse), onAnalyse, Modifier.padding(top = Spacing.xs))
+                if (row.canAnalyse) {
+                    val label = if (row.kind == EvidenceKind.IMAGE) R.string.evidence_read_image else R.string.evidence_analyse
+                    SecondaryButton(stringResource(label), onAnalyse, Modifier.padding(top = Spacing.xs))
+                }
             }
             OverflowMenuButton(
                 contentDescription = stringResource(R.string.evidence_options, kind, received),

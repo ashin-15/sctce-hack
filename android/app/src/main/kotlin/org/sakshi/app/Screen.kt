@@ -1,6 +1,7 @@
 package org.sakshi.app
 
 import org.sakshi.app.importing.ImportUiState
+import org.sakshi.app.session.DeletionState
 import org.sakshi.app.session.SessionState
 import org.sakshi.core.vault.SenderSelector
 import org.sakshi.core.vault.Vault
@@ -11,11 +12,15 @@ sealed interface Screen {
 
     data class Lock(val state: SessionState) : Screen
 
+    /** "Delete everything" is running or has an outcome to show. It comes before every other screen. */
+    data class Deletion(val state: DeletionState) : Screen
+
     /** The unlocked session; [SessionScreen] says which part of it. */
     class Session(val vault: Vault) : Screen
 }
 
-fun screenFor(acknowledged: Boolean, session: SessionState): Screen = when {
+fun screenFor(acknowledged: Boolean, session: SessionState, deletion: DeletionState = DeletionState.Idle): Screen = when {
+    deletion != DeletionState.Idle -> Screen.Deletion(deletion)
     !acknowledged -> Screen.Onboarding
     session is SessionState.Unlocked -> Screen.Session(session.vault)
     else -> Screen.Lock(session)
@@ -43,6 +48,11 @@ sealed interface SessionScreen {
     data class WhoIsWho(val caseId: String, val focusClaim: SenderSelector? = null) : SessionScreen
 
     data class Patterns(val caseId: String) : SessionScreen
+
+    data class Search(val caseId: String) : SessionScreen
+
+    /** Explains what "Delete everything" removes and asks for the typed word. Once confirmed the whole app takes over. */
+    data object DeleteEverything : SessionScreen
 
     /** Chooses what goes into a report. What was chosen is held in the case's report view model, not in the route. */
     data class ReportSelection(val caseId: String) : SessionScreen

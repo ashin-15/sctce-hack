@@ -15,10 +15,16 @@ import org.sakshi.core.vault.AcquisitionKind
 import org.sakshi.core.vault.BatchSaveResult
 import org.sakshi.core.vault.EvidenceDetails
 import org.sakshi.core.vault.Vault
+import org.sakshi.processing.ocr.OcrFailure
+import org.sakshi.processing.ocr.OcrOutcome
+import org.sakshi.processing.ocr.OcrProcessor
 import org.sakshi.processing.text.RulesEngine
 
 /**
- * Turns one imported text evidence item into a parsed-text derivative, events and rule suggestions.
+ * Turns one imported text evidence item into a parsed-text derivative, events and rule suggestions. With an [ocr]
+ * engine, a JPEG, PNG or WebP image becomes an OCR derivative with one region per recognised line, and one event
+ * whose suggestions point at both the recognised text and the image regions. Without one, images are kept as
+ * received and not analysed.
  *
  * Input kind rule: the text is read as a WhatsApp-style export when the parser finds at least two sender
  * messages and any text before the first record is at most 256 code points; otherwise it is plain text and
@@ -33,6 +39,7 @@ public class TextAnalysis internal constructor(
     private val ids: () -> String,
     private val limits: AnalysisLimits,
     private val dispatcher: CoroutineDispatcher,
+    private val ocr: OcrProcessor? = null,
 ) : TextAnalyser {
     public constructor(
         vault: Vault,
@@ -41,7 +48,8 @@ public class TextAnalysis internal constructor(
         ids: () -> String,
         limits: AnalysisLimits = AnalysisLimits(),
         dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    ) : this(vault, VaultTextDerivatives(vault.derivatives), rules, clock, ids, limits, dispatcher)
+        ocr: OcrProcessor? = null,
+    ) : this(vault, VaultTextDerivatives(vault.derivatives), rules, clock, ids, limits, dispatcher, ocr)
 
     /**
      * Analyses the evidence. For an export, [exportOptions] is required before events can be written; without
@@ -55,6 +63,8 @@ public class TextAnalysis internal constructor(
     override suspend fun analyse(evidenceId: String, exportOptions: ExportOptions?): AnalysisOutcome {
         val details = vault.evidence.details(evidenceId)
             ?: return AnalysisOutcome.NotAnalysable(NotAnalysableReason.EVIDENCE_MISSING)
+        val recogniser = ocr?.takeIf { details.detectedMime in OCR_IMAGE_TYPES && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
+        if (recogniser != null) return analyseImage(details, recogniser)
         eligibility(details)?.let { return AnalysisOutcome.NotAnalysable(it) }
         val derivative = when (val prepared = prepare(details)) {
             is Prepared.Refused -> return AnalysisOutcome.NotAnalysable(prepared.reason)
@@ -63,15 +73,8 @@ public class TextAnalysis internal constructor(
         if (alreadyAnalysed(CaseId(details.caseId), derivative.id)) {
             return AnalysisOutcome.NotAnalysable(NotAnalysableReason.ALREADY_ANALYSED)
         }
-        val context = EventContext(
-            caseId = CaseId(details.caseId),
-            derivative = ArtifactId(derivative.id),
-            evidenceSha256 = details.sha256,
-            receivedAt = Timestamp(details.receivedAt),
-            availableAt = Timestamp(clock().toString()),
-        )
         val built = withContext(dispatcher) {
-            EventBuilder(rules, ids, context, details.id, limits).build(derivative.text, exportOptions)
+            EventBuilder(rules, ids, contextOf(details, derivative), details.id, limits).build(derivative.text, exportOptions)
         }
         return when (built) {
             is BuildResult.NeedsOptions -> AnalysisOutcome.NeedsExportOptions(
@@ -85,11 +88,57 @@ public class TextAnalysis internal constructor(
         }
     }
 
+    /** The image path: recognise once, keep the result as a derivative, then build the single image event. */
+    private suspend fun analyseImage(details: EvidenceDetails, recogniser: OcrProcessor): AnalysisOutcome {
+        if (details.byteSize > limits.maxImageBytes) return AnalysisOutcome.NotAnalysable(NotAnalysableReason.TOO_LARGE)
+        val image = when (val prepared = prepareImage(details, recogniser)) {
+            is PreparedImage.Refused -> return AnalysisOutcome.NotAnalysable(prepared.reason)
+            is PreparedImage.Ready -> prepared.image
+        }
+        if (alreadyAnalysed(CaseId(details.caseId), image.derivative.id)) {
+            return AnalysisOutcome.NotAnalysable(NotAnalysableReason.ALREADY_ANALYSED)
+        }
+        val built = withContext(dispatcher) {
+            EventBuilder(rules, ids, contextOf(details, image.derivative), details.id, limits).buildImage(image, recogniser.engine)
+        }
+        return save(details, image.derivative, built)
+    }
+
+    /** Reuses the newest OCR derivative when it can be read back; otherwise runs recognition on the original. */
+    private suspend fun prepareImage(details: EvidenceDetails, recogniser: OcrProcessor): PreparedImage {
+        derivatives.latestOcr(details.id)?.let(OcrRecord::read)?.let { return PreparedImage.Ready(it) }
+        val bytes = readOriginal(details) ?: return PreparedImage.Refused(NotAnalysableReason.UNREADABLE)
+        val outcome = try {
+            recogniser.process(bytes)
+        } finally {
+            bytes.fill(0)
+        }
+        return when (outcome) {
+            is OcrOutcome.NoText -> PreparedImage.Refused(NotAnalysableReason.NO_TEXT_RECOGNISED)
+            is OcrOutcome.Failed -> PreparedImage.Refused(
+                if (outcome.failure == OcrFailure.UNDECODABLE) NotAnalysableReason.IMAGE_NOT_DECODABLE else NotAnalysableReason.RECOGNITION_FAILED,
+            )
+            is OcrOutcome.Success -> {
+                val draft = OcrRecord.draft(outcome.result, recogniser.engine, ids, limits.minOcrLineConfidence)
+                val stored = derivatives.saveOcr(details.id, draft)
+                PreparedImage.Ready(checkNotNull(OcrRecord.read(stored)) { "Stored OCR derivative cannot be read back" })
+            }
+        }
+    }
+
+    private fun contextOf(details: EvidenceDetails, derivative: DerivativeText) = EventContext(
+        caseId = CaseId(details.caseId),
+        derivative = ArtifactId(derivative.id),
+        evidenceSha256 = details.sha256,
+        receivedAt = Timestamp(details.receivedAt),
+        availableAt = Timestamp(clock().toString()),
+    )
+
     private suspend fun save(details: EvidenceDetails, derivative: DerivativeText, built: BuildResult.Built): AnalysisOutcome {
         val lengthOfDerivative = CodePointIndex(derivative.text).length
         val result = vault.events.saveAll(built.events) { if (it.value == derivative.id) lengthOfDerivative else null }
         check(result is BatchSaveResult.Saved) { "Analysis produced events the vault refused: ${describe(result)}" }
-        val partial = AnalysisWarning.UNRESOLVED_TIMES in built.warnings || AnalysisWarning.RECORD_LIMIT_REACHED in built.warnings
+        val partial = PARTIAL_WARNINGS.any { it in built.warnings }
         vault.evidence.setSupportState(details.id, if (partial) SupportState.PARTIAL else SupportState.ANALYZED)
         return AnalysisOutcome.Analysed(
             derivativeId = derivative.id,
@@ -153,7 +202,23 @@ public class TextAnalysis internal constructor(
         class Refused(val reason: NotAnalysableReason) : Prepared
     }
 
+    private sealed interface PreparedImage {
+        class Ready(val image: ImageText) : PreparedImage
+
+        class Refused(val reason: NotAnalysableReason) : PreparedImage
+    }
+
     private companion object {
         const val TEXT_PREFIX: String = "text/"
+
+        /** Detected types the image path reads; other images stay preserve-only. */
+        val OCR_IMAGE_TYPES: Set<String> = setOf("image/jpeg", "image/png", "image/webp")
+
+        /** Warnings after which the evidence counts as analysed in part. */
+        val PARTIAL_WARNINGS: Set<AnalysisWarning> = setOf(
+            AnalysisWarning.UNRESOLVED_TIMES,
+            AnalysisWarning.RECORD_LIMIT_REACHED,
+            AnalysisWarning.OCR_LOW_CONFIDENCE_LINES,
+        )
     }
 }

@@ -30,7 +30,10 @@ public sealed interface DecisionTargetKind {
 
     public data object Duplicate : DecisionTargetKind
 
-    /** A target type this version does not know, or a pattern or explanation. */
+    /** A person's response to a stored pattern description; the target id is the pattern's content id. */
+    public data object Pattern : DecisionTargetKind
+
+    /** A target type this version does not know, or an explanation. */
     public data object Other : DecisionTargetKind
 }
 
@@ -51,6 +54,9 @@ public sealed interface DecisionChange {
 
     public data class Duplicate(val status: DedupStatus, val canonicalEventId: EventId?) : DecisionChange
 
+    /** What a pattern decision says now: [PatternReview.NOT_REVIEWED] when the person withdrew an earlier response. */
+    public data class PatternReviewed(val to: PatternReview) : DecisionChange
+
     public data object Unknown : DecisionChange
 }
 
@@ -60,6 +66,7 @@ internal object DecisionParser {
     fun target(targetType: String, targetId: String): DecisionTargetKind = when (targetType) {
         ReviewTargetType.FINDING -> categoryIndex(targetId)?.let { DecisionTargetKind.Category(it, null) } ?: DecisionTargetKind.Other
         ReviewTargetType.ASSOCIATION -> DecisionTargetKind.Association
+        ReviewTargetType.PATTERN -> DecisionTargetKind.Pattern
         ReviewTarget.DIRECTION -> DecisionTargetKind.Direction
         ReviewTarget.WANTEDNESS -> DecisionTargetKind.Wantedness
         ReviewTarget.BOUNDARY -> DecisionTargetKind.Boundary
@@ -72,6 +79,7 @@ internal object DecisionParser {
         return try {
             when (targetType) {
                 ReviewTargetType.FINDING -> categoryStatus(action)
+                ReviewTargetType.PATTERN -> DecisionChange.PatternReviewed(patternReview(action))
                 ReviewTargetType.ASSOCIATION -> when (action) {
                     ReviewAction.ACCEPT -> value["actor_id"]?.let { DecisionChange.Sender(ActorId(it)) }
                     ReviewAction.REJECT -> DecisionChange.Sender(null)
@@ -91,6 +99,14 @@ internal object DecisionParser {
         } catch (_: IllegalArgumentException) {
             DecisionChange.Unknown
         }
+    }
+
+    /** The review state a pattern decision leaves: only accept, reject and mark unknown set one; anything else clears it. */
+    fun patternReview(action: String): PatternReview = when (action) {
+        ReviewAction.ACCEPT -> PatternReview.ACCEPTED
+        ReviewAction.REJECT -> PatternReview.REJECTED
+        ReviewAction.MARK_UNKNOWN -> PatternReview.MARKED_UNKNOWN
+        else -> PatternReview.NOT_REVIEWED
     }
 
     private fun categoryStatus(action: String): DecisionChange? = when (action) {

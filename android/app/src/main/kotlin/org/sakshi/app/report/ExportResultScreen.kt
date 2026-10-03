@@ -77,6 +77,7 @@ private fun Content(export: ExportDone) {
     ) {
         item(key = "ready") { ScreenTitle(stringResource(R.string.export_ready)) }
         item(key = "size") { LabelValue(stringResource(R.string.export_file_size), formatByteSize(export.summary.zipBytes, locale)) }
+        item(key = "version") { Text(stringResource(R.string.export_report_version, export.reportVersion), style = MaterialTheme.typography.bodyLarge) }
         item(key = "key") { SigningKey(export.keyId) }
         item(key = "inside") { Inside(export.summary) }
         item(key = "cautions") {

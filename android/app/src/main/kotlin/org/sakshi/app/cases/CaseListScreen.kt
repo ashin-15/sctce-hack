@@ -67,6 +67,7 @@ fun CaseListScreen(
     onMessageShown: () -> Unit,
     onLock: () -> Unit,
     onOpen: (String) -> Unit,
+    onDeleteEverything: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var dialog by remember { mutableStateOf<Dialog?>(null) }
@@ -91,6 +92,8 @@ fun CaseListScreen(
         title = stringResource(R.string.app_name),
         modifier = modifier,
         actions = listOf(TopAction(stringResource(R.string.action_lock), onLock)),
+        menuDescription = stringResource(R.string.cases_menu_options),
+        menu = listOf(MenuAction(stringResource(R.string.delete_all_menu), destructive = true, onClick = onDeleteEverything)),
         onTitleLongPress = if (BuildConfig.DEBUG) ({ catalogOpen = true }) else null,
         snackbarHostState = snackbar,
         bottomBar = {

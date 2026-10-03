@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +51,7 @@ class CaseDetailActions(
     val openTimeline: () -> Unit,
     val openPatterns: () -> Unit,
     val openReport: () -> Unit,
+    val openSearch: () -> Unit,
 )
 
 @Composable
@@ -70,7 +73,10 @@ fun CaseDetailScreen(state: CaseDetailUiState, actions: CaseDetailActions, modif
         title = state.title.orEmpty(),
         modifier = modifier,
         onBack = actions.back,
-        actions = listOf(TopAction(stringResource(R.string.action_lock), actions.lock)),
+        actions = listOf(
+            TopAction(stringResource(R.string.action_search), actions.openSearch, icon = Icons.Default.Search),
+            TopAction(stringResource(R.string.action_lock), actions.lock),
+        ),
         snackbarHostState = snackbar,
         bottomBar = if (canAdd) {
             { AddEvidenceActions(enabled = !state.archived, callbacks = actions.add, onPaste = { dialog = Dialog.Paste }) }

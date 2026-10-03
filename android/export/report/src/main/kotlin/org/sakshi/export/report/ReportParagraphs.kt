@@ -73,16 +73,14 @@ internal object ReportParagraphs {
         for (part in block.observed) {
             out += status(word(part.status))
             out += quote(part.quote)
-            out += mono(
-                ReportText.fill(
-                    ReportText.ARTIFACT_LINE,
-                    part.representation, part.artifactId, part.sha256 ?: ReportText.HASH_NOT_RECORDED, part.locator,
-                ),
-            )
+            if (part.redactedPassages > 0) out += Paragraph(ReportText.REDACTION_NOTE, ParagraphStyle.SMALL)
+            val hashText = part.sha256 ?: if (part.redactedPassages > 0) ReportText.HASH_WITHHELD else ReportText.HASH_NOT_RECORDED
+            out += mono(ReportText.fill(ReportText.ARTIFACT_LINE, part.representation, part.artifactId, hashText, part.locator))
         }
         for (part in block.userStatements) {
             out += status(word(part.status))
             out += quote(part.text)
+            if (part.redactedPassages > 0) out += Paragraph(ReportText.REDACTION_NOTE, ParagraphStyle.SMALL)
             out += mono(ReportText.fill(ReportText.STATEMENT_LINE, part.writtenAt, part.artifactId, part.locator))
         }
         if (block.inferred.isNotEmpty()) out += Paragraph(ReportText.ACCEPTED_TAGS_HEADING, ParagraphStyle.SMALL, keepWithNext = true)

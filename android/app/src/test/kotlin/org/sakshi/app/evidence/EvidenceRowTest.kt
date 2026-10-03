@@ -42,12 +42,14 @@ class EvidenceRowTest {
     private fun row(kind: EvidenceKind, state: String) = EvidenceRow("synthetic-id", "2026-10-02T10:00:00Z", 10, kind, state)
 
     @Test
-    fun onlyUnanalysedTextOffersAnalyseText() {
+    fun onlyUnanalysedTextAndImagesOfferAnalysis() {
         assertTrue(row(EvidenceKind.TEXT, SupportState.SAVED).canAnalyse)
         assertTrue(row(EvidenceKind.TEXT_FILE, SupportState.SAVED).canAnalyse)
+        assertTrue(row(EvidenceKind.IMAGE, SupportState.SAVED).canAnalyse)
         assertFalse(row(EvidenceKind.TEXT, SupportState.ANALYZED).canAnalyse)
         assertFalse(row(EvidenceKind.TEXT, SupportState.PARTIAL).canAnalyse)
-        listOf(EvidenceKind.IMAGE, EvidenceKind.NOTE, EvidenceKind.PDF, EvidenceKind.AUDIO, EvidenceKind.FILE).forEach {
+        assertFalse(row(EvidenceKind.IMAGE, SupportState.ANALYZED).canAnalyse)
+        listOf(EvidenceKind.NOTE, EvidenceKind.PDF, EvidenceKind.AUDIO, EvidenceKind.FILE).forEach {
             assertFalse(row(it, SupportState.SAVED).canAnalyse, it.name)
         }
     }
@@ -57,6 +59,8 @@ class EvidenceRowTest {
         assertEquals(AnalysisLabel.WAITING_FOR_TEXT, row(EvidenceKind.TEXT, SupportState.SAVED).analysis)
         assertEquals(AnalysisLabel.ANALYSED, row(EvidenceKind.TEXT, SupportState.ANALYZED).analysis)
         assertEquals(AnalysisLabel.ANALYSED_IN_PART, row(EvidenceKind.TEXT_FILE, SupportState.PARTIAL).analysis)
-        assertEquals(AnalysisLabel.WAITING_FOR_TEXT, row(EvidenceKind.IMAGE, SupportState.ANALYZED).analysis)
+        assertEquals(AnalysisLabel.ANALYSED, row(EvidenceKind.IMAGE, SupportState.ANALYZED).analysis)
+        assertEquals(AnalysisLabel.ANALYSED_IN_PART, row(EvidenceKind.IMAGE, SupportState.PARTIAL).analysis)
+        assertEquals(AnalysisLabel.WAITING_FOR_TEXT, row(EvidenceKind.NOTE, SupportState.ANALYZED).analysis)
     }
 }

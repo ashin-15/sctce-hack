@@ -5,15 +5,24 @@ import org.sakshi.processing.text.DateOrder
 
 private const val DEFAULT_MAX_TEXT_BYTES: Long = 5L * 1024 * 1024
 private const val DEFAULT_MAX_RECORDS: Int = 10_000
+private const val DEFAULT_MAX_IMAGE_BYTES: Long = 30L * 1024 * 1024
+private const val DEFAULT_MIN_OCR_LINE_CONFIDENCE: Float = 0.5f
 
-/** Size bounds for one analysis. */
+/**
+ * Bounds for one analysis. [minOcrLineConfidence] is a demonstration setting, not a calibrated threshold: a line whose
+ * engine score is below it, or that has no score, marks the image text as uncertain. It never hides the line.
+ */
 public data class AnalysisLimits(
     val maxTextBytes: Long = DEFAULT_MAX_TEXT_BYTES,
     val maxRecords: Int = DEFAULT_MAX_RECORDS,
+    val maxImageBytes: Long = DEFAULT_MAX_IMAGE_BYTES,
+    val minOcrLineConfidence: Float = DEFAULT_MIN_OCR_LINE_CONFIDENCE,
 ) {
     init {
         require(maxTextBytes > 0) { "maxTextBytes must be positive" }
         require(maxRecords > 0) { "maxRecords must be positive" }
+        require(maxImageBytes > 0) { "maxImageBytes must be positive" }
+        require(minOcrLineConfidence in 0f..1f) { "minOcrLineConfidence must be within 0 to 1" }
     }
 }
 
@@ -31,8 +40,8 @@ public data class ExportOptions(
     }
 }
 
-/** How the text was read. */
-public enum class InputKind { PLAIN_TEXT, WHATSAPP_EXPORT }
+/** How the text was read. [IMAGE_TEXT] is text recognised in an image by software, not the image itself. */
+public enum class InputKind { PLAIN_TEXT, WHATSAPP_EXPORT, IMAGE_TEXT }
 
 /** Conditions the user should be told about. A set of these never means "nothing was found". */
 public enum class AnalysisWarning {
@@ -56,6 +65,15 @@ public enum class AnalysisWarning {
 
     /** Some cue matches were withheld because their cue list is not reviewed. */
     CUE_LIST_NOT_REVIEWED,
+
+    /**
+     * The image was read with a Latin-script engine. Text in other scripts, such as Malayalam or Devanagari, is not
+     * read and may be missing without any sign. Given for every image.
+     */
+    OCR_LATIN_SCRIPT_ONLY,
+
+    /** Some recognised lines have a low or missing engine score, so their text may be wrong. Count is lines. */
+    OCR_LOW_CONFIDENCE_LINES,
 }
 
 /** Why a piece of evidence was not analysed here. */
@@ -67,6 +85,15 @@ public enum class NotAnalysableReason {
     EVIDENCE_MISSING,
     UNREADABLE,
     ALREADY_ANALYSED,
+
+    /** The engine found no text it can read. Text in a script it does not read ends here too. */
+    NO_TEXT_RECOGNISED,
+
+    /** The saved file is not an image this phone can decode. */
+    IMAGE_NOT_DECODABLE,
+
+    /** Text recognition stopped with an error or ran out of memory. */
+    RECOGNITION_FAILED,
 }
 
 /** Result of [TextAnalysis.analyse]. */

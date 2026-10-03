@@ -57,6 +57,7 @@ public object BundleVerifier {
             }
             val signatureOutcome = SignatureVerifier.verify(manifestBytes, signature, signer)
             val events = ContentChecks.events(view)
+            val references = ReferenceChecks.check(view, events.events)
             val checks = listOf(
                 StructureChecks.layout(view),
                 StructureChecks.canonical(manifestBytes, parsed),
@@ -64,7 +65,7 @@ public object BundleVerifier {
                 StructureChecks.fileHashes(view),
                 StructureChecks.merkle(view.manifest),
                 events.check,
-                ReferenceChecks.check(view, events.events),
+                references.check,
                 ContentChecks.noCrossCase(view, events.events),
                 StructureChecks.omitted(view.manifest),
             )
@@ -80,6 +81,7 @@ public object BundleVerifier {
                     "event_count" to omitted.eventCount,
                 ),
                 BundleFormat.LIMITS,
+                Unverifiable.statements(omitted, view.manifest.redactions, references.omittedAnchors ?: 0),
             )
         }
     }

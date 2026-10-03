@@ -21,6 +21,7 @@ import org.sakshi.app.analysis.AnalysisScreen
 import org.sakshi.app.analysis.AnalysisViewModel
 import org.sakshi.app.cases.CaseListScreen
 import org.sakshi.app.cases.CaseListViewModel
+import org.sakshi.app.deletion.DeleteEverythingScreen
 import org.sakshi.app.evidence.AddEvidenceCallbacks
 import org.sakshi.app.evidence.CaseDetailActions
 import org.sakshi.app.evidence.CaseDetailScreen
@@ -37,6 +38,10 @@ import org.sakshi.app.patterns.PatternsViewModel
 import org.sakshi.app.people.WhoIsWhoActions
 import org.sakshi.app.people.WhoIsWhoScreen
 import org.sakshi.app.people.WhoIsWhoViewModel
+import org.sakshi.app.search.SearchActions
+import org.sakshi.app.search.SearchFilterActions
+import org.sakshi.app.search.SearchScreen
+import org.sakshi.app.search.SearchViewModel
 import org.sakshi.app.report.ExportResultActions
 import org.sakshi.app.report.ExportResultScreen
 import org.sakshi.app.report.ExportShare
@@ -101,9 +106,20 @@ fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewM
         is SessionScreen.EventReview -> EventReviewRoute(screen, services, owner, navigator)
         is SessionScreen.WhoIsWho -> WhoIsWhoRoute(screen, services, owner, navigator)
         is SessionScreen.Patterns -> PatternsRoute(screen.caseId, services, owner, navigator)
+        is SessionScreen.Search -> SearchRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ReportSelection -> ReportSelectionRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ReportPreview -> ReportPreviewRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ExportResult -> ExportResultRoute(screen.caseId, services, owner, navigator, container)
+        SessionScreen.DeleteEverything -> DeleteEverythingScreen(
+            onConfirm = {
+                // Everything that holds saved data is released first; the deletion then outlives this screen and session.
+                container.deletion.start {
+                    services.exports.clearExports()
+                    services.close()
+                }
+            },
+            onBack = navigator::back,
+        )
     }
 }
 
@@ -128,6 +144,7 @@ private fun CaseListRoute(
         onMessageShown = model::messageShown,
         onLock = container.session::lock,
         onOpen = navigator::openCase,
+        onDeleteEverything = navigator::openDeleteEverything,
     )
 }
 
@@ -164,6 +181,7 @@ private fun CaseDetailRoute(
             openTimeline = { navigator.openTimeline(caseId) },
             openPatterns = { navigator.openPatterns(caseId) },
             openReport = { navigator.openReport(caseId) },
+            openSearch = { navigator.openSearch(caseId) },
         )
     }
     CaseDetailScreen(state, actions)
@@ -245,6 +263,7 @@ private fun TimelineRoute(caseId: String, services: SessionServices, owner: View
             setFilter = model::setFilter,
             addGap = model::addGap,
             gapOutcomeShown = model::gapOutcomeShown,
+            openSearch = { navigator.openSearch(caseId) },
         )
     }
     TimelineScreen(state, gapOutcome, actions)
@@ -315,9 +334,35 @@ private fun PatternsRoute(caseId: String, services: SessionServices, owner: View
             setView = model::setView,
             openEvent = { navigator.openEventReview(caseId, it) },
             enter = model::recompute,
+            answer = model::answer,
         )
     }
     PatternsScreen(state, actions)
+}
+
+@Composable
+private fun SearchRoute(caseId: String, services: SessionServices, owner: ViewModelStoreOwner, navigator: SessionNavigator) {
+    val model = remember(services, caseId) {
+        ViewModelProvider(owner, SearchViewModel.factory(caseId, services))["search-$caseId", SearchViewModel::class.java]
+    }
+    val state by model.state.collectAsState()
+    val actions = remember(model, navigator, caseId) {
+        SearchActions(
+            back = navigator::back,
+            openEvent = { navigator.openEventReview(caseId, it) },
+            onQueryChanged = model::onQueryChanged,
+            filters = SearchFilterActions(
+                setOpen = model::setFiltersOpen,
+                setScope = model::setScope,
+                setPerson = model::setPerson,
+                toggleSource = model::toggleSource,
+                setFromText = model::setFromText,
+                setUntilText = model::setUntilText,
+                clear = model::clearFilters,
+            ),
+        )
+    }
+    SearchScreen(state, actions)
 }
 
 @Composable

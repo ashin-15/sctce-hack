@@ -68,6 +68,36 @@
     <string name="message_title_too_long">The title is too long. The limit is %1$d.</string>
     <string name="message_save_failed">The change could not be saved. Try again.</string>
 
+    <!-- Delete everything -->
+    <string name="cases_menu_options">More options</string>
+    <string name="delete_all_menu">Delete everything</string>
+    <string name="delete_all_title">Delete everything</string>
+    <string name="delete_all_removed_heading">What will be removed</string>
+    <string name="delete_all_removed_cases">Every case</string>
+    <string name="delete_all_removed_files">Every saved file</string>
+    <string name="delete_all_removed_text">All text Sakshi read from them</string>
+    <string name="delete_all_removed_answers">Your review answers</string>
+    <string name="delete_all_removed_activity">The record of activity</string>
+    <string name="delete_all_removed_keys">The keys that protect them</string>
+    <string name="delete_all_not_affected">Report files you already shared or saved somewhere else are not affected. Sakshi cannot delete them.</string>
+    <string name="delete_all_permanent">This cannot be undone.</string>
+    <string name="delete_all_limit">Physical erasure from the phone\'s storage cannot be promised.</string>
+    <string name="delete_all_slow">Take your time. Nothing is deleted until you type the word below and press the button.</string>
+    <string name="delete_all_confirm_word">DELETE</string>
+    <string name="delete_all_type_prompt">To go on, type %1$s below.</string>
+    <string name="delete_all_field_label">Word to type</string>
+    <string name="delete_all_button">Delete everything</string>
+    <string name="delete_all_running_title">Deleting</string>
+    <string name="delete_all_running_body">This can take a moment. Please keep Sakshi open.</string>
+    <string name="delete_all_incomplete_title">Deleting is not finished</string>
+    <string name="delete_all_incomplete_body">Most of what Sakshi had saved was deleted, but some files could not be removed. Try again.</string>
+    <string name="delete_all_failed_title">Deleting stopped</string>
+    <string name="delete_all_failed_body">Deleting did not finish, so Sakshi cannot say that everything was removed. Try again.</string>
+    <string name="delete_all_retry">Try again</string>
+    <string name="delete_all_done_title">Deleted</string>
+    <string name="delete_all_done_body">Everything Sakshi had saved on this phone was deleted.</string>
+    <string name="delete_all_done_continue">Continue</string>
+
     <!-- Lock and share -->
     <string name="lock_share_pending">Unlock to choose where to save what you shared.</string>
     <string name="share_target_label">Save to Sakshi</string>
@@ -222,6 +252,7 @@
 
     <!-- Analysis -->
     <string name="evidence_analyse">Analyse text</string>
+    <string name="evidence_read_image">Read text in image</string>
     <string name="result_analyse_now">Analyse now</string>
     <string name="analysis_done_label">Saved. Analysed, the messages are on the timeline.</string>
     <string name="analysis_done_in_part_label">Saved. Analysed in part, see the timeline.</string>
@@ -281,6 +312,14 @@
     <string name="analysis_warn_prefix">Text before the opening message of the file was kept in the saved file but not turned into a message.</string>
     <string name="analysis_warn_language">Some messages are in a language or script this version cannot analyse. They are kept and shown, with no suggestions.</string>
     <string name="analysis_warn_cue_list">Some word matches were held back because the word list for that language has not been reviewed.</string>
+    <string name="analysis_warn_ocr_latin_only">The text was read from the image by software on this phone. It reads Latin letters only, so writing in Malayalam, Devanagari or other scripts may be missing. Compare it with the image.</string>
+    <plurals name="analysis_warn_ocr_low_confidence">
+        <item quantity="one">%1$d line read from the image may be wrong. Check it against the image.</item>
+        <item quantity="other">%1$d lines read from the image may be wrong. Check them against the image.</item>
+    </plurals>
+    <string name="analysis_refused_no_text_recognised">No text in Latin letters could be read from this image. Writing in Malayalam, Devanagari or other scripts is not read in this version. The image is kept as received.</string>
+    <string name="analysis_refused_image_not_decodable">This image could not be opened on this phone, so no text was read. It is kept as received.</string>
+    <string name="analysis_refused_recognition_failed">Reading text from this image stopped before it finished. The image is kept as received. You can try again.</string>
 
     <!-- Time -->
     <string name="time_unknown">Time not known</string>
@@ -447,6 +486,19 @@
     <string name="review_problem_value">That choice is not available here.</string>
     <string name="review_problem_case">Those items belong to different cases.</string>
     <string name="review_problem_generic">That change could not be saved.</string>
+    <string name="review_picture_heading">The picture you saved</string>
+    <string name="review_picture_description">The picture this text was read from</string>
+    <string name="review_picture_loading">Loading the picture…</string>
+    <string name="review_picture_open">Open a larger view</string>
+    <string name="review_picture_outlined">Outlined: the lines the underlined words were read from.</string>
+    <string name="review_picture_no_outline">The lines these words were read from could not be placed on the picture. Check the words against the whole picture.</string>
+    <string name="review_picture_text_note">Text read from the picture by this phone. It can contain mistakes. Check it against the picture.</string>
+    <string name="review_picture_too_large">This picture is too large to show here. The saved original is unchanged.</string>
+    <string name="review_picture_unreadable">The picture could not be shown here. The saved original is unchanged. You can still review the text.</string>
+    <string name="review_picture_zoom_in">Zoom in</string>
+    <string name="review_picture_zoom_out">Zoom out</string>
+    <string name="review_picture_close">Close the larger view</string>
+    <string name="review_picture_scroll_hint">Scroll to look around the picture.</string>
     <string name="history_agreed">You agreed with the suggestion: %1$s</string>
     <string name="history_disagreed">You disagreed with the suggestion: %1$s</string>
     <string name="history_not_sure">You marked the suggestion as not sure: %1$s</string>
@@ -514,6 +566,23 @@
     <string name="pattern_status_insufficient">Not enough context to say</string>
     <string name="pattern_status_not_observed">Not observed in the selected records. This does not mean nothing happened.</string>
     <string name="pattern_interpretation">One way to read this: %1$s</string>
+    <string name="patterns_refreshing">Something in this case changed. These descriptions are being worked out again.</string>
+    <string name="patterns_notice_changed">This description changed before your answer was saved. It has been worked out again.</string>
+    <string name="patterns_notice_not_saved">Your answer could not be saved. Please try again.</string>
+    <string name="patterns_review_none">Not reviewed yet</string>
+    <string name="patterns_review_accepted">You agreed this matches your evidence</string>
+    <string name="patterns_review_rejected">You said this does not match</string>
+    <string name="patterns_review_rejected_reason">You said this does not match: %1$s</string>
+    <string name="patterns_review_unknown">You marked this as not sure</string>
+    <string name="patterns_accept">This matches my evidence</string>
+    <string name="patterns_reject">This does not match</string>
+    <string name="patterns_unsure">I am not sure</string>
+    <string name="patterns_withdraw">Undo my answer</string>
+    <string name="patterns_review_explain">Your answer is saved with this description. If you correct something in the case, the description is worked out again and asks for your answer again.</string>
+    <string name="patterns_review_preview_only">These descriptions include items you have not reviewed yet, so they cannot be answered here.</string>
+    <string name="patterns_reject_title">Why does this not match?</string>
+    <string name="patterns_reject_body">Choosing a reason is optional. Your answer is saved with this description.</string>
+    <string name="patterns_reject_no_reason">No reason</string>
     <plurals name="pattern_based_on">
         <item quantity="one">Based on %1$d item</item>
         <item quantity="other">Based on %1$d items</item>
@@ -595,6 +664,25 @@
     <string name="report_limit_sender">It does not show who really sent a message.</string>
     <string name="report_limit_real">It does not show that a message is real.</string>
     <string name="report_limit_time">It does not show when a message was really sent. The times come from the saved records and from the clock of this phone.</string>
+    <string name="report_history_intro">Report version %1$s was exported on %2$s.</string>
+    <string name="report_history_unchanged">Nothing in it has changed since.</string>
+    <string name="report_history_since">Since then, %1$s.</string>
+    <string name="report_history_since_both">Since then, %1$s and %2$s.</string>
+    <plurals name="report_history_changed">
+        <item quantity="one">%1$d of its messages or notes was changed</item>
+        <item quantity="other">%1$d of its messages or notes were changed</item>
+    </plurals>
+    <plurals name="report_history_removed">
+        <item quantity="one">%1$d of its messages or notes is no longer in this case</item>
+        <item quantity="other">%1$d of its messages or notes are no longer in this case</item>
+    </plurals>
+    <plurals name="report_history_removed_short">
+        <item quantity="one">%1$d is no longer in this case</item>
+        <item quantity="other">%1$d are no longer in this case</item>
+    </plurals>
+    <string name="report_history_kept">That file stays as it was. A new export will be version %1$d.</string>
+    <string name="report_history_join_two">%1$s %2$s</string>
+    <string name="report_history_join_three">%1$s %2$s %3$s</string>
     <string name="report_preview_action">Preview report</string>
 
     <string name="report_preview_title">Preview of the report</string>
@@ -623,6 +711,7 @@
     <string name="report_refused_unknown_event">One of the selected items is no longer in this case. Change the selection and try again.</string>
     <string name="report_refused_case_missing">This case is no longer available.</string>
     <string name="report_refused_unknown_evidence">One of the chosen original files is not part of this case. Change the selection and try again.</string>
+    <string name="report_refused_changed_since_preview">Something in this case changed after the preview was made, so the file was not created. Go back and preview the report again.</string>
 
     <string name="export_notice_ok">OK</string>
     <string name="export_running">Creating the export file</string>
@@ -640,6 +729,7 @@
     <string name="export_result_title">Export file</string>
     <string name="export_ready">The export file is ready.</string>
     <string name="export_file_size">File size</string>
+    <string name="export_report_version">Report version %1$d</string>
     <string name="export_key_label">Signing key code</string>
     <string name="export_key_what">What is this?</string>
     <string name="export_key_explanation">This identifies the key on this phone that signed the file. Anyone checking the file should compare this code with you through another channel. It does not show who you are.</string>
@@ -679,4 +769,55 @@
     <string name="export_share_title">Share export file</string>
     <string name="export_share_unavailable">No app on this phone can receive the file.</string>
     <string name="export_discard">Discard export file</string>
+
+    <!-- Search -->
+    <string name="action_search">Search</string>
+    <string name="search_title">Search case</string>
+    <string name="search_placeholder">Search evidence…</string>
+    <string name="search_clear">Clear search</string>
+    <string name="search_empty_initial_title">Search evidence</string>
+    <string name="search_empty_initial_body">Type words to search the text Sakshi has read from this case: analysed text, chat exports, text read from images and notes you wrote.</string>
+    <string name="search_empty_results_title">No matches found in this case</string>
+    <string name="search_empty_results_body">No text or note in this case contains \"%1$s\". Items not yet read, and audio, video and files kept as received, are not searched.</string>
+    <string name="search_failed_title">Search stopped</string>
+    <string name="search_failed_body">The search could not finish, so this is not a list of results. Try again.</string>
+    <string name="search_limit_reached">There are more matches than shown here. Type more words to narrow the search.</string>
+
+    <!-- Search filters -->
+    <string name="search_filters_open">Filters</string>
+    <string name="search_filters_hide">Hide filters</string>
+    <string name="search_filters_clear">Clear filters</string>
+    <string name="search_filters_scope_heading">What to search</string>
+    <string name="search_scope_all">All text Sakshi has read in this case</string>
+    <string name="search_scope_accepted">Only messages with a tag you agreed with or added</string>
+    <string name="search_filters_person_heading">Person</string>
+    <string name="search_person_anyone">Anyone</string>
+    <string name="search_filters_source_heading">Where it came from</string>
+    <string name="search_filters_dates_heading">Dates</string>
+    <string name="search_date_from_label">From</string>
+    <string name="search_date_until_label">Until</string>
+    <string name="search_date_hint">Day/month/year, for example 03/10/2026. Both days are included. This phone\'s time zone is used.</string>
+    <string name="search_date_error_invalid">That is not a date that exists. Use day/month/year, for example 03/10/2026.</string>
+    <string name="search_date_error_order">The \"from\" date is after the \"until\" date.</string>
+    <string name="search_dates_problem_title">Check the dates</string>
+    <string name="search_dates_problem_body">Nothing is searched until both dates are correct.</string>
+    <string name="search_filtered_empty_title">No matches with these filters</string>
+    <string name="search_filtered_empty_body">No message that fits these filters contains \"%1$s\". Change or clear the filters to search more text.</string>
+    <string name="search_filters_note">With these filters, text and notes that have not been turned into messages yet are not shown.</string>
+    <string name="search_filters_note_dates">With these filters, text and notes that have not been turned into messages yet, and messages without a known time, are not shown.</string>
+    <string name="search_summary_none">Filters: none</string>
+    <string name="search_summary">Filters: %1$s</string>
+    <string name="search_summary_person">person: %1$s</string>
+    <string name="search_summary_person_unknown">a person no longer in this case</string>
+    <string name="search_summary_source">from: %1$s</string>
+    <string name="search_summary_dates_between">dates: %1$s to %2$s</string>
+    <string name="search_summary_dates_from">dates: from %1$s</string>
+    <string name="search_summary_dates_until">dates: up to %1$s</string>
+    <string name="search_summary_dates_invalid">dates: not valid yet</string>
+    <string name="derivative_kind_parsed_text">Parsed Text</string>
+    <string name="derivative_kind_ocr">OCR</string>
+    <string name="derivative_kind_transcript">Transcript</string>
+    <string name="derivative_kind_normalised_view">Normalised View</string>
+    <string name="derivative_kind_user_edit">User Edit</string>
+    <string name="derivative_kind_note">Your note</string>
 </resources>

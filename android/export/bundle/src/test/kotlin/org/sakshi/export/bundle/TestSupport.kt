@@ -22,6 +22,9 @@ const val DERIVATIVE_ID: String = "synthetic-derivative-1"
 const val ORIGINAL_LENGTH: Long = 3L * 1024 * 1024 + 17
 const val ANCHOR: String = "demo-ref-schema-1"
 
+/** The artefact id every synthetic event of the shared fixture cites. */
+const val CITED_ARTIFACT: String = "demo-export-a"
+
 /** Deterministic bytes generated on the fly, so large inputs never sit in memory. */
 class PatternStream(private val length: Long, private val seed: Int) : InputStream() {
     private var position = 0L
@@ -104,6 +107,7 @@ fun sampleProvenance(): Provenance = Provenance(
     nodes = listOf(
         ProvenanceNode(ORIGINAL_ID, ProvenanceKind.EVIDENCE, patternHash(ORIGINAL_LENGTH, 1), true),
         ProvenanceNode(DERIVATIVE_ID, ProvenanceKind.DERIVATIVE, patternHash(2048, 2), true),
+        ProvenanceNode(CITED_ARTIFACT, ProvenanceKind.EVIDENCE, null, false),
         ProvenanceNode("synthetic-event-1", ProvenanceKind.EVENT, null, false),
         ProvenanceNode("synthetic-event-2", ProvenanceKind.EVENT, null, false),
         ProvenanceNode("synthetic-finding-1", ProvenanceKind.FINDING, null, false),
@@ -112,6 +116,8 @@ fun sampleProvenance(): Provenance = Provenance(
     edges = listOf(
         ProvenanceEdge(DERIVATIVE_ID, ORIGINAL_ID, ProvenanceRelation.DERIVED_FROM),
         ProvenanceEdge(ORIGINAL_ID, "synthetic-event-1", ProvenanceRelation.ANCHORS),
+        ProvenanceEdge(CITED_ARTIFACT, "synthetic-event-1", ProvenanceRelation.ANCHORS),
+        ProvenanceEdge(CITED_ARTIFACT, "synthetic-event-2", ProvenanceRelation.ANCHORS),
         ProvenanceEdge("synthetic-event-1", "synthetic-finding-1", ProvenanceRelation.SUPPORTS),
     ),
 )

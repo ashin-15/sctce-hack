@@ -7,12 +7,14 @@ import org.sakshi.core.model.EventId
 import org.sakshi.core.model.EventSource
 import org.sakshi.core.model.OutgoingCoverage
 import org.sakshi.core.model.ReferenceId
+import org.sakshi.core.model.Representation
 import org.sakshi.core.model.ScopeId
 import org.sakshi.core.model.SourceKind
 import org.sakshi.core.model.TextStatus
 import org.sakshi.core.model.TimeBasis
 import org.sakshi.core.model.TimeBounds
 import org.sakshi.core.model.Timestamp
+import org.sakshi.processing.ocr.OcrEngine
 import org.sakshi.processing.text.DateOrder
 import org.sakshi.processing.text.ExportParse
 import org.sakshi.processing.text.ExportTime
@@ -56,6 +58,38 @@ internal class EventBuilder(
         if (!isExport) return built(listOf(plainEvent(text, index)), InputKind.PLAIN_TEXT)
         if (options == null) return needsOptions(parse, messages)
         return built(exportEvents(index, parse, options), InputKind.WHATSAPP_EXPORT)
+    }
+
+    /**
+     * One event for the text read from one image. Who sent it, when and in which direction is not known from the
+     * image: those stay unknown until the user says. The text is marked uncertain when any line scored low.
+     */
+    fun buildImage(image: ImageText, engine: OcrEngine): BuildResult.Built {
+        val text = image.derivative.text
+        val signals = rules.analyse(text)
+        noteLanguage(signals)
+        note(AnalysisWarning.OCR_LATIN_SCRIPT_ONLY)
+        val low = image.regions.count { OcrRecord.isLow(it.confidence, limits.minOcrLineConfidence) }
+        if (low > 0) warnings[AnalysisWarning.OCR_LOW_CONFIDENCE_LINES] = low
+        val assessment = signals.takeIf { it.matches.isNotEmpty() }?.let {
+            CueReferences.assess(it, 0, EventFactory.BODY_REFERENCE, context.derivative, context.evidenceSha256, Representation.OCR_DERIVATIVE) { span ->
+                image.regions.filter { region -> region.start < span.end && span.start < region.end }.map { region -> region.id }
+            }
+        }
+        val parser = "${engine.id}-${engine.version}".take(MAX_ID_LENGTH)
+        val draft = EventDraft(
+            eventId = EventId(ids()),
+            timestamp = EventFactory.unknownTime(),
+            sender = EventFactory.claimedSender(null),
+            direction = Direction.UNKNOWN,
+            source = EventSource(SourceKind.SELECTED_IMAGE, null, null, null, null, ScopeId(parser)),
+            bodySpan = CodePointSpan(0, CodePointIndex(text).length),
+            textStatus = if (low > 0) TextStatus.EXTRACTION_UNCERTAIN else TextStatus.AVAILABLE,
+            outgoingCoverage = OutgoingCoverage.UNKNOWN,
+            assessment = assessment,
+            representation = Representation.OCR_DERIVATIVE,
+        )
+        return built(listOf(EventFactory.build(context, draft)), InputKind.IMAGE_TEXT)
     }
 
     private fun built(events: List<Event>, kind: InputKind): BuildResult.Built =

@@ -51,6 +51,15 @@ class NotAnalysableTest : AnalysisTestBase() {
     }
 
     @Test
+    fun aNotesWordsAreNeverRunThroughCueMatching() {
+        val id = importBytes("you are worthless, send nudes or I will kill you".toByteArray(), kind = AcquisitionKind.MANUAL_NOTE)
+        assertEquals(NotAnalysableReason.MANUAL_NOTE, refusal(id))
+        assertNothingWritten(id)
+        // Searching a note's words (when wired) reads them directly; it never creates events, derivatives or findings.
+        assertTrue(runBlocking { vault.search.search(org.sakshi.core.model.CaseId(caseId), "worthless").hits.isEmpty() })
+    }
+
+    @Test
     fun oversizeTextIsRefusedBeforeReading() {
         val small = TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, AnalysisLimits(maxTextBytes = 10))
         val id = importText("this text is longer than ten bytes")

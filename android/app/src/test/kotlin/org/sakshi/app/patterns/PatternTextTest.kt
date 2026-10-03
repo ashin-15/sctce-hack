@@ -3,11 +3,14 @@ package org.sakshi.app.patterns
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.sakshi.app.R
 import org.sakshi.app.support.ForbiddenWords
 import org.sakshi.app.support.VaultTestBase
 import org.sakshi.app.ui.resolve
 import org.sakshi.core.temporal.AssessmentStatus
 import org.sakshi.core.temporal.PatternType
+import org.sakshi.core.vault.PatternReview
+import org.sakshi.core.vault.ReviewReason
 
 class PatternTextTest : VaultTestBase() {
     @Test
@@ -53,5 +56,43 @@ class PatternTextTest : VaultTestBase() {
     @Test
     fun theInterpretationIsIntroducedByOneWayToReadThis() {
         assertEquals("One way to read this: This may be a change in wording.", interpretationText("This may be a change in wording.").resolve(context.resources))
+    }
+
+    @Test
+    fun everyReviewStateHasPlainWordsAndTheReasonIsAddedToARejection() {
+        val resources = context.resources
+        assertEquals("Not reviewed yet", patternReviewText(PatternReview.NOT_REVIEWED, null).resolve(resources))
+        assertEquals("You agreed this matches your evidence", patternReviewText(PatternReview.ACCEPTED, null).resolve(resources))
+        assertEquals("You said this does not match", patternReviewText(PatternReview.REJECTED, null).resolve(resources))
+        assertEquals("You marked this as not sure", patternReviewText(PatternReview.MARKED_UNKNOWN, null).resolve(resources))
+        val reasons = mapOf(
+            ReviewReason.WRONG_SENDER_OR_QUOTE to "Wrong sender or quote",
+            ReviewReason.EXTRACTION_ERROR to "The text was read wrongly",
+            ReviewReason.DUPLICATE to "Duplicate",
+            ReviewReason.INSUFFICIENT_CONTEXT to "Not enough context",
+        )
+        assertEquals(reasons.keys.toList(), PATTERN_REJECT_REASONS)
+        reasons.forEach { (code, words) ->
+            assertEquals("You said this does not match: $words", patternReviewText(PatternReview.REJECTED, code).resolve(resources))
+        }
+    }
+
+    @Test
+    fun theReviewWordsUseNoForbiddenWordAndNoDash() {
+        val resources = context.resources
+        val texts = PatternReview.entries.map { patternReviewText(it, null).resolve(resources) } +
+            PATTERN_REJECT_REASONS.map { patternReviewText(PatternReview.REJECTED, it).resolve(resources) } +
+            PatternNotice.entries.map { patternNoticeText(it).resolve(resources) } +
+            listOf(
+                R.string.patterns_accept, R.string.patterns_reject, R.string.patterns_unsure, R.string.patterns_withdraw,
+                R.string.patterns_review_explain, R.string.patterns_review_preview_only, R.string.patterns_refreshing,
+                R.string.patterns_reject_title, R.string.patterns_reject_body, R.string.patterns_reject_no_reason,
+            ).map { resources.getString(it) }
+        texts.forEach { text ->
+            assertEquals(emptyList(), ForbiddenWords.found(text), text)
+            assertTrue(!ForbiddenWords.hasDash(text), text)
+            val lower = text.lowercase()
+            listOf("confirm", "verif", "prove", "valid").forEach { assertTrue(it !in lower, "$it in $text") }
+        }
     }
 }

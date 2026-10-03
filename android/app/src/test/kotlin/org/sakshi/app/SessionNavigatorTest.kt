@@ -76,4 +76,23 @@ class SessionNavigatorTest {
         navigator.back()
         assertEquals(SessionScreen.CaseDetail("synthetic-case"), navigator.current.value)
     }
+
+    @Test
+    fun searchOpensFromTheCaseAndBackReturnsThere() {
+        val navigator = SessionNavigator()
+        navigator.openCase("synthetic-case")
+        navigator.openSearch("synthetic-case")
+        assertEquals(SessionScreen.Search("synthetic-case"), navigator.current.value)
+        navigator.back()
+        assertEquals(SessionScreen.CaseDetail("synthetic-case"), navigator.current.value)
+    }
+
+    @Test
+    fun deleteEverythingOpensFromTheCaseListAndBackReturnsThere() {
+        val navigator = SessionNavigator()
+        navigator.openDeleteEverything()
+        assertEquals(SessionScreen.DeleteEverything, navigator.current.value)
+        navigator.back()
+        assertEquals(SessionScreen.CaseList, navigator.current.value)
+    }
 }

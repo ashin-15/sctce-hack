@@ -25,6 +25,15 @@ class ResultAnalyseTest {
     }
 
     @Test
+    fun anImageOffersItOnlyWhenItsBytesAreATypeTextRecognitionReads() {
+        listOf("image/jpeg", "image/png", "image/webp").forEach {
+            assertTrue(isAnalysableText(saved(declared = "image/*", detected = it), ItemLabel.File("synthetic")), it)
+        }
+        assertFalse(isAnalysableText(saved(declared = "image/gif", detected = "image/gif"), ItemLabel.File("synthetic.gif")))
+        assertFalse(isAnalysableText(saved(declared = "image/png", detected = "image/png", state = AnalysisState.PRESERVED_NOT_ANALYSED), ItemLabel.File("synthetic.png")))
+    }
+
+    @Test
     fun keptOnlyItemsAndUnknownLabelsDoNot() {
         assertFalse(isAnalysableText(saved(state = AnalysisState.PRESERVED_NOT_ANALYSED), ItemLabel.SharedText))
         assertFalse(isAnalysableText(saved(), ItemLabel.Unknown))

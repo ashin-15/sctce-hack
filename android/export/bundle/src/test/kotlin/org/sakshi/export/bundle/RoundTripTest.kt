@@ -53,7 +53,10 @@ class RoundTripTest {
         val dir = tmp.newFolder().toPath()
         val provenance = Provenance(
             sampleProvenance().nodes.filter { it.kind == ProvenanceKind.EVIDENCE || it.kind == ProvenanceKind.EVENT || it.kind == ProvenanceKind.FINDING },
-            emptyList(),
+            listOf(
+                ProvenanceEdge(CITED_ARTIFACT, "synthetic-event-1", ProvenanceRelation.ANCHORS),
+                ProvenanceEdge(CITED_ARTIFACT, "synthetic-event-2", ProvenanceRelation.ANCHORS),
+            ),
         )
         BundleWriter.write(sampleContent(provenance = provenance, derivatives = emptyList(), report = null), dir, SoftwareP256Signer.generate())
 

@@ -13,6 +13,12 @@ public interface TextDerivatives {
 
     /** The text of the derivative, or null if it does not exist. */
     public suspend fun text(derivativeId: String): String?
+
+    /** The newest OCR derivative of the evidence, or null. */
+    public suspend fun latestOcr(evidenceId: String): OcrDerivative?
+
+    /** Stores recognised text and its image regions as a new OCR derivative of the evidence, in one step. */
+    public suspend fun saveOcr(evidenceId: String, draft: OcrDraft): OcrDerivative
 }
 
 /** Tool identity recorded on derivatives written by this module. */

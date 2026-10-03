@@ -60,13 +60,21 @@ sealed interface PreviewState {
 
     data object Building : PreviewState
 
-    class Ready(val model: ReportModel, val rows: List<PreviewRow>, val summary: PreviewSummary) : PreviewState
+    /** A built preview and exactly what it was built from, so the export can make the same report. */
+    class Ready(
+        val model: ReportModel,
+        val rows: List<PreviewRow>,
+        val summary: PreviewSummary,
+        val selection: ReportSelection,
+        val options: ReportOptions,
+        val contentSha256: String,
+    ) : PreviewState
 
     data class Refused(val message: UiText) : PreviewState
 }
 
-/** A finished export file. [keyId] is the full hex id of the signing key. */
-class ExportDone(val file: File, val snapshotId: String, val keyId: String, val summary: ExportSummary)
+/** A finished export file. [keyId] is the full hex id of the signing key. [reportVersion] is the case's report number. */
+class ExportDone(val file: File, val snapshotId: String, val keyId: String, val summary: ExportSummary, val reportVersion: Int)
 
 sealed interface ExportState {
     data object Idle : ExportState
@@ -89,6 +97,7 @@ data class ReportUiState(
     val zone: ZoneId = ZoneId.systemDefault(),
     val preview: PreviewState = PreviewState.Idle,
     val export: ExportState = ExportState.Idle,
+    val earlierExport: EarlierExport? = null,
 ) {
     val selectableCount: Int get() = rows.count { it.selectable }
     val canPreview: Boolean get() = selected.isNotEmpty()
@@ -128,9 +137,13 @@ class ReportViewModel(
             .map { (events, evidence) -> load(events, evidence) }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val state: StateFlow<ReportUiState> = combine(loaded, choices, preview, export) { data, chosen, previewing, exporting ->
+    private val earlier: StateFlow<EarlierExport?> = vault.reports.observeDrift(CaseId(caseId))
+        .map { ExportHistoryMapping.earlierExport(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val state: StateFlow<ReportUiState> = combine(loaded, choices, preview, export, earlier) { data, chosen, previewing, exporting, exported ->
         if (data == null) {
-            ReportUiState(zone = chosen.zone, preview = previewing, export = exporting)
+            ReportUiState(zone = chosen.zone, preview = previewing, export = exporting, earlierExport = exported)
         } else {
             val selected = chosen.selected intersect ReportRows.selectableIds(data.rows)
             ReportUiState(
@@ -142,6 +155,7 @@ class ReportViewModel(
                 zone = chosen.zone,
                 preview = previewing,
                 export = exporting,
+                earlierExport = exported,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ReportUiState(zone = zone))
@@ -226,17 +240,19 @@ class ReportViewModel(
         )
     }
 
-    private fun currentOptions() = ReportOptions(includeUnreviewedSuggestions = choices.value.includeUnreviewed)
-
     /** Builds the report model for the current selection and shows it as a preview. */
     fun buildPreview() {
         val selection = currentSelection() ?: return
-        val options = currentOptions()
+        val includeUnreviewed = choices.value.includeUnreviewed
         val sizes = state.value.originals.filter { it.included }.sumOf { it.byteSize }
         previewJob?.cancel()
         preview.value = PreviewState.Building
         previewJob = viewModelScope.launch {
             preview.value = try {
+                val options = ReportOptions(
+                    includeUnreviewedSuggestions = includeUnreviewed,
+                    reportVersion = vault.reports.nextVersion(selection.caseId),
+                )
                 when (val built = builder.build(selection, options)) {
                     is ReportBuildResult.Refused -> PreviewState.Refused(ReportMessages.refusal(built.reason))
                     is ReportBuildResult.Built -> PreviewState.Ready(
@@ -249,6 +265,9 @@ class ReportViewModel(
                             leftOut = built.bundleInputs.omitted.eventCount,
                             includesUnreviewed = options.includeUnreviewedSuggestions,
                         ),
+                        selection,
+                        options,
+                        built.contentSha256,
                     )
                 }
             } catch (cancelled: CancellationException) {
@@ -268,16 +287,18 @@ class ReportViewModel(
         if (export.value !is ExportState.Running && export.value !is ExportState.Done) export.value = ExportState.Idle
     }
 
-    /** Makes the export file for the current selection. The outcome is in [state]. */
+    /**
+     * Makes the export file for the report that was previewed, with the choices it was built from and not the ones on
+     * screen now. Does nothing without a ready preview. The outcome is in [state].
+     */
     fun startExport() {
         if (export.value is ExportState.Running || export.value is ExportState.Done) return
-        val selection = currentSelection() ?: return
-        val options = currentOptions()
+        val previewed = preview.value as? PreviewState.Ready ?: return
         export.value = ExportState.Running()
         exportJob = viewModelScope.launch {
             try {
-                export.value = when (val result = exports.export(selection, options)) {
-                    is ExportResult.Exported -> ExportState.Done(ExportDone(result.zipFile, result.snapshotId, result.signerKeyId, result.summary))
+                export.value = when (val result = exports.export(previewed.selection, previewed.options, previewed.contentSha256)) {
+                    is ExportResult.Exported -> ExportState.Done(ExportDone(result.zipFile, result.snapshotId, result.signerKeyId, result.summary, result.reportVersion))
                     is ExportResult.Refused -> ExportState.Failed(ReportMessages.refusal(result.reason))
                     is ExportResult.Failed -> ExportState.Failed(ReportMessages.failure(result.reason))
                 }

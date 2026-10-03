@@ -13,6 +13,11 @@ public data class VerificationReport(
     val checks: List<Check>,
     val omitted: Map<String, Int>,
     val limits: List<String>,
+    /**
+     * Statements about what this bundle cannot show because it was left out or removed: omitted files and records,
+     * anchors to items that are not included, and text the person removed. They do not change [verdict].
+     */
+    val unverifiable: List<String> = emptyList(),
 )
 
 /** Upper bounds applied to the untrusted bundle. */

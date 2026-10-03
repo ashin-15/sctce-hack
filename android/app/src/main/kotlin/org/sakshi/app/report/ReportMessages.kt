@@ -15,6 +15,7 @@ object ReportMessages {
             RefusalReason.UNKNOWN_EVENT -> R.string.report_refused_unknown_event
             RefusalReason.CASE_MISSING -> R.string.report_refused_case_missing
             RefusalReason.UNKNOWN_EVIDENCE -> R.string.report_refused_unknown_evidence
+            RefusalReason.CHANGED_SINCE_PREVIEW -> R.string.report_refused_changed_since_preview
         },
     )
 

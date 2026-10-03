@@ -30,6 +30,15 @@ class ReportMessagesTest {
     }
 
     @Test
+    fun aChangedCaseTellsThePersonToPreviewAgain() {
+        val text = ReportMessages.refusal(RefusalReason.CHANGED_SINCE_PREVIEW).resolve(resources)
+        assertEquals(
+            "Something in this case changed after the preview was made, so the file was not created. Go back and preview the report again.",
+            text,
+        )
+    }
+
+    @Test
     fun everyExportFailureHasAPlainSentence() {
         assertDistinctAndClean(ExportFailure.entries.map { ReportMessages.failure(it).resolve(resources) })
     }

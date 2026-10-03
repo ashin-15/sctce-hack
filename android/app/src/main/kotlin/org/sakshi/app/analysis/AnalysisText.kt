@@ -18,6 +18,9 @@ fun refusalText(reason: NotAnalysableReason): UiText = res(
         NotAnalysableReason.EVIDENCE_MISSING -> R.string.analysis_refused_missing
         NotAnalysableReason.UNREADABLE -> R.string.analysis_refused_unreadable
         NotAnalysableReason.ALREADY_ANALYSED -> R.string.analysis_refused_already
+        NotAnalysableReason.NO_TEXT_RECOGNISED -> R.string.analysis_refused_no_text_recognised
+        NotAnalysableReason.IMAGE_NOT_DECODABLE -> R.string.analysis_refused_image_not_decodable
+        NotAnalysableReason.RECOGNITION_FAILED -> R.string.analysis_refused_recognition_failed
     },
 )
 
@@ -30,6 +33,8 @@ fun warningText(warning: AnalysisWarning, count: Int): UiText = when (warning) {
     AnalysisWarning.UNPARSED_PREFIX_SKIPPED -> res(R.string.analysis_warn_prefix)
     AnalysisWarning.UNSUPPORTED_LANGUAGE_PRESENT -> res(R.string.analysis_warn_language)
     AnalysisWarning.CUE_LIST_NOT_REVIEWED -> res(R.string.analysis_warn_cue_list)
+    AnalysisWarning.OCR_LATIN_SCRIPT_ONLY -> res(R.string.analysis_warn_ocr_latin_only)
+    AnalysisWarning.OCR_LOW_CONFIDENCE_LINES -> plural(R.plurals.analysis_warn_ocr_low_confidence, count, count)
 }
 
 fun warningTexts(result: AnalysisOutcome.Analysed): List<UiText> =

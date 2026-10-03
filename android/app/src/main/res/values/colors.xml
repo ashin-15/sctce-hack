@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher icon: the theme's plum ink on a plain field. Deliberately abstract. -->
+    <color name="ic_launcher_background">#3D3346</color>
+</resources>

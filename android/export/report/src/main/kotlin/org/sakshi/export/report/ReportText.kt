@@ -57,6 +57,19 @@ public object ReportText {
     public const val SCOPE_SOURCES: String = "Kinds of source: {0}."
     public const val SCOPE_GAPS: String = "{0} known gaps in coverage are listed under what is not known."
 
+    public const val SCOPE_ORIGINALS_NOTE: String =
+        "An included original is the exact saved file. It may carry details inside it, such as camera or location " +
+            "information, that this report does not list."
+    public const val SCOPE_REDACTED: String =
+        "{0} passages in {1} records were removed by the person who made this report. Each removed passage is " +
+            "replaced by a marker. The removed text and a hash of it are not in this report or in the bundle."
+    public const val SCOPE_REDACTED_LIMIT: String =
+        "The bundle can show that its own files are unchanged. It cannot show what the removed text said or " +
+            "that the removal was correct."
+    public const val SCOPE_REDACTED_ORIGINAL: String =
+        "Warning: an original file included in the bundle is the source of removed text and still contains it, " +
+            "because originals are kept exactly as saved."
+
     // Timeline, footer and lists.
     public const val TIMELINE_ROW: String = "{0} ({1}). Sender: {2} ({3}). {4}. Source: {5}."
     public const val PAGE_FOOTER: String = "Page {0} of {1} - Report version {2}"
@@ -70,6 +83,8 @@ public object ReportText {
     public const val QUOTE_UNAVAILABLE: String = "The text could not be read from the saved records."
     public const val ARTIFACT_LINE: String = "{0}. Artefact {1}. SHA-256 {2}. Location: {3}."
     public const val HASH_NOT_RECORDED: String = "not recorded"
+    public const val HASH_WITHHELD: String = "withheld because text was removed"
+    public const val REDACTION_NOTE: String = "Parts of this text were removed by the person who made this report."
     public const val SCORE_NOT_RECORDED: String = "not recorded"
     public const val STATEMENT_LINE: String = "Written {0}. Artefact {1}. Location: {2}."
     public const val TAG_LINE: String = "{0} ({1}). Basis: {2}. Producer version {3}. Confidence: {4}."
@@ -82,6 +97,7 @@ public object ReportText {
     public const val LOCATOR_AUDIO: String = "{0} to {1} of the audio"
     public const val LOCATOR_REGION_PAGE: String = "region {0} on page {1}"
     public const val LOCATOR_REGION: String = "region {0}"
+    public const val LOCATOR_WITHHELD: String = "withheld because text was removed"
 
     // Patterns.
     public const val PATTERN_STATUS: String = "Status: {0}."

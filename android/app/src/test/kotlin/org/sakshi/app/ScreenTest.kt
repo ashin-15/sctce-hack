@@ -9,6 +9,7 @@ import org.sakshi.acquisition.importer.ImportReport
 import org.sakshi.acquisition.importer.PendingBatch
 import org.sakshi.app.importing.CaseChoice
 import org.sakshi.app.importing.ImportUiState
+import org.sakshi.app.session.DeletionState
 import org.sakshi.app.session.SessionState
 import org.sakshi.app.support.VaultTestBase
 
@@ -20,6 +21,16 @@ class ScreenTest : VaultTestBase() {
         assertEquals(Screen.Onboarding, screenFor(acknowledged = false, SessionState.Locked))
         assertEquals(Screen.Onboarding, screenFor(acknowledged = false, SessionState.NoDeviceLock))
         assertEquals(Screen.Onboarding, screenFor(acknowledged = false, SessionState.Unlocked(vault)))
+    }
+
+    @Test
+    fun aDeletionInAnyStateTakesOverEveryOtherScreen() {
+        val states = listOf(DeletionState.Running, DeletionState.Incomplete, DeletionState.Failed, DeletionState.Done)
+        states.forEach { deletion ->
+            assertEquals(Screen.Deletion(deletion), screenFor(acknowledged = true, SessionState.Unlocked(vault), deletion))
+            assertEquals(Screen.Deletion(deletion), screenFor(acknowledged = false, SessionState.Locked, deletion))
+        }
+        assertEquals(Screen.Onboarding, screenFor(acknowledged = false, SessionState.Locked, DeletionState.Idle))
     }
 
     @Test
@@ -37,7 +48,12 @@ class ScreenTest : VaultTestBase() {
 
     @Test
     fun anIdleImportLeavesTheCurrentSessionScreen() {
-        listOf(SessionScreen.CaseList, SessionScreen.CaseDetail("synthetic-id"), SessionScreen.ManualNote("synthetic-id")).forEach {
+        listOf(
+            SessionScreen.CaseList,
+            SessionScreen.CaseDetail("synthetic-id"),
+            SessionScreen.ManualNote("synthetic-id"),
+            SessionScreen.Search("synthetic-id"),
+        ).forEach {
             assertEquals(it, sessionScreenFor(it, ImportUiState.Idle))
         }
     }

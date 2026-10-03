@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Optional notification observation lane (megaplan 13.2). The service is disabled until the person makes an
+        affirmative choice in the app, which calls NotificationObservation.enable() and so switches the component on at
+        runtime. A build that never enables the lane exposes nothing: a disabled service is not listed in the system
+        notification access screen and cannot be bound. The service is exported only because the system must bind it;
+        the bind permission limits binding to the system.
+    -->
+    <application>
+        <service
+            android:name="org.sakshi.acquisition.notifications.SakshiNotificationListener"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+            <!--
+                API 31+ filter types the listener asks to receive by default: conversations, alerting and silent.
+                Ongoing notifications are left out. Silent messages can be relevant, so silent is not disabled.
+                The person can still change this in system settings.
+            -->
+            <meta-data
+                android:name="android.service.notification.default_filter_types"
+                android:value="conversations|alerting|silent" />
+        </service>
+    </application>
+</manifest>

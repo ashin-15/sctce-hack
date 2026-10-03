@@ -47,6 +47,8 @@ public data class ObservedPart(
     val sha256: String?,
     val locator: String,
     val representation: String,
+    /** Number of passages removed from [quote] by the person who made the report; zero when the quote is whole. */
+    val redactedPassages: Int = 0,
 ) : ReportPart {
     override val status: EpistemicStatus get() = EpistemicStatus.OBSERVED
 }
@@ -57,6 +59,8 @@ public data class UserStatementPart(
     val artifactId: String,
     val writtenAt: String,
     val locator: String,
+    /** Number of passages removed from [text]; zero when the text is whole. */
+    val redactedPassages: Int = 0,
 ) : ReportPart {
     override val status: EpistemicStatus get() = EpistemicStatus.USER_REPORTED
 }

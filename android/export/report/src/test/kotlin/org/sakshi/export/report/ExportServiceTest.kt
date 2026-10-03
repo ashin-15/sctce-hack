@@ -135,7 +135,7 @@ class ExportServiceTest : ReportTestBase() {
         assertFalse(Files.exists(unzip(without.zipFile).resolve("evidence")))
         assertEquals(2, without.summary.omitted.evidenceCount)
 
-        val with = exported(runBlocking { service().export(selectAll(input).copy(includeOriginalsFor = setOf(firstId))) })
+        val with = exported(runBlocking { service().export(selectAll(input).copy(includeOriginalsFor = setOf(firstId)), ReportOptions(reportVersion = 2)) })
         val dir = unzip(with.zipFile)
         assertEquals(Verdict.CONSISTENT, BundleVerifier.verify(dir).verdict)
         assertEquals(listOf(firstId), Files.list(dir.resolve("evidence")).use { s -> s.map { it.fileName.toString() }.toList() })

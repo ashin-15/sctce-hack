@@ -58,6 +58,7 @@ internal class EventDraft(
     val textStatus: TextStatus,
     val outgoingCoverage: OutgoingCoverage,
     val assessment: CueAssessment?,
+    val representation: Representation = Representation.PRESERVED_IMPORT,
 )
 
 /**
@@ -73,7 +74,7 @@ internal object EventFactory {
             referenceId = BODY_REFERENCE,
             artifactId = context.derivative,
             sha256 = context.evidenceSha256,
-            representation = Representation.PRESERVED_IMPORT,
+            representation = draft.representation,
             locator = Locator.Text(draft.bodySpan.start, draft.bodySpan.end),
         )
         val assessment = draft.assessment

@@ -1,6 +1,6 @@
 # Handoff: Sakshi Android implementation
 
-**Date:** 2 October 2026
+**Date:** 3 October 2026 (phase 10 OCR added; foundation status below is from 2 October)
 **Branch:** `android-foundation` (tracks `origin/android-foundation`)
 **Status:** Foundation implementation complete. All 837 JVM tests across all 12 modules pass (0 failures, 0 errors, 0 skipped), Android Lint passes with 0 errors, manifest permissions strictly verified, and 33 connected Android tests pass on the attached Samsung SM-S928B. All UI workarounds are migrated to the library APIs. Ready for owner review and manual on-device flow checks.
 
@@ -45,7 +45,8 @@ Ready to commit: the full foundation implementation covering `:acquisition:impor
 | `:core:vault` | Android | Keystore wrapper, blob store, audit chain, case/evidence repositories, event store, actor registry, derivative store, review coordinator (142 JVM tests, 22 device tests) |
 | `:acquisition:importer` | Android | Share intents, pickers, paste, manual notes, streaming limits (84 JVM tests, 4 device tests) |
 | `:processing:text` | Kotlin/JVM | Language hints, rules cue engine, label mapping, WhatsApp text-export parser (52 tests) |
-| `:processing:analysis` | Android | Imported text to derivative, events, single-pass EventText, TextAnalyser, on-demand patterns (48 JVM tests, 2 device tests) |
+| `:processing:ocr` | Android | Bundled ML Kit Latin OCR, line regions with engine scores, EXIF rotation; manifest strips ML Kit's network permissions (14 JVM tests, 5 device tests) |
+| `:processing:analysis` | Android | Imported text and screenshots to derivatives, events, single-pass EventText, TextAnalyser, on-demand patterns (58 JVM tests, 4 device tests) |
 | `:export:bundle` | Kotlin/JVM | Bundle writer, offline verifier, command-line tool (47 tests) |
 | `:export:report` | Android | Report model, PDF renderer, Keystore signer, export service, audit records (38 JVM tests, 5 device tests) |
 | `:app` | Android | Onboarding, lock, cases, import, analysis, timeline, review, who is who, patterns, report preview and export (227 tests) |
@@ -133,9 +134,18 @@ Paste into a new case with "Paste text":
 - **The orphan-file sweep** must only run at start-up; nothing enforces that.
 - **Python suite on Linux:** `test_screenshot_text_has_renderable_glyphs` errors because the committed screenshot manifest references Windows font paths. Not caused by the Android work.
 
+## Phase 10 (OCR) in this pass, uncommitted
+
+- Images (detected JPEG, PNG, WebP) offer "Read text in image". The result is an OCR derivative plus one region per line, and one `selected_image` event; cues point at the text span and at the line's image region. Sender, direction and time stay unknown (decision D-20).
+- No Latin text found gives `NO_TEXT_RECOGNISED` and writes nothing; on both phones Malayalam and Devanagari renders hit this path (D-22). Every image result says only Latin script is read. Low or missing line scores mark the text `extraction_uncertain` (threshold 0.5, demo, D-21).
+- ML Kit pulled in `INTERNET` and `ACCESS_NETWORK_STATE` through its telemetry library; removed in `processing/ocr/src/main/AndroidManifest.xml` (D-19). The telemetry service and receivers stay declared; no errors were seen in logcat, but this was not tested for long periods.
+- Device runs: SM-S928B (OCR suite), then CPH2695 (OCR, image analysis and text analysis suites) after the Samsung disconnected. Numbers in `benchmark.md`.
+- Also fixed in passing: a raw `...` in the search placeholder and a dependency declared outside the version catalog (both from the uncommitted phase 8 search work, which this pass leaves otherwise as found).
+- Open for phase 10: V-10 release-build latency and memory; airplane-mode cold launch (V-17); CER on the bench screenshot fixtures (needs Linux font paths in `bench/data.py` and `data/screenshots.jsonl`); show the image beside the recognised text in event review; Devanagari (ML Kit) and Malayalam (Tesseract) engines.
+
 ## Not built yet (megaplan order)
 
-1. OCR for screenshots (ML Kit bundled Latin, megaplan phase 10), including the check that it works with no `INTERNET` permission.
+1. Phase 10 remainder: image shown beside OCR text in review, V-10 numbers. Devanagari and Malayalam OCR are deferred by the owner (3 Oct 2026, D-23).
 2. Storing patterns and report snapshots; staleness tracking in the database rather than recompute on demand.
 3. Search (phase 8).
 4. Audio transcription (phase 11) and the secure seekable source it needs.

@@ -47,6 +47,10 @@ class SessionNavigator : ViewModel() {
 
     fun openPatterns(caseId: String) = push(SessionScreen.Patterns(caseId))
 
+    fun openSearch(caseId: String) = push(SessionScreen.Search(caseId))
+
+    fun openDeleteEverything() = push(SessionScreen.DeleteEverything)
+
     fun openReport(caseId: String) = push(SessionScreen.ReportSelection(caseId))
 
     fun openReportPreview(caseId: String) = push(SessionScreen.ReportPreview(caseId))

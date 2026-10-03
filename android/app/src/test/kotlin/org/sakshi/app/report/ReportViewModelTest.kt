@@ -24,6 +24,7 @@ import org.sakshi.app.ui.resolve
 import org.sakshi.core.model.CategoryLabel
 import org.sakshi.core.model.CategoryReviewStatus
 import org.sakshi.core.model.ConfirmationStatus
+import org.sakshi.core.model.EventId
 import org.sakshi.core.vault.BatchSaveResult
 import org.sakshi.export.bundle.BundleVerifier
 import org.sakshi.export.bundle.Verdict
@@ -41,6 +42,13 @@ class ReportViewModelTest : ReportTestBase() {
 
     private fun done(model: ReportViewModel): ExportDone =
         assertIs<ExportState.Done>(await(model.state) { it.export is ExportState.Done }.export).export
+
+    /** Previews what is selected, then exports exactly that preview. */
+    private fun exportPreviewed(model: ReportViewModel) {
+        model.buildPreview()
+        ready(model)
+        model.startExport()
+    }
 
     /** Marks the first message that has [label] as agreed, the way the person does on the review screen. */
     private fun agreeWith(label: CategoryLabel) {
@@ -220,7 +228,7 @@ class ReportViewModelTest : ReportTestBase() {
         loaded(model)
         model.selectAll()
         await(model.state) { it.canPreview }
-        model.startExport()
+        exportPreviewed(model)
         val plain = done(model)
         assertEquals(setOf(plain.file.name), exportDirectory.list()!!.toSet())
         assertEquals("${plain.snapshotId}.zip", plain.file.name)
@@ -235,7 +243,7 @@ class ReportViewModelTest : ReportTestBase() {
         val evidenceId = model.state.value.originals.single().evidenceId
         model.toggleOriginal(evidenceId)
         await(model.state) { s -> s.originals.any { it.included } }
-        model.startExport()
+        exportPreviewed(model)
         val withOriginal = done(model)
         val dir = unzip(withOriginal.file)
         assertEquals(Verdict.CONSISTENT, BundleVerifier.verify(dir).verdict)
@@ -243,6 +251,121 @@ class ReportViewModelTest : ReportTestBase() {
         assertEquals(1, originals.size)
         assertEquals(SyntheticChats.EIGHT_MESSAGES.toByteArray().size.toLong(), Files.size(originals.single()))
         assertEquals(1, withOriginal.summary.originalCount)
+    }
+
+    @Test
+    fun theFirstPreviewIsVersionOneAndTheNextExportIsVersionTwo() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        loaded(model)
+        model.selectAll()
+        await(model.state) { it.canPreview }
+        model.buildPreview()
+        assertEquals(1, ready(model).options.reportVersion)
+        model.startExport()
+        assertEquals(1, done(model).reportVersion)
+        model.leaveResult()
+        model.buildPreview()
+        assertEquals(2, ready(model).options.reportVersion)
+        model.startExport()
+        assertEquals(2, done(model).reportVersion)
+    }
+
+    @Test
+    fun theExportPassesTheFingerprintOfTheReportThatWasPreviewed() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        loaded(model)
+        model.selectAll()
+        await(model.state) { it.canPreview }
+        model.buildPreview()
+        val previewed = ready(model)
+        assertTrue(previewed.contentSha256.isNotBlank())
+        assertEquals(previewed.selection.eventIds, model.state.value.selected.map { EventId(it) }.toSet())
+        model.startExport()
+        val export = done(model)
+        assertEquals(previewed.options.reportVersion, export.reportVersion)
+        assertEquals(previewed.summary.messages, export.summary.eventCount)
+    }
+
+    @Test
+    fun aCaseThatChangedAfterThePreviewIsNotExported() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        loaded(model)
+        model.selectAll()
+        await(model.state) { it.canPreview }
+        model.buildPreview()
+        ready(model)
+        agreeWith(CategoryLabel.VERBAL_ABUSE)
+        model.startExport()
+        val failed = assertIs<ExportState.Failed>(await(model.state) { it.export is ExportState.Failed }.export)
+        assertEquals(ReportMessages.refusal(RefusalReason.CHANGED_SINCE_PREVIEW), failed.message)
+        waitForEmptyExports()
+        model.backToSelection()
+        model.exportNoticeShown()
+        model.buildPreview()
+        ready(model)
+        model.startExport()
+        assertEquals(1, done(model).reportVersion)
+    }
+
+    @Test
+    fun exportDoesNothingWithoutAReadyPreview() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        loaded(model)
+        model.selectAll()
+        await(model.state) { it.canPreview }
+        model.startExport()
+        assertEquals(ExportState.Idle, model.state.value.export)
+        assertEquals(PreviewState.Idle, model.state.value.preview)
+        assertEquals(emptyList(), exportDirectory.list().orEmpty().toList())
+    }
+
+    /** The preview is not reset by changing a choice, so what is exported is what was previewed. */
+    @Test
+    fun changingAChoiceAfterThePreviewDoesNotChangeWhatIsExported() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        val rows = loaded(model).rows
+        model.selectAll()
+        await(model.state) { it.selected.size == rows.size }
+        model.buildPreview()
+        ready(model)
+        model.selectNone()
+        model.toggle(rows.first().eventId)
+        await(model.state) { it.selected.size == 1 }
+        model.setIncludeUnreviewed(true)
+        model.startExport()
+        val export = done(model)
+        assertEquals(rows.size, export.summary.eventCount)
+        assertEquals(1, model.state.value.selected.size)
+    }
+
+    @Test
+    fun anEarlierExportIsShownWithItsDrift() {
+        caseId = newCase()
+        addChat(caseId)
+        val model = reportModel(services(), caseId)
+        loaded(model)
+        assertEquals(null, model.state.value.earlierExport)
+        model.selectAll()
+        await(model.state) { it.canPreview }
+        exportPreviewed(model)
+        done(model)
+        val fresh = await(model.state) { it.earlierExport != null }.earlierExport!!
+        assertEquals(1, fresh.version)
+        assertTrue(fresh.upToDate)
+        agreeWith(CategoryLabel.VERBAL_ABUSE)
+        val drifted = await(model.state) { it.earlierExport?.upToDate == false }.earlierExport!!
+        assertEquals(1, drifted.changed)
+        assertEquals(0, drifted.removed)
     }
 
     @Test
@@ -255,7 +378,7 @@ class ReportViewModelTest : ReportTestBase() {
         loaded(model)
         model.selectAll()
         await(model.state) { it.canPreview }
-        model.startExport()
+        exportPreviewed(model)
         assertTrue(started.await(20, TimeUnit.SECONDS))
         model.cancelExport()
         assertEquals(ExportState.Running(cancelling = true), model.state.value.export)
@@ -274,7 +397,7 @@ class ReportViewModelTest : ReportTestBase() {
         loaded(model)
         model.selectAll()
         await(model.state) { it.canPreview }
-        model.startExport()
+        exportPreviewed(model)
         val export = done(model)
         assertTrue(export.file.isFile)
         model.leaveResult()
@@ -294,7 +417,7 @@ class ReportViewModelTest : ReportTestBase() {
         loaded(model)
         model.selectAll()
         await(model.state) { it.canPreview }
-        model.startExport()
+        exportPreviewed(model)
         assertTrue(done(model).file.isFile)
         store.clear()
         assertEquals(emptyList(), exportDirectory.list().orEmpty().toList())

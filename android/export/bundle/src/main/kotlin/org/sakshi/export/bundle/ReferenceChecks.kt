@@ -6,8 +6,11 @@ import org.sakshi.core.model.Event
 internal object ReferenceChecks {
     private const val NAME: String = "references"
 
-    fun check(view: BundleView, events: List<Event>?): Check {
-        if (events == null) return Check(NAME, CheckStatus.FAILED, "not evaluated: events could not be read")
+    /** [omittedAnchors] counts event anchors whose artefact is listed as not included; null when not evaluated. */
+    class Outcome(val check: Check, val omittedAnchors: Int?)
+
+    fun check(view: BundleView, events: List<Event>?): Outcome {
+        if (events == null) return Outcome(Check(NAME, CheckStatus.FAILED, "not evaluated: events could not be read"), null)
         val documents = try {
             Documents(
                 BundleDocuments.parseFindings(view.loadVerified(BundleFormat.FINDINGS)),
@@ -16,24 +19,28 @@ internal object ReferenceChecks {
                 BundleDocuments.parseProvenance(view.loadVerified(BundleFormat.PROVENANCE)),
             )
         } catch (e: BundleReadException) {
-            return Check(NAME, CheckStatus.FAILED, "documents not read: ${e.message}")
+            return Outcome(Check(NAME, CheckStatus.FAILED, "documents not read: ${e.message}"), null)
         } catch (e: IllegalArgumentException) {
-            return Check(NAME, CheckStatus.FAILED, "a document is malformed: ${safe(e.message.orEmpty())}")
+            return Outcome(Check(NAME, CheckStatus.FAILED, "a document is malformed: ${safe(e.message.orEmpty())}"), null)
         }
         val byKey = events.associateBy { it.eventId.value to it.revision }
         val problems = mutableListOf<String>()
         findings(documents.findings, byKey, problems)
         patterns(documents.patterns, byKey, problems)
         provenance(view, documents.provenance, problems)
+        val anchors = AnchorGraph.resolve(events, documents.provenance)
+        problems += anchors.problems
         val outside = outsideCount(documents.corrections, byKey, documents)
-        if (problems.isNotEmpty()) return Check(NAME, CheckStatus.FAILED, summarise(problems))
-        return Check(
+        if (problems.isNotEmpty()) return Outcome(Check(NAME, CheckStatus.FAILED, summarise(problems)), anchors.omittedAnchors)
+        val check = Check(
             NAME,
             CheckStatus.PASSED,
             "${documents.findings.size} findings, ${documents.patterns.size} patterns, ${documents.corrections.size} corrections " +
                 "($outside target items outside this bundle), ${documents.provenance.nodes.size} provenance nodes, " +
-                "${documents.provenance.edges.size} edges",
+                "${documents.provenance.edges.size} edges, every event anchor resolved " +
+                "(${anchors.omittedAnchors} to items listed as not included)",
         )
+        return Outcome(check, anchors.omittedAnchors)
     }
 
     private class Documents(

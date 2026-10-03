@@ -1,5 +1,6 @@
 package org.sakshi.export.report
 
+import org.sakshi.core.integrity.Sha256
 import org.sakshi.core.model.Event
 import org.sakshi.core.model.Representation
 import org.sakshi.export.bundle.Finding
@@ -26,6 +27,7 @@ internal object ProvenanceAssembler {
         patterns: List<Pattern>,
         originals: List<IncludedOriginal>,
         reportSha256: String,
+        redactedCopies: List<RedactedCopy> = emptyList(),
     ): Provenance {
         val nodes = LinkedHashMap<String, ProvenanceNode>()
         val edges = LinkedHashSet<ProvenanceEdge>()
@@ -62,6 +64,13 @@ internal object ProvenanceAssembler {
                 edges += ProvenanceEdge("event:$it", node, ProvenanceRelation.SUPPORTS)
             }
             edges += ProvenanceEdge(node, REPORT_NODE, ProvenanceRelation.CITED_BY)
+        }
+        for (copy in redactedCopies) {
+            val bytes = copy.text.toByteArray(Charsets.UTF_8)
+            nodes[copy.opaqueId] = ProvenanceNode(copy.opaqueId, ProvenanceKind.DERIVATIVE, Sha256.hex(Sha256.digest(bytes)), true)
+            val source = included[copy.artifactId]?.opaqueId ?: copy.artifactId
+            if (source !in nodes) nodes[source] = ProvenanceNode(source, ProvenanceKind.EVIDENCE, null, false)
+            edges += ProvenanceEdge(copy.opaqueId, source, ProvenanceRelation.DERIVED_FROM)
         }
         nodes[REPORT_NODE] = ProvenanceNode(REPORT_NODE, ProvenanceKind.REPORT, reportSha256, true)
         return Provenance(nodes.values.toList(), edges.toList())

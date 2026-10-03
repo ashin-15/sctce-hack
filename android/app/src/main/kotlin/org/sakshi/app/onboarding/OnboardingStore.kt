@@ -9,6 +9,9 @@ interface OnboardingStore {
     fun isAcknowledged(): Boolean
 
     fun acknowledge()
+
+    /** Forgets the acknowledgement, so the next launch shows the limits screen again as on a first install. */
+    fun reset()
 }
 
 class SharedPreferencesOnboardingStore(private val preferences: SharedPreferences) : OnboardingStore {
@@ -16,6 +19,10 @@ class SharedPreferencesOnboardingStore(private val preferences: SharedPreference
 
     override fun acknowledge() {
         preferences.edit { putBoolean(KEY_ACKNOWLEDGED, true) }
+    }
+
+    override fun reset() {
+        preferences.edit { remove(KEY_ACKNOWLEDGED) }
     }
 
     companion object {

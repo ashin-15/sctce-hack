@@ -57,7 +57,7 @@ public object BundleWriter {
         bytes(BundleFormat.CORRECTIONS, BundleFormat.ROLE_CORRECTIONS, BundleDocuments.corrections(content.corrections))
         bytes(BundleFormat.PATTERNS, BundleFormat.ROLE_PATTERNS, BundleDocuments.patterns(content.patterns))
         bytes(BundleFormat.PROVENANCE, BundleFormat.ROLE_PROVENANCE, BundleDocuments.provenance(content.provenance))
-        bytes(BundleFormat.README, BundleFormat.ROLE_README, VerificationReadme.text.toByteArray(Charsets.UTF_8))
+        bytes(BundleFormat.README, BundleFormat.ROLE_README, VerificationReadme.text(content.redactions).toByteArray(Charsets.UTF_8))
         content.originals.forEach { stream("${BundleFormat.EVIDENCE_DIR}/${it.opaqueId}", BundleFormat.ROLE_ORIGINAL, it) }
         content.derivatives.forEach { stream("${BundleFormat.DERIVATIVES_DIR}/${it.opaqueId}", BundleFormat.ROLE_DERIVATIVE, it) }
         content.reportPdf?.let { stream(BundleFormat.REPORT, BundleFormat.ROLE_REPORT, it) }
@@ -73,14 +73,20 @@ public object BundleWriter {
             auditChainHead = content.auditChainHead,
             omitted = content.omitted,
             limits = BundleFormat.LIMITS,
+            redactions = content.redactions,
         )
         val manifestBytes = CanonicalJson.encode(manifest.toJson())
         val spki = signer.publicKeySpkiDer
         val keyId = Sha256.hex(Sha256.digest(spki))
         write(target, BundleFormat.SIGNER, SignerFile.encode(spki, keyId))
         write(target, BundleFormat.MANIFEST, manifestBytes)
-        write(target, BundleFormat.SIGNATURE, signer.sign(manifestBytes))
-        return BundleSummary(content.snapshotId, keyId, manifest.merkleRoot, sorted.size)
+        val signature = signer.sign(manifestBytes)
+        write(target, BundleFormat.SIGNATURE, signature)
+        return BundleSummary(
+            content.snapshotId, keyId, manifest.merkleRoot, sorted.size,
+            manifestSha256 = Sha256.hex(Sha256.digest(manifestBytes)),
+            signatureHex = Sha256.hex(signature),
+        )
     }
 
     private fun write(root: Path, relative: String, data: ByteArray) {

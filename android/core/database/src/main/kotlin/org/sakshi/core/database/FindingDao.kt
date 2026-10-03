@@ -70,7 +70,16 @@ public abstract class FindingDao {
     )
     public abstract suspend fun getLatestDecision(targetType: String, targetId: String): ReviewDecisionEntity?
 
-    /** The newest decision for each target of [targetType] in the caseby insertion order. */
+    /** The newest decision for each target of [targetType] in the case, ordered by target id. */
+    @Query(
+        "SELECT d.* FROM review_decision d WHERE d.case_id = :caseId AND d.target_type = :targetType " +
+            "AND NOT EXISTS (SELECT 1 FROM review_decision n WHERE n.target_type = d.target_type " +
+            "AND n.target_id = d.target_id AND n.seq > d.seq) " +
+            "ORDER BY d.target_id",
+    )
+    public abstract suspend fun getLatestDecisionsForCase(caseId: String, targetType: String): List<ReviewDecisionEntity>
+
+    /** The newest decision for each target of [targetType] in the case, ordered by target id. */
     @Query(
         "SELECT d.* FROM review_decision d WHERE d.case_id = :caseId AND d.target_type = :targetType " +
             "AND NOT EXISTS (SELECT 1 FROM review_decision n WHERE n.target_type = d.target_type " +

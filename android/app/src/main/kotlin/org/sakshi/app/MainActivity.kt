@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import org.sakshi.app.deletion.DeletionProgressScreen
 import org.sakshi.app.lock.BiometricGate
 import org.sakshi.app.importing.ConsumedIntentTracker
 import org.sakshi.app.lock.LockScreen
@@ -88,7 +90,9 @@ class MainActivity : FragmentActivity() {
     private fun Host() {
         val session by container.session.state.collectAsState()
         val sharePending by container.importCoordinator.hasPending.collectAsState()
-        var acknowledged by remember { mutableStateOf(container.onboarding.isAcknowledged()) }
+        val deletion by container.deletion.state.collectAsState()
+        // Read again whenever the deletion state changes, because a finished deletion resets it.
+        var acknowledged by remember(deletion) { mutableStateOf(container.onboarding.isAcknowledged()) }
         val unlocked = session is SessionState.Unlocked
         // A view model holds case titles and evidence, so none may outlive the unlocked session.
         LaunchedEffect(unlocked) {
@@ -99,7 +103,8 @@ class MainActivity : FragmentActivity() {
             }
         }
         LaunchedEffect(session) { container.importCoordinator.dropIfExpired() }
-        when (val screen = screenFor(acknowledged, session)) {
+        when (val screen = screenFor(acknowledged, session, deletion)) {
+            is Screen.Deletion -> DeletionProgressScreen(screen.state, onRetry = container.deletion::retry, onFinish = container.deletion::finish)
             Screen.Onboarding -> OnboardingScreen(
                 onAcknowledge = {
                     container.onboarding.acknowledge()
@@ -121,13 +126,11 @@ class MainActivity : FragmentActivity() {
                     sessionOwner?.clear()
                     SessionViewModelStoreOwner().also { sessionOwner = it }
                 }
-                SessionHost(
-                    services = remember(screen.vault) {
-                        SessionServices(screen.vault, applicationContext, container.dispatchers.io)
-                    },
-                    container = container,
-                    owner = owner,
-                )
+                val services = remember(screen.vault) {
+                    SessionServices(screen.vault, applicationContext, container.dispatchers.io)
+                }
+                DisposableEffect(services) { onDispose(services::close) }
+                SessionHost(services = services, container = container, owner = owner)
             }
         }
     }

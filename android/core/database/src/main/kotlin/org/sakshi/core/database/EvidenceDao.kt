@@ -94,15 +94,15 @@ public abstract class EvidenceDao {
     /**
      * Deletes the evidence and everything that depends on it: blob record, metadata, derivatives,
      * regions, anchors and jobs (by cascade), then findings left without any anchor, events left
-     * without any anchor, and review decisions of removed findings. Patterns that used a touched
-     * event are marked stale. The caller must still erase the blob file and its key.
+     * without any anchor, and review decisions of removed findings. When any event was anchored to
+     * the evidence, every pattern of the case is marked stale. The caller must still erase the blob file and its key.
      */
     @Transaction
     public open suspend fun deleteWithDependants(evidenceId: String) {
         val caseId = caseIdOf(evidenceId) ?: return
         val events = eventIdsAnchoredTo(evidenceId)
         val findings = findingIdsAnchoredTo(evidenceId)
-        if (events.isNotEmpty()) markPatternsStale(events)
+        if (events.isNotEmpty()) markPatternsStale(caseId)
         deleteEvidence(evidenceId)
         if (findings.isNotEmpty()) deleteFindingsWithoutAnchor(findings)
         if (events.isNotEmpty()) deleteEventsWithoutAnchor(events)
@@ -121,8 +121,8 @@ public abstract class EvidenceDao {
     )
     protected abstract suspend fun findingIdsAnchoredTo(evidenceId: String): List<String>
 
-    @Query(MARK_PATTERNS_STALE_FOR_EVENTS)
-    protected abstract suspend fun markPatternsStale(eventIds: List<String>): Int
+    @Query(MARK_PATTERNS_STALE_FOR_CASE)
+    protected abstract suspend fun markPatternsStale(caseId: String): Int
 
     @Query("DELETE FROM evidence WHERE id = :evidenceId")
     protected abstract suspend fun deleteEvidence(evidenceId: String): Int

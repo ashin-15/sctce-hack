@@ -47,6 +47,11 @@ public object VerifierCli {
         appendLine("Left out of this bundle (counts only):")
         report.omitted.forEach { (name, count) -> appendLine("  $name: $count") }
         appendLine()
+        if (report.unverifiable.isNotEmpty()) {
+            appendLine("Cannot be checked from this bundle:")
+            report.unverifiable.forEach { appendLine("  $it") }
+            appendLine()
+        }
         appendLine("Limits:")
         report.limits.forEach { appendLine("  $it") }
         appendLine()

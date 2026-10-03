@@ -3,7 +3,7 @@ package org.sakshi.processing.analysis
 import org.sakshi.core.vault.DerivativeKind
 import org.sakshi.core.vault.DerivativeStore
 
-/** [TextDerivatives] over the vault's [DerivativeStore]; saved text is the decoder output, stored unchanged. */
+/** [TextDerivatives] over the vault's [DerivativeStore]; saved text is the decoder or recogniser output, stored unchanged. */
 public class VaultTextDerivatives(private val store: DerivativeStore) : TextDerivatives {
     override suspend fun latestParsedText(evidenceId: String): DerivativeText? =
         store.latest(evidenceId, DerivativeKind.PARSED_TEXT)?.let { DerivativeText(it.id, it.text) }
@@ -14,4 +14,21 @@ public class VaultTextDerivatives(private val store: DerivativeStore) : TextDeri
     }
 
     override suspend fun text(derivativeId: String): String? = store.get(derivativeId)?.text
+
+    override suspend fun latestOcr(evidenceId: String): OcrDerivative? =
+        store.latest(evidenceId, DerivativeKind.OCR)?.let { OcrDerivative(it.id, it.text, it.sourceMapJson) }
+
+    override suspend fun saveOcr(evidenceId: String, draft: OcrDraft): OcrDerivative {
+        val saved = store.saveWithRegions(
+            evidenceId = evidenceId,
+            kind = DerivativeKind.OCR,
+            text = draft.text,
+            toolId = draft.toolId,
+            toolVersion = draft.toolVersion,
+            regions = draft.regions,
+            sourceMapJson = draft.sourceMapJson,
+            qualityJson = draft.qualityJson,
+        )
+        return OcrDerivative(saved.id, saved.text, saved.sourceMapJson)
+    }
 }

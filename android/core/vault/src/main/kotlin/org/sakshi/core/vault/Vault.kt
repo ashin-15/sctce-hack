@@ -14,7 +14,7 @@ import org.sakshi.core.database.SakshiDatabaseFactory
 /** What [Vault.startUp] cleaned up. */
 public class StartUpReport(public val sweep: SweepReport, public val jobsRecovered: Int)
 
-/** An open vault session: cases, evidence, events, actors, audit log and job queue over one database and blob store. */
+/** An open vault session: cases, evidence, events, actors, stored patterns, audit log and job queue over one database and blob store. */
 public class Vault private constructor(
     private val database: SakshiDatabase,
     private val sweeper: OrphanSweeper,
@@ -26,7 +26,19 @@ public class Vault private constructor(
     public val actors: ActorRegistry,
     public val derivatives: DerivativeStore,
     public val review: ReviewCoordinator,
+    public val search: EvidenceSearch,
+    public val reports: ReportHistory,
+    public val patterns: PatternStore,
+    private val destruction: () -> VaultDestroyResult,
 ) : Closeable {
+
+    /**
+     * Makes the text of manual notes searchable through [source]; see [VaultEvidenceSearch.useNoteTextSource].
+     * Call it once after opening. Without it, search reads derivatives only.
+     */
+    public fun useNoteTextSource(source: NoteTextSource?) {
+        (search as? VaultEvidenceSearch)?.useNoteTextSource(source)
+    }
 
     /** Removes temporary and orphaned files, returns interrupted jobs to the queue and audits the opening. */
     public suspend fun startUp(): StartUpReport {
@@ -49,6 +61,15 @@ public class Vault private constructor(
     /** Closes the database. Do not use the vault afterwards. */
     override fun close() {
         database.close()
+    }
+
+    /**
+     * Closes this vault and then destroys it on this device, as [Companion.destroy] does. Do not use the vault
+     * afterwards; open a new one with [Companion.open].
+     */
+    public fun destroy(): VaultDestroyResult {
+        close()
+        return destruction()
     }
 
     public companion object {
@@ -78,11 +99,36 @@ public class Vault private constructor(
                     passphrase,
                     File(root, DATABASE_FILE).absolutePath,
                 )
-                return assemble(database, File(root, BLOB_DIRECTORY), wrapper, clock, { UUID.randomUUID().toString() }, dispatcher)
+                return assemble(database, File(root, BLOB_DIRECTORY), wrapper, clock, { UUID.randomUUID().toString() }, dispatcher) {
+                    destroy(context, wrapper)
+                }
             } finally {
                 passphrase.fill(0)
             }
         }
+
+        /**
+         * Destroys the whole vault on this device while it is closed: the wrapped database passphrase file, the
+         * master key when [wrapper] is a [DestroyableKeyWrapper] (the Keystore alias for [KeystoreKeyWrapper]), the
+         * database and its side files, every blob and temporary file, and the vault directory. Blocks; call it off
+         * the main thread. Nothing outside the vault directory is touched. Open vaults must be closed first (or use
+         * the instance [destroy]).
+         *
+         * It never throws for a file that cannot be removed: it returns [VaultDestroyResult.Incomplete] listing
+         * what remains, and only [VaultDestroyResult.Destroyed] means nothing remains. It is idempotent: on a
+         * vault that is already destroyed or was never created it returns [VaultDestroyResult.Destroyed], and
+         * calling it again after an incomplete result retries. A later [open] creates a fresh empty vault with a
+         * new key.
+         *
+         * Honest limit: files are deleted and the key is destroyed, which makes remaining ciphertext unreadable,
+         * but physical erasure from flash storage cannot be promised. Backups or copies made outside the app are
+         * not reached.
+         */
+        public fun destroy(
+            context: Context,
+            wrapper: KeyWrapper,
+            deleter: VaultFileDeleter = VaultFileDeleter.DEFAULT,
+        ): VaultDestroyResult = VaultDestruction(File(context.noBackupFilesDir, VAULT_DIRECTORY), wrapper, deleter).run()
 
         /** Tests only: in-memory unencrypted database, with blobs under the app's no-backup directory. */
         public fun openForTests(
@@ -98,7 +144,7 @@ public class Vault private constructor(
             clock,
             ids,
             dispatcher,
-        )
+        ) { destroy(context, wrapper) }
 
         private fun assemble(
             database: SakshiDatabase,
@@ -107,10 +153,12 @@ public class Vault private constructor(
             clock: () -> Instant,
             ids: () -> String,
             dispatcher: CoroutineDispatcher,
+            destruction: () -> VaultDestroyResult,
         ): Vault {
             val blobs = BlobStore(blobDirectory, wrapper)
             val audit = AuditLog(database, clock)
             val events = EventStore(database, audit, clock, ids, dispatcher)
+            val actors = ActorRegistry(database, audit, ids, dispatcher)
             return Vault(
                 database = database,
                 sweeper = OrphanSweeper(database, blobs, dispatcher),
@@ -119,9 +167,13 @@ public class Vault private constructor(
                 audit = audit,
                 jobs = JobQueue(database, clock),
                 events = events,
-                actors = ActorRegistry(database, audit, ids, dispatcher),
+                actors = actors,
                 derivatives = DerivativeStore(database, audit, clock, ids, dispatcher),
                 review = ReviewCoordinator(database, events, audit, clock, ids, dispatcher),
+                search = VaultEvidenceSearch(database, dispatcher),
+                reports = ReportHistory(database, events, audit, clock, ids, dispatcher),
+                patterns = PatternStore(database, events, actors, audit, clock, ids, dispatcher),
+                destruction = destruction,
             )
         }
     }

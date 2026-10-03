@@ -1,6 +1,7 @@
 package org.sakshi.export.report
 
 import android.content.Context
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -17,6 +18,9 @@ import kotlinx.coroutines.withContext
 import org.sakshi.core.crypto.BlobIntegrityException
 import org.sakshi.core.crypto.BlobReader
 import org.sakshi.core.integrity.Sha256
+import org.sakshi.core.model.CaseId
+import org.sakshi.core.vault.ExportDependencies
+import org.sakshi.core.vault.ExportRecord
 import org.sakshi.core.vault.Vault
 import org.sakshi.export.bundle.BundleContent
 import org.sakshi.export.bundle.BundleFile
@@ -44,9 +48,18 @@ public class ExportService(
 ) {
     /**
      * Builds the report and bundle for [selection], verifies the bundle, zips it to
-     * `<cacheDir>/exports/<snapshot-id>.zip` and returns it. On any refusal or failure nothing is left behind.
+     * `<cacheDir>/exports/<snapshot-id>.zip`, stores the snapshot as the case's next report version and returns it.
+     * On any refusal or failure nothing is left behind and no version is used.
+     *
+     * With [previewedContentSha256], the export is refused with [RefusalReason.CHANGED_SINCE_PREVIEW] unless it
+     * renders exactly the content of that preview, so a person never shares a report they have not seen.
+     * [ReportOptions.reportVersion] must be the case's next version for the same reason.
      */
-    public suspend fun export(selection: ReportSelection, options: ReportOptions = ReportOptions()): ExportResult =
+    public suspend fun export(
+        selection: ReportSelection,
+        options: ReportOptions = ReportOptions(),
+        previewedContentSha256: String? = null,
+    ): ExportResult =
         withContext(dispatcher) {
             val snapshotId = ids()
             if (!SNAPSHOT_ID.matches(snapshotId)) return@withContext ExportResult.Failed(ExportFailure.CONTENT_REJECTED)
@@ -57,9 +70,17 @@ public class ExportService(
             } catch (_: ProviderException) {
                 return@withContext ExportResult.Failed(ExportFailure.SIGNING_FAILED)
             }
+            if (options.reportVersion != vault.reports.nextVersion(selection.caseId)) {
+                return@withContext ExportResult.Refused(RefusalReason.CHANGED_SINCE_PREVIEW)
+            }
             when (val built = builder.build(selection, options, keyId)) {
                 is ReportBuildResult.Refused -> ExportResult.Refused(built.reason)
-                is ReportBuildResult.Built -> Run(snapshotId, keyId, built).execute()
+                is ReportBuildResult.Built ->
+                    if (previewedContentSha256 != null && built.contentSha256 != previewedContentSha256) {
+                        ExportResult.Refused(RefusalReason.CHANGED_SINCE_PREVIEW)
+                    } else {
+                        Run(snapshotId, keyId, built, options.reportVersion).execute()
+                    }
             }
         }
 
@@ -83,7 +104,7 @@ public class ExportService(
 
     private fun exportsDirectory(): File = File(context.cacheDir, EXPORTS)
 
-    private inner class Run(val snapshotId: String, val keyId: String, val built: ReportBuildResult.Built) {
+    private inner class Run(val snapshotId: String, val keyId: String, val built: ReportBuildResult.Built, val version: Int) {
         private val root = exportsDirectory()
         private val work = File(root, "$snapshotId.work")
         private val bundle = File(root, snapshotId)
@@ -103,6 +124,8 @@ public class ExportService(
             ExportResult.Failed(ExportFailure.SIGNING_FAILED)
         } catch (_: IllegalArgumentException) {
             ExportResult.Failed(ExportFailure.CONTENT_REJECTED)
+        } catch (_: VersionTakenException) {
+            ExportResult.Refused(RefusalReason.CHANGED_SINCE_PREVIEW)
         } finally {
             withContext(NonCancellable) {
                 work.deleteRecursively()
@@ -122,10 +145,11 @@ public class ExportService(
             val originals = originals()
             val inputs = built.bundleInputs
             val reportSha = Sha256.hex(Sha256.digest(pdf.readBytes()))
+            val createdAt = clock().toString()
             val content = BundleContent(
                 snapshotId = snapshotId,
                 caseId = inputs.caseId,
-                createdAt = clock().toString(),
+                createdAt = createdAt,
                 generator = built.model.generator,
                 auditChainHead = inputs.auditChainHead,
                 omitted = inputs.omitted,
@@ -133,27 +157,54 @@ public class ExportService(
                 findings = inputs.findings,
                 corrections = inputs.corrections,
                 patterns = inputs.patterns,
-                provenance = ProvenanceAssembler.assemble(inputs.events, inputs.findings, inputs.patterns, originals.map { it.first }, reportSha),
+                provenance = ProvenanceAssembler.assemble(
+                    inputs.events, inputs.findings, inputs.patterns, originals.map { it.first }, reportSha, inputs.redactedCopies,
+                ),
                 originals = originals.map { it.second },
-                derivatives = emptyList(),
+                derivatives = inputs.redactedCopies.map { copy ->
+                    val bytes = copy.text.toByteArray(Charsets.UTF_8)
+                    BundleFile(copy.opaqueId, bytes.size.toLong()) { ByteArrayInputStream(bytes) }
+                },
                 reportPdf = BundleFile("report", pdf.length()) { pdf.inputStream() },
+                redactions = inputs.redactions,
             )
             val summary = BundleWriter.write(content, bundle.toPath(), signer)
             if (BundleVerifier.verify(bundle.toPath()).verdict != Verdict.CONSISTENT) {
                 return ExportResult.Failed(ExportFailure.VERIFICATION_FAILED)
             }
-            return pack(summary, pages, originals.size)
+            return pack(summary, pages, originals.size, createdAt)
         }
 
-        private suspend fun pack(summary: BundleSummary, pages: Int, originalCount: Int): ExportResult {
+        private suspend fun pack(summary: BundleSummary, pages: Int, originalCount: Int, createdAt: String): ExportResult {
             val part = File(root, "$snapshotId.zip.part")
             ZipPacker.pack(bundle.toPath(), part)
             val inputs = built.bundleInputs
-            vault.audit.recordExport(snapshotId, inputs.caseId, inputs.events.size, originalCount, summary.signerKeyId)
+            val record = ExportRecord(
+                snapshotId = snapshotId,
+                version = version,
+                createdAt = createdAt,
+                merkleRoot = summary.merkleRoot,
+                manifestSha256 = summary.manifestSha256,
+                signatureHex = summary.signatureHex,
+                signerKeyId = summary.signerKeyId,
+                originalCount = originalCount,
+                dependencies = ExportDependencies(inputs.events.associate { it.eventId.value to it.revision }, built.contentSha256),
+            )
             Files.move(part.toPath(), zip.toPath(), StandardCopyOption.ATOMIC_MOVE)
+            try {
+                vault.reports.record(CaseId(inputs.caseId), record)
+            } catch (taken: IllegalStateException) {
+                withContext(NonCancellable) { zip.delete() }
+                throw VersionTakenException(taken)
+            } catch (failure: Exception) {
+                // The snapshot was not stored (the transaction rolled back), so the file must not outlive it.
+                withContext(NonCancellable) { zip.delete() }
+                throw failure
+            }
             return ExportResult.Exported(
                 zipFile = zip,
                 snapshotId = snapshotId,
+                reportVersion = version,
                 signerKeyId = summary.signerKeyId,
                 summary = ExportSummary(
                     merkleRoot = summary.merkleRoot,
@@ -165,6 +216,9 @@ public class ExportService(
                     originalCount = originalCount,
                     omitted = inputs.omitted,
                     zipBytes = zip.length(),
+                    redactedEventCount = inputs.redactions.eventCount,
+                    redactedPassageCount = inputs.redactions.passageCount,
+                    includedOriginalHoldsRemovedText = inputs.redactions.originalMayHoldRemovedContent,
                 ),
             )
         }
@@ -197,6 +251,9 @@ public class ExportService(
             }
         }
     }
+
+    /** Another export stored the version this one was built for. */
+    private class VersionTakenException(cause: Throwable) : Exception(cause)
 
     private companion object {
         const val EXPORTS = "exports"

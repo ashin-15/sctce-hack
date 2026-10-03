@@ -22,4 +22,12 @@ class OnboardingStoreTest {
         SharedPreferencesOnboardingStore.create(context).acknowledge()
         assertTrue(SharedPreferencesOnboardingStore.create(context).isAcknowledged())
     }
+
+    @Test
+    fun resetBringsBackTheFirstRunState() {
+        val store = SharedPreferencesOnboardingStore.create(context)
+        store.acknowledge()
+        store.reset()
+        assertFalse(SharedPreferencesOnboardingStore.create(context).isAcknowledged())
+    }
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.sakshi.core.database.DerivativeEntity
+import org.sakshi.core.database.RegionEntity
 import org.sakshi.core.database.SakshiDatabase
 import org.sakshi.core.integrity.Sha256
 
@@ -19,6 +20,17 @@ public object DerivativeKind {
 
     internal val all: Set<String> = setOf(PARSED_TEXT, OCR, TRANSCRIPT, NORMALISED_VIEW, USER_EDIT)
 }
+
+/**
+ * A region of the source image or page to store with a derivative. [id] is chosen by the caller so that the
+ * derivative's source map and event anchors can name the region before it is stored.
+ */
+public data class RegionDraft(
+    val id: String,
+    val pageIndex: Int,
+    val polygonJson: String,
+    val transformJson: String? = null,
+)
 
 /** One immutable revision of text derived from evidence. The original evidence is never changed by it. */
 public data class StoredDerivative(
@@ -62,8 +74,37 @@ public class DerivativeStore(
         parentDerivativeId: String? = null,
         sourceMapJson: String? = null,
         qualityJson: String? = null,
+    ): StoredDerivative = saveWithRegions(
+        evidenceId = evidenceId,
+        kind = kind,
+        text = text,
+        toolId = toolId,
+        toolVersion = toolVersion,
+        regions = emptyList(),
+        parentDerivativeId = parentDerivativeId,
+        sourceMapJson = sourceMapJson,
+        qualityJson = qualityJson,
+    )
+
+    /**
+     * Inserts a new derivative and its regions in one transaction, with the same single audit row as [save].
+     *
+     * @throws IllegalArgumentException as [save] does, and for duplicate or blank region ids or a negative page index.
+     */
+    public suspend fun saveWithRegions(
+        evidenceId: String,
+        kind: String,
+        text: String,
+        toolId: String,
+        toolVersion: String,
+        regions: List<RegionDraft>,
+        parentDerivativeId: String? = null,
+        sourceMapJson: String? = null,
+        qualityJson: String? = null,
     ): StoredDerivative {
         require(kind in DerivativeKind.all) { "Unknown derivative kind" }
+        require(regions.all { it.id.isNotBlank() && it.pageIndex >= 0 }) { "Invalid region" }
+        require(regions.map { it.id }.toSet().size == regions.size) { "Duplicate region id" }
         return withContext(dispatcher) {
             database.withTransaction {
                 val dao = database.derivativeDao()
@@ -87,7 +128,8 @@ public class DerivativeStore(
                     modelVersionId = null,
                     createdAt = clock().toString(),
                 )
-                dao.insert(entity)
+                val regionEntities = regions.map { RegionEntity(it.id, entity.id, it.pageIndex, it.polygonJson, it.transformJson) }
+                dao.insertWithRegions(entity, regionEntities)
                 audit.append(
                     AuditActions.DERIVATIVE_SAVED,
                     SUBJECT_TYPE,
@@ -115,6 +157,10 @@ public class DerivativeStore(
     /** Every derivative of the evidence, by kind and then oldest revision first. */
     public suspend fun listForEvidence(evidenceId: String): List<StoredDerivative> =
         withContext(dispatcher) { database.derivativeDao().getAllForEvidence(evidenceId).map { it.toStored() } }
+
+    /** Regions belonging to the derivative. */
+    public suspend fun regions(derivativeId: String): List<RegionEntity> =
+        withContext(dispatcher) { database.derivativeDao().getRegions(derivativeId) }
 
     /**
      * Code point length of a derivative's text, or null if unknown; suitable as the `artifactLengths` lookup of

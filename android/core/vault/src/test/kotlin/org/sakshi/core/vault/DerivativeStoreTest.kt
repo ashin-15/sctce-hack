@@ -117,4 +117,37 @@ class DerivativeStoreTest : VaultTestBase() {
         assertNull(store.get(saved.id))
         assertEquals(emptyList(), store.listForEvidence(evidenceId))
     }
+
+    @Test
+    fun regionsAreStoredWithTheCallersIdsInOneAuditedSave() = runBlocking<Unit> {
+        val evidenceId = evidenceIn(cases.create("Synthetic").id)
+        val regions = listOf(
+            RegionDraft("synthetic-region-b", 0, "[[0,0],[4,0],[4,2],[0,2]]", "{\"rotation_degrees\":90}"),
+            RegionDraft("synthetic-region-a", 0, "[[0,3],[4,3],[4,5],[0,5]]"),
+        )
+        val saved = store.saveWithRegions(evidenceId, DerivativeKind.OCR, "ab\ncd", "synthetic-ocr", "1", regions)
+
+        val stored = store.regions(saved.id)
+        assertEquals(setOf("synthetic-region-a", "synthetic-region-b"), stored.map { it.id }.toSet())
+        assertEquals(setOf(saved.id), stored.map { it.derivativeId }.toSet())
+        assertEquals("{\"rotation_degrees\":90}", stored.single { it.id == "synthetic-region-b" }.transformJson)
+        assertEquals(1, recording.calls.count { it.startsWith("derivative.saved|") })
+
+        evidence.delete(evidenceId)
+        assertEquals(emptyList(), store.regions(saved.id))
+    }
+
+    @Test
+    fun invalidRegionsWriteNothing() = runBlocking<Unit> {
+        val evidenceId = evidenceIn(cases.create("Synthetic").id)
+        val duplicate = listOf(RegionDraft("synthetic-r", 0, "[]"), RegionDraft("synthetic-r", 0, "[]"))
+        assertFailsWith<IllegalArgumentException> { store.saveWithRegions(evidenceId, DerivativeKind.OCR, "t", "tool", "1", duplicate) }
+        assertFailsWith<IllegalArgumentException> {
+            store.saveWithRegions(evidenceId, DerivativeKind.OCR, "t", "tool", "1", listOf(RegionDraft(" ", 0, "[]")))
+        }
+        assertFailsWith<IllegalArgumentException> {
+            store.saveWithRegions(evidenceId, DerivativeKind.OCR, "t", "tool", "1", listOf(RegionDraft("synthetic-r", -1, "[]")))
+        }
+        assertEquals(0, derivativeRows())
+    }
 }

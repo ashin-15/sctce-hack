@@ -25,6 +25,8 @@ internal object ContentValidator {
         require(c.corrections.map { it.id }.toSet().size == c.corrections.size) { "Duplicate correction id" }
         val digests = validateFiles(c)
         validateProvenance(c, digests)
+        val anchors = AnchorGraph.resolve(c.events, c.provenance)
+        require(anchors.problems.isEmpty()) { anchors.problems.first() }
         return digests
     }
 

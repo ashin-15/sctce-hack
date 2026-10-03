@@ -24,17 +24,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
-import java.time.ZoneId
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import java.util.Locale
 import org.sakshi.app.R
+import org.sakshi.app.review.reasonText
 import org.sakshi.app.timeline.dateTimeText
 import org.sakshi.app.ui.components.ChoiceButton
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
+import org.sakshi.app.ui.components.FormDialog
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.QuietTextButton
+import org.sakshi.app.ui.components.RadioRow
 import org.sakshi.app.ui.components.SakshiScaffold
+import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
@@ -42,12 +48,15 @@ import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.EpistemicStatus
 import org.sakshi.core.temporal.EvidenceView
+import org.sakshi.core.vault.PatternReview
+import org.sakshi.core.vault.PatternReviewAction
 
 class PatternsActions(
     val back: () -> Unit,
     val setView: (EvidenceView) -> Unit,
     val openEvent: (String) -> Unit,
     val enter: () -> Unit,
+    val answer: (key: String, action: PatternReviewAction, reason: String?) -> Unit,
 )
 
 @Composable
@@ -69,13 +78,24 @@ fun PatternsScreen(state: PatternsUiState, actions: PatternsActions, modifier: M
             if (state.view == EvidenceView.CANDIDATE_PREVIEW) {
                 item(key = "preview-note") { StatusNote(NoteKind.Caution, stringResource(R.string.patterns_preview_note)) }
             }
+            if (state.refreshing) {
+                item(key = "refreshing") { StatusNote(NoteKind.Info, stringResource(R.string.patterns_refreshing), Modifier.liveUpdates()) }
+            }
+            state.notice?.let { notice ->
+                item(key = "notice") {
+                    val kind = if (notice == PatternNotice.CHANGED_BEFORE_SAVE) NoteKind.Caution else NoteKind.Problem
+                    StatusNote(kind, patternNoticeText(notice).text(), Modifier.liveUpdates())
+                }
+            }
             when {
                 state.loading -> item(key = "loading") { SupportingText(stringResource(R.string.patterns_loading)) }
                 state.failed -> item(key = "failed") { StatusNote(NoteKind.Problem, stringResource(R.string.patterns_failed)) }
                 state.cards.isEmpty() -> item(key = "empty") {
                     EmptyState(stringResource(R.string.patterns_empty_title), stringResource(R.string.patterns_empty_body))
                 }
-                else -> items(state.cards, key = { it.key }) { card -> PatternCard(card, state.zone, locale, actions.openEvent) }
+                else -> items(state.cards, key = { it.key }) { card ->
+                    PatternCard(card, state, locale, actions.openEvent, actions.answer)
+                }
             }
             item(key = "footer") { SupportingText(stringResource(R.string.patterns_footer), Modifier.padding(top = Spacing.md)) }
         }
@@ -104,7 +124,14 @@ private fun ViewToggle(view: EvidenceView, onChoose: (EvidenceView) -> Unit) {
 }
 
 @Composable
-private fun PatternCard(card: PatternCardView, zone: ZoneId, locale: Locale, onOpenEvent: (String) -> Unit) {
+private fun PatternCard(
+    card: PatternCardView,
+    state: PatternsUiState,
+    locale: Locale,
+    onOpenEvent: (String) -> Unit,
+    onAnswer: (key: String, action: PatternReviewAction, reason: String?) -> Unit,
+) {
+    val zone = state.zone
     var showSupport by remember(card.key) { mutableStateOf(false) }
     EpistemicBlock(EpistemicStatus.PATTERN) {
         Text(card.title.text(), style = MaterialTheme.typography.titleMedium)
@@ -127,6 +154,67 @@ private fun PatternCard(card: PatternCardView, zone: ZoneId, locale: Locale, onO
                     )
                 }
             }
+        }
+        when {
+            card.reviewable -> ReviewControls(card, enabled = !state.loading && !state.refreshing, onAnswer = onAnswer)
+            state.view == EvidenceView.CANDIDATE_PREVIEW && isReviewableStatus(card.status) ->
+                SupportingText(stringResource(R.string.patterns_review_preview_only))
+        }
+    }
+}
+
+/** Marks a text whose change is read out when it appears, so a state change is heard as well as seen. */
+private fun Modifier.liveUpdates(): Modifier = semantics { liveRegion = LiveRegionMode.Polite }
+
+/**
+ * The person's answer to one description. The answer is shown as words; the buttons are full width so large fonts
+ * wrap instead of clipping. Agreeing says only that the description matches what was saved.
+ */
+@Composable
+private fun ReviewControls(
+    card: PatternCardView,
+    enabled: Boolean,
+    onAnswer: (key: String, action: PatternReviewAction, reason: String?) -> Unit,
+) {
+    var rejecting by remember(card.key) { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        Text(
+            patternReviewText(card.review, card.reviewReason).text(),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.liveUpdates(),
+        )
+        SecondaryButton(stringResource(R.string.patterns_accept), { onAnswer(card.key, PatternReviewAction.ACCEPT, null) }, Modifier.fillMaxWidth(), enabled)
+        SecondaryButton(stringResource(R.string.patterns_reject), { rejecting = true }, Modifier.fillMaxWidth(), enabled)
+        SecondaryButton(stringResource(R.string.patterns_unsure), { onAnswer(card.key, PatternReviewAction.MARK_UNKNOWN, null) }, Modifier.fillMaxWidth(), enabled)
+        if (card.review != PatternReview.NOT_REVIEWED) {
+            QuietTextButton(stringResource(R.string.patterns_withdraw), { onAnswer(card.key, PatternReviewAction.WITHDRAW, null) }, Modifier.fillMaxWidth(), enabled)
+        }
+        SupportingText(stringResource(R.string.patterns_review_explain))
+    }
+    if (rejecting) {
+        RejectDialog(
+            onChoose = { reason ->
+                rejecting = false
+                onAnswer(card.key, PatternReviewAction.REJECT, reason)
+            },
+            onDismiss = { rejecting = false },
+        )
+    }
+}
+
+@Composable
+private fun RejectDialog(onChoose: (String?) -> Unit, onDismiss: () -> Unit) {
+    var reason by remember { mutableStateOf<String?>(null) }
+    FormDialog(
+        title = stringResource(R.string.patterns_reject_title),
+        confirmLabel = stringResource(R.string.review_disagree_confirm),
+        onConfirm = { onChoose(reason) },
+        onDismiss = onDismiss,
+    ) {
+        SupportingText(stringResource(R.string.patterns_reject_body))
+        Column(Modifier.selectableGroup()) {
+            RadioRow(stringResource(R.string.patterns_reject_no_reason), selected = reason == null, onSelect = { reason = null })
+            PATTERN_REJECT_REASONS.forEach { code -> RadioRow(reasonText(code).text(), selected = reason == code, onSelect = { reason = code }) }
         }
     }
 }

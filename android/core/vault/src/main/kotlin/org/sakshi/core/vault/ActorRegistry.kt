@@ -75,7 +75,8 @@ public class ActorRegistry(
     }
 
     /**
-     * Changes the label of an actor and audits `actor.renamed` with ids only. Deleting an actor is not offered:
+     * Changes the label of an actor, marks the case's stored patterns stale (their wording names the person) and audits
+     * `actor.renamed` with ids only. Deleting an actor is not offered:
      * events and boundaries refer to actors by foreign key, so the database refuses it while any do.
      *
      * @throws IllegalArgumentException for an unknown actor or a blank or over-long label.
@@ -89,6 +90,7 @@ public class ActorRegistry(
                 val actor = requireNotNull(database.eventDao().getActor(actorId.value)) { "Unknown actor" }
                 if (actor.displayLabel == displayLabel) return@withTransaction
                 database.eventDao().updateActor(actor.copy(displayLabel = displayLabel))
+                database.patternDao().markStaleForCase(actor.caseId)
                 audit.append(
                     AuditActions.ACTOR_RENAMED,
                     SUBJECT_TYPE,

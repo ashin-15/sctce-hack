@@ -38,6 +38,11 @@ public data class ExportSummary(
     val originalCount: Int,
     val omitted: OmittedCounts,
     val zipBytes: Long,
+    /** Records with text removed, and the passages removed from them. */
+    val redactedEventCount: Int = 0,
+    val redactedPassageCount: Int = 0,
+    /** True when an included original still holds text that was removed elsewhere in the bundle. */
+    val includedOriginalHoldsRemovedText: Boolean = false,
 )
 
 /** Outcome of [ExportService.export]. */
@@ -45,6 +50,8 @@ public sealed interface ExportResult {
     public data class Exported(
         val zipFile: File,
         val snapshotId: String,
+        /** The report version this export is stored as, printed in the PDF footer. */
+        val reportVersion: Int,
         val signerKeyId: String,
         val summary: ExportSummary,
     ) : ExportResult

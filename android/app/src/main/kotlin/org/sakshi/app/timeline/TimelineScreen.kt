@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,6 +66,7 @@ class TimelineActions(
     val setFilter: (TimelineFilter) -> Unit,
     val addGap: (String, String, GapReason) -> Unit,
     val gapOutcomeShown: () -> Unit,
+    val openSearch: () -> Unit,
 )
 
 @Composable
@@ -80,7 +83,10 @@ fun TimelineScreen(state: TimelineUiState, gapOutcome: GapOutcome, actions: Time
         title = stringResource(R.string.timeline_title),
         modifier = modifier,
         onBack = actions.back,
-        actions = listOf(TopAction(stringResource(R.string.timeline_patterns), actions.openPatterns)),
+        actions = listOf(
+            TopAction(stringResource(R.string.action_search), actions.openSearch, icon = Icons.Default.Search),
+            TopAction(stringResource(R.string.timeline_patterns), actions.openPatterns),
+        ),
     ) {
         if (state.loaded) Content(state, actions, onAddGap = { addingGap = true })
     }

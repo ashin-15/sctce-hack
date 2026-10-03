@@ -25,12 +25,15 @@ data class EvidenceRow(
             else -> analysisOf(kind)
         }
 
-    /** True for a text item that has not been turned into events yet, so "Analyse text" is offered. */
+    /** True for a text item or image that has not been turned into events yet, so "Analyse text" is offered. */
     val canAnalyse: Boolean get() = kind.readsAsText && !analysed
 }
 
-/** The kinds the text analysis reads. Images wait for text recognition, which this version does not have. */
-val EvidenceKind.readsAsText: Boolean get() = this == EvidenceKind.TEXT || this == EvidenceKind.TEXT_FILE
+/**
+ * The kinds the text analysis reads. Images are read by on-device text recognition (Latin script only); an image
+ * type the recogniser cannot open is refused with a reason when the user asks.
+ */
+val EvidenceKind.readsAsText: Boolean get() = this == EvidenceKind.TEXT || this == EvidenceKind.TEXT_FILE || this == EvidenceKind.IMAGE
 
 private val ARCHIVE_TYPES = setOf(
     "application/zip",

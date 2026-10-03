@@ -55,6 +55,7 @@ internal object EventBlocks {
         zone: ZoneId,
         tags: TagSplit,
         quotes: QuoteSource,
+        redacted: RedactedReference? = null,
         hashOf: suspend (String) -> String?,
     ): EventBlock {
         val time = ReportFormat.time(event, zone)
@@ -62,18 +63,22 @@ internal object EventBlocks {
         val observed = mutableListOf<ObservedPart>()
         val statements = mutableListOf<UserStatementPart>()
         for (reference in event.evidenceReferences) {
-            val quote = quotes.quote(event, reference)
+            val hidden = redacted?.takeIf { it.referenceId == reference.referenceId.value }
+            val quote = hidden?.text ?: quotes.quote(event, reference)
             val artifact = reference.artifactId.value
-            val locator = ReportFormat.locator(reference.locator)
+            val locator = if (hidden != null) ReportText.LOCATOR_WITHHELD else ReportFormat.locator(reference.locator)
+            val removed = hidden?.passages ?: 0
             if (reference.representation == Representation.MANUAL_STATEMENT) {
-                statements += UserStatementPart(quote, artifact, time.text, locator)
+                statements += UserStatementPart(quote, artifact, time.text, locator, removed)
             } else {
                 observed += ObservedPart(
                     quote = quote,
                     artifactId = artifact,
-                    sha256 = reference.sha256 ?: hashOf(artifact),
+                    // A hash of the whole text would let a reader test guesses at the removed part.
+                    sha256 = if (hidden != null) null else reference.sha256 ?: hashOf(artifact),
                     locator = locator,
                     representation = ReportText.REPRESENTATION.getValue(reference.representation),
+                    redactedPassages = removed,
                 )
             }
         }

@@ -6,6 +6,7 @@ import org.sakshi.core.integrity.Sha256
 import org.sakshi.core.model.CaseId
 import org.sakshi.core.model.ConfirmationStatus
 import org.sakshi.core.model.Event
+import org.sakshi.core.model.Locator
 import org.sakshi.core.model.Representation
 import org.sakshi.core.temporal.CoverageGap
 import org.sakshi.core.temporal.EvidenceView
@@ -19,6 +20,7 @@ import org.sakshi.core.vault.Vault
 import org.sakshi.export.bundle.Correction
 import org.sakshi.export.bundle.GeneratorInfo
 import org.sakshi.export.bundle.OmittedCounts
+import org.sakshi.export.bundle.RedactionSummary
 
 /**
  * Builds the report model and the bundle inputs for a selection. Patterns are computed over the selected
@@ -51,7 +53,11 @@ public class ReportBuilder(
         }
         val evidence = vault.evidence.observeForCase(selection.caseId.value).first().map { it.id }.toSet()
         if (!evidence.containsAll(selection.includeOriginalsFor)) return refused(RefusalReason.UNKNOWN_EVIDENCE)
-        val request = Request(selection, options, signerKeyId, title, now, latest, chosen, evidence.size)
+        val plan = when (val planned = RedactionPlanner.plan(selection, chosen, quotes)) {
+            is PlanResult.Refused -> return refused(planned.reason)
+            is PlanResult.Ready -> planned.plan
+        }
+        val request = Request(selection, options, signerKeyId, title, now, latest, chosen, evidence.size, plan)
         return assemble(request)
     }
 
@@ -64,6 +70,7 @@ public class ReportBuilder(
         val caseEvents: List<Event>,
         val chosen: List<Event>,
         val evidenceCount: Int,
+        val redaction: RedactionPlan,
     )
 
     private suspend fun assemble(r: Request): ReportBuildResult {
@@ -76,10 +83,13 @@ public class ReportBuilder(
 
         val tags = ordered.associateWith { EventBlocks.split(it, r.options) }
         val blocks = ordered.mapIndexed { index, event ->
-            EventBlocks.block(index + 1, event, r.selection.zone, tags.getValue(event), quotes) { details.sha256(it) }
+            EventBlocks.block(index + 1, event, r.selection.zone, tags.getValue(event), quotes, r.redaction.of(event)) {
+                details.sha256(it)
+            }
         }
         val omitted = omittedCounts(r)
-        val scope = scope(r, storedGaps.size, details.acquisitionKinds(ordered))
+        val redactions = r.redaction.summary(originalHoldsRemovedText(r))
+        val scope = scope(r, storedGaps.size, details.acquisitionKinds(ordered), redactions)
         val model = ReportModel(
             title = r.title,
             reportVersion = r.options.reportVersion,
@@ -103,13 +113,15 @@ public class ReportBuilder(
         )
         val inputs = BundleInputs(
             caseId = caseId.value,
-            events = ordered,
+            events = ordered.map { withheld(it, r.redaction) },
             findings = ordered.flatMap { EventBlocks.findings(it, tags.getValue(it)) },
             corrections = corrections(r.selection.caseId, ordered),
             patterns = analysis.patterns.mapNotNull { PatternBlocks.bundlePattern(it, actorLabels, r.selection.zone) },
             omitted = omitted,
             auditChainHead = model.integrity.auditChainHead,
             includeOriginalsFor = r.selection.includeOriginalsFor,
+            redactions = redactions,
+            redactedCopies = r.redaction.references.map { RedactedCopy(it.copyId, it.artifactId, it.text) },
         )
         return ReportBuildResult.Built(model, inputs)
     }
@@ -151,6 +163,25 @@ public class ReportBuilder(
                 Correction(it.id, it.targetType, it.targetId, it.targetRevision, it.action, it.reasonCode, it.decidedAt)
             }
 
+    /**
+     * The copy of [event] that goes into the bundle. The reference a person removed text from loses its hash and its
+     * exact range, which would otherwise let a reader test guesses at the removed part or work out its length.
+     */
+    private fun withheld(event: Event, plan: RedactionPlan): Event {
+        val redacted = plan.of(event) ?: return event
+        return event.copy(
+            evidenceReferences = event.evidenceReferences.map {
+                if (it.referenceId.value == redacted.referenceId) it.copy(sha256 = null, locator = Locator.WholeArtifact) else it
+            },
+        )
+    }
+
+    /** True when a redacted quote was read from a file that is also included as an original. */
+    private suspend fun originalHoldsRemovedText(r: Request): Boolean = r.redaction.references.any { reference ->
+        val evidenceId = vault.derivatives.get(reference.artifactId)?.evidenceId ?: reference.artifactId
+        evidenceId in r.selection.includeOriginalsFor
+    }
+
     private fun omittedCounts(r: Request): OmittedCounts {
         val derivatives = r.caseEvents.flatMap { it.evidenceReferences }
             .filter { it.representation == Representation.OCR_DERIVATIVE || it.representation == Representation.TRANSCRIPT_DERIVATIVE }
@@ -163,7 +194,7 @@ public class ReportBuilder(
         )
     }
 
-    private fun scope(r: Request, gapCount: Int, methods: List<String>): ScopeStatement {
+    private fun scope(r: Request, gapCount: Int, methods: List<String>, redactions: RedactionSummary): ScopeStatement {
         val lines = mutableListOf(
             ReportText.fill(ReportText.SCOPE_SELECTED, r.chosen.size, r.caseEvents.size),
             ReportText.fill(ReportText.SCOPE_EXCLUDED, r.caseEvents.size - r.chosen.size),
@@ -180,6 +211,12 @@ public class ReportBuilder(
             ReportText.fill(ReportText.SCOPE_ZONE, r.selection.zone.id),
             ReportText.SCOPE_UTC_NOTE,
         )
+        if (r.selection.includeOriginalsFor.isNotEmpty()) lines += ReportText.SCOPE_ORIGINALS_NOTE
+        if (!redactions.isEmpty) {
+            lines += ReportText.fill(ReportText.SCOPE_REDACTED, redactions.passageCount, redactions.eventCount)
+            lines += ReportText.SCOPE_REDACTED_LIMIT
+            if (redactions.originalMayHoldRemovedContent) lines += ReportText.SCOPE_REDACTED_ORIGINAL
+        }
         if (methods.isNotEmpty()) lines += ReportText.fill(ReportText.SCOPE_METHODS, methods.joinToString(", "))
         val sources = r.chosen.map { ReportText.SOURCE_KIND.getValue(it.source.kind) }.distinct().sorted()
         if (sources.isNotEmpty()) lines += ReportText.fill(ReportText.SCOPE_SOURCES, sources.joinToString(", "))

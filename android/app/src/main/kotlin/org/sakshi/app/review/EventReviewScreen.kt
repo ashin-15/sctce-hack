@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.plural
 import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.BoundaryMarker
@@ -84,7 +86,13 @@ private sealed interface ReviewDialog {
 @Composable
 fun EventReviewScreen(state: EventReviewState, zone: ZoneId, actions: EventReviewActions, modifier: Modifier = Modifier) {
     var dialog by remember { mutableStateOf<ReviewDialog?>(null) }
+    var pictureLarge by rememberSaveable { mutableStateOf(false) }
     BackHandler(onBack = actions.back)
+    val ready = state.picture as? PictureState.Ready
+    if (pictureLarge && ready != null) {
+        PictureLargeView(state, ready, onClose = { pictureLarge = false }, modifier)
+        return
+    }
     SakshiScaffold(
         title = stringResource(R.string.review_title),
         modifier = modifier,
@@ -105,7 +113,7 @@ fun EventReviewScreen(state: EventReviewState, zone: ZoneId, actions: EventRevie
         when {
             !state.loaded -> Unit
             event == null -> SupportingText(stringResource(R.string.review_event_missing), Modifier.padding(Spacing.gutter))
-            else -> Content(state, event, zone, actions, onDialog = { dialog = it })
+            else -> Content(state, event, zone, actions, onDialog = { dialog = it }, onOpenPicture = { pictureLarge = true })
         }
     }
     when (val current = dialog) {
@@ -128,12 +136,19 @@ fun EventReviewScreen(state: EventReviewState, zone: ZoneId, actions: EventRevie
 }
 
 @Composable
-private fun Content(state: EventReviewState, event: Event, zone: ZoneId, actions: EventReviewActions, onDialog: (ReviewDialog) -> Unit) {
+private fun Content(
+    state: EventReviewState,
+    event: Event,
+    zone: ZoneId,
+    actions: EventReviewActions,
+    onDialog: (ReviewDialog) -> Unit,
+    onOpenPicture: () -> Unit,
+) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = Spacing.gutter, vertical = Spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl),
     ) {
-        SavedSection(state, event, zone)
+        SavedSection(state, event, zone, onOpenPicture)
         WhoAndWhenSection(state, event, actions)
         SuggestionsSection(state, actions, onDialog)
         if (state.boundaryOffered) BoundarySection(state, actions)
@@ -145,11 +160,19 @@ private fun Content(state: EventReviewState, event: Event, zone: ZoneId, actions
 private fun locale(): Locale = LocalConfiguration.current.locales[0]
 
 @Composable
-private fun SavedSection(state: EventReviewState, event: Event, zone: ZoneId) {
+private fun SavedSection(state: EventReviewState, event: Event, zone: ZoneId, onOpenPicture: () -> Unit) {
     var explainFingerprint by remember { mutableStateOf(false) }
     val body = state.body
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         ScreenTitle(stringResource(R.string.review_saved_heading))
+        if (state.fromPicture) {
+            PictureSection(state, onOpenPicture)
+            SupportingText(stringResource(R.string.review_picture_text_note))
+            val lines = state.uncertainLines
+            if (state.textUncertain && lines != null) {
+                StatusNote(NoteKind.Caution, plural(R.plurals.analysis_warn_ocr_low_confidence, lines, lines).text())
+            }
+        }
         if (body == null) {
             EpistemicBlock(EpistemicStatus.UNKNOWN, stringResource(R.string.body_not_available))
         } else {

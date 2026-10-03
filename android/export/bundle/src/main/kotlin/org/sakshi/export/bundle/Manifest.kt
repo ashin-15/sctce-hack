@@ -15,6 +15,28 @@ public data class OmittedCounts(val evidenceCount: Int, val derivativeCount: Int
     }
 }
 
+/**
+ * What the person removed from quoted text before export. Counts only; the removed text and its hash are never
+ * recorded. [originalMayHoldRemovedContent] is true when an included original file is the source of a removed passage.
+ */
+public data class RedactionSummary(
+    val eventCount: Int,
+    val passageCount: Int,
+    val originalMayHoldRemovedContent: Boolean = false,
+) {
+    init {
+        require(eventCount >= 0 && passageCount >= eventCount) { "Redaction counts are inconsistent" }
+        require(passageCount > 0 || !originalMayHoldRemovedContent) { "A warning needs at least one removed passage" }
+    }
+
+    /** True when nothing was removed. */
+    public val isEmpty: Boolean get() = passageCount == 0
+
+    public companion object {
+        public val NONE: RedactionSummary = RedactionSummary(0, 0)
+    }
+}
+
 internal data class ManifestFile(val path: String, val role: String, val sha256: String, val size: Long)
 
 internal data class Manifest(
@@ -27,6 +49,7 @@ internal data class Manifest(
     val auditChainHead: String,
     val omitted: OmittedCounts,
     val limits: List<String>,
+    val redactions: RedactionSummary = RedactionSummary.NONE,
 ) {
     fun toJson(): JsonObject = jsonObject(
         "format" to JsonPrimitive(BundleFormat.FORMAT),
@@ -49,6 +72,11 @@ internal data class Manifest(
             "event_count" to JsonPrimitive(omitted.eventCount),
         ),
         "limits" to jsonStrings(limits),
+        "redactions" to if (redactions.isEmpty) null else jsonObject(
+            "event_count" to JsonPrimitive(redactions.eventCount),
+            "passage_count" to JsonPrimitive(redactions.passageCount),
+            "original_may_hold_removed_content" to JsonPrimitive(redactions.originalMayHoldRemovedContent),
+        ),
     )
 
     companion object {
@@ -74,7 +102,13 @@ internal data class Manifest(
                 auditChainHead = o.str("audit_chain_head"),
                 omitted = OmittedCounts(omitted.int("evidence_count"), omitted.int("derivative_count"), omitted.int("event_count")),
                 limits = o.strings("limits"),
+                redactions = o["redactions"]?.let { parseRedactions(it) } ?: RedactionSummary.NONE,
             )
+        }
+
+        private fun parseRedactions(element: JsonElement): RedactionSummary {
+            val o = element as? JsonObject ?: throw IllegalArgumentException("redactions must be an object")
+            return RedactionSummary(o.int("event_count"), o.int("passage_count"), o.bool("original_may_hold_removed_content"))
         }
 
         private fun fileJson(f: ManifestFile): JsonObject = jsonObject(

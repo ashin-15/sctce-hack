@@ -37,7 +37,11 @@ public class VaultKeyFile(private val directory: File) {
         }
     }
 
+    /** The wrapped passphrase file and its temporary sibling, whether or not they exist. */
+    internal fun files(): List<File> = listOf(file, File(directory, FILE_NAME + TEMPORARY_SUFFIX))
+
     private companion object {
+        const val TEMPORARY_SUFFIX = ".tmp"
         const val FILE_NAME = "db.key.wrapped"
         const val PASSPHRASE_SIZE = 32
     }

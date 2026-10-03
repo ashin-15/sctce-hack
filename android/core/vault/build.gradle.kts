@@ -41,6 +41,7 @@ dependencies {
     api(project(":core:model"))
     api(project(":core:crypto"))
     api(project(":core:database"))
+    api(project(":core:temporal"))
     implementation(project(":core:integrity"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
@@ -50,7 +51,6 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(project(":core:temporal"))
     testImplementation(testFixtures(project(":core:temporal")))
 
     androidTestImplementation(libs.junit)
