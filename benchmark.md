@@ -185,3 +185,21 @@ A milestone is recorded as complete only for work actually performed. This ledge
 
 - V-08 status: partly verified. ML Kit returned text in a process whose package holds neither `INTERNET` nor `ACCESS_NETWORK_STATE` (asserted in the test), so the process could not open sockets. Not done: airplane-mode cold launch of the app and packet capture. No crash or `SecurityException` from the telemetry library was seen in logcat on either phone.
 - Not verified: OCR in the installed app with a person using it, release-build latency and memory (V-10), real screenshots from messaging apps, dark-mode and low-contrast screenshots, CER on the bench screenshot fixtures (the committed manifest still names Windows font paths, so the fixtures were not regenerated on Linux), Devanagari OCR (ML Kit Devanagari model not added) and Malayalam OCR (Tesseract not added).
+
+## Android phases 8, 9, 12 and 13: search, stored patterns, report versions, redaction, notification lane, security tests - 3 October 2026
+
+- Added since phase 10: case-scoped search with filters and a separate scope for messages with accepted tags; notes searchable as the person's own statements; stored pattern descriptions with content-derived ids, case-wide staleness marked in the same transaction as every correcting write, and per-description review (agree, does not match with a reason, not sure, undo); numbered report versions bound to the previewed content; text redaction in the export library; verifier anchor and graph checks; whole-vault deletion that destroys the key first; an off-by-default notification observation module kept in memory only; policy guardrail tests; security tests and `docs/architecture/threat-model.md`.
+- JVM verification on a clean checkout of `454130e`: 1,304 tests in 15 modules, 0 failures, 0 skipped; `:app:assembleDebug`, `:app:lintDebug` (0 errors, 14 warnings, all dependency or target version notices) and `:app:verifyManifestPermissions` passed. The notification module adds 122 tests (commit `3875e66`). These are fixture and unit results, not accuracy figures.
+- Device tests, debug build, CPH2695 (MT6835), Android 16, phone unlocked and kept awake over USB, one run each:
+
+| Suite | Tests | Result |
+|---|---|---|
+| `:core:vault` | 26 (includes 4 new database security tests) | passed: the SQLCipher file does not open as plain SQLite, with an empty or wrong key, or after one flipped byte at any of 10 positions |
+| `:processing:analysis` | 7 (includes 3 new leak tests) | passed: no marker text in English, Malayalam or Devanagari, as UTF-8 or UTF-16, in any file of the test sandbox or in the process's own logcat after a full workflow |
+| `:acquisition:importer` | 4 | passed |
+| `:processing:ocr` | 5 | passed |
+| `:export:report` | 5 | passed |
+
+- An earlier run the same morning had one importer test hang for 8.5 minutes while the phone was asleep on the lock screen; with the phone awake the same suite passed. Device results are only recorded from awake, unlocked runs.
+- Notification device test: not run. The vendor build refused `pm grant ... POST_NOTIFICATIONS` from adb, so the test skipped itself; listener access was granted for the attempt and removed afterwards.
+- Not verified: any screen used by a person; release builds; battery, thermal and memory measurements; real messaging-app notification payloads; backup extraction (V-09); real biometric invalidation.
