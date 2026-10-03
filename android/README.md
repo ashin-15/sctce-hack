@@ -15,6 +15,7 @@ Implementation follows `../MEGAPLAN.md`. This directory contains the complete fo
 | `:acquisition:importer` | Android library | Share intent, picker and paste readers, streaming limits, manual note codec |
 | `:processing:text` | Kotlin/JVM | Script and language hints, rules cue engine, label mapping, WhatsApp text-export parser |
 | `:processing:ocr` | Android library | Bundled ML Kit Latin text recognition (no download), line regions with engine scores, EXIF rotation, decode bounds. Its manifest removes the `INTERNET` and `ACCESS_NETWORK_STATE` permissions that ML Kit's telemetry library adds |
+| `:processing:stt` | Android library (arm64 native) | whisper.cpp base q5_1 speech to text: `SttProcessor`, `ModelSessionManager` (hash-pinned model, one heavy model at a time, unloads), `ModelProvisioner`, in-memory `MediaCodec` decoding over the vault's random-access reader, transcript with time ranges, silence as an explicit result. Library only: no screen yet. See "Speech to text (phase 11)" |
 | `:processing:analysis` | Android library | Text analysis pipeline, screenshot text (OCR derivative with regions, one event per image, cues anchored to text span and image region), derivative storage, single-pass code-point body and quote extraction (`EventText`), on-demand pattern engine with supporting events |
 | `:export:bundle` | Kotlin/JVM | Bundle writer, offline verifier, command-line tool (`./gradlew :export:bundle:run --args="verify <dir>"`) |
 | `:export:report` | Android library | Report model, PDF renderer, Keystore signer (ECDSA P-256), export service, export audit records |
@@ -24,7 +25,7 @@ Implementation follows `../MEGAPLAN.md`. This directory contains the complete fo
 
 - JDK 21 for Gradle (`JAVA_HOME=/usr/lib/jvm/java-21-openjdk` on the development host; the default JDK 27 is not used).
 - Android SDK platform 36 (`ANDROID_HOME` or `local.properties`).
-- No NDK is needed. The only model is ML Kit's bundled Latin OCR model, which comes from Maven with the library. A device or emulator is needed to verify the parts listed under "Verified on a device, and what is not".
+- The NDK is needed only for `:processing:stt` (NDK `29.0.14206865`, SDK CMake `3.31.6`, both from the SDK manager; see "Speech to text (phase 11)"). The bundled model of the other modules is ML Kit's Latin OCR model, which comes from Maven with the library. A device or emulator is needed to verify the parts listed under "Verified on a device, and what is not".
 
 ## Commands
 
@@ -62,6 +63,35 @@ uv run --no-project --with numpy --with scikit-learn python android/tools/gen_in
 ## Verified on a device, and what is not
 
 Instrumented tests on one Samsung SM-S928B (Android 16) cover the SQLCipher database, the Keystore key wrapper, on-disk confidentiality, tamper detection, event storage, import through a real content provider, text analysis and derivative generation, on-device Keystore report signing, and PDF report creation. The OCR and image analysis tests also ran on a CPH2695 (Android 16): ML Kit reads synthetic Latin screenshots in a process without network permission and returns no text for Malayalam and Devanagari renders. Not yet verified: OCR in the app with a person using it, release-build OCR latency and memory, the unlock flow and every screen with a person using the app, a file share from another app, the pickers, lock on background, backup and device-transfer exclusion, Android versions below 16, and 16 KB page devices.
+
+## Speech to text (phase 11)
+
+`:processing:stt` is a library and device-test deliverable only; it has no screen and the app does not call it yet. It runs whisper.cpp (multilingual base, 5-bit `q5_1`) on the CPU, offline. There is no network code in the module and the model is not in the APK.
+
+Preparation steps (the only network steps; the Gradle build never downloads and fails with a pointer to the script if the source is missing):
+
+```sh
+# one pinned whisper.cpp release (tag and SHA-256 are in the script), extracted to android/third_party/ (git-ignored)
+./tools/prepare-whisper.sh
+# model: the repository's models/whisper.cpp/ggml-base-q5_1.bin (git-ignored), SHA-256 422f1ae4...a8898.
+# For device tests, push it where the tests expect it:
+adb push ../models/whisper.cpp/ggml-base-q5_1.bin /data/local/tmp/ggml-base-q5_1.bin
+```
+
+In the app, the model is installed by an explicit "prepare speech model" action: `ModelProvisioner.forContext(context).importFrom(inputStream)` streams a user-chosen file into `noBackupFilesDir/models`, hashes it, and renames it into place only when it is the pinned file. `ModelSessionManager` verifies the SHA-256 again before every load and refuses on a mismatch.
+
+```sh
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :processing:stt:testDebugUnitTest :processing:stt:connectedDebugAndroidTest
+```
+
+Limits, stated plainly:
+
+- arm64-v8a only. The native library is not built for x86_64, so the module cannot be exercised on an x86_64 emulator; the JVM tests use a fake engine.
+- Clips of at most 60 s (0.5 s container tolerance), one at a time, refused with `TooLong` before the whole file is decoded when the container states its duration. Silence is `NoSpeech`; unreadable audio is `Unsupported`; a phone at thermal status SEVERE or worse is refused (`Failed(THERMAL)`).
+- Audio is decoded with `MediaExtractor` and `MediaCodec` reading through the vault's authenticated random-access reader (`BlobReader.asRandomAccessSource()`), so no decrypted byte is written to a file. Only the in-memory PCM (under 4 MB for 60 s at 16 kHz) exists.
+- Segment confidence is the engine's mean token probability: uncalibrated, not a probability that the words are right. The model transcribes in the spoken language and never translates.
+- The signal-level silence gate (about -50 dBFS), the model no-speech limit (0.6) and the low-confidence limit (0.5) are demonstration settings, not calibrated.
+- Malayalam, Hindi and code-mixed speech accuracy is not measured. Device numbers from the instrumented tests are debug-build observations on one phone, not V-12 release measurements.
 
 ## Permissions check
 

@@ -14,3 +14,5 @@ android/**/build/
 android/local.properties
 graphify-out/
 AgentHitaAndroid/
+android/third_party/
+android/**/.cxx/

@@ -203,3 +203,20 @@ A milestone is recorded as complete only for work actually performed. This ledge
 - An earlier run the same morning had one importer test hang for 8.5 minutes while the phone was asleep on the lock screen; with the phone awake the same suite passed. Device results are only recorded from awake, unlocked runs.
 - Notification device test: not run. The vendor build refused `pm grant ... POST_NOTIFICATIONS` from adb, so the test skipped itself; listener access was granted for the attempt and removed afterwards.
 - Not verified: any screen used by a person; release builds; battery, thermal and memory measurements; real messaging-app notification payloads; backup extraction (V-09); real biometric invalidation.
+
+## Android phase 11: speech to text library, whisper.cpp base q5_1 - 3 October 2026
+
+- Added `:processing:stt`: whisper.cpp `v1.9.4` (tag tarball SHA-256 recorded on first download, trust on first use; fetched only by `android/tools/prepare-whisper.sh`), statically linked into one arm64-v8a `libsakshi_stt.so` (3.0 MB), CPU only, NEON, no OpenMP; all three LOAD segments 16 KB aligned (`readelf -lW`, Align 0x4000). Model `ggml-base-q5_1.bin` from Hugging Face `ggerganov/whisper.cpp` revision `5359861c739e955e79d9a303bcbc70fb988958b1`, SHA-256 `422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898` (matches the upstream LFS record), not bundled; installed only through an explicit provisioning call that verifies the hash.
+- Audio is decoded with `MediaExtractor`/`MediaCodec` through a `MediaDataSource` over an authenticated random-access reader, so decrypted bytes never touch a file (V-04 random access exists in `BlobReader`; the decode path was exercised on the device with in-memory sources, not yet with encrypted evidence).
+- JVM: 47 tests. Device: 12 tests passed on CPH2695 (MT6835), Android 16, debug build, 4 threads, thermal status 1, battery 100 % at 36.2 C.
+- One 60 s synthetic English clip (on-device text to speech, repeated), one warm-up then one measured run. Debug-build observations, not V-12 release measurements:
+
+| Measure | Value |
+|---|---|
+| Model load including SHA-256 check | 405 ms |
+| Transcription | 42,305 ms (real-time factor 0.705) |
+| PSS before load / after load / after transcription / after unload | 45.5 MB / 141.5 MB / 377.0 MB / 41.0 MB |
+| Word error rate, one short English sentence | 0.000 (language detected `en`) |
+
+- Silence (10 s) gave `NoSpeech` from the signal-level gate; a 440 Hz tone (5 s) gave `NoSpeech` from the model, with no invented words; a 70 s clip was refused as too long before full decoding; forcing Hindi on English speech returned English text, not a translation.
+- Not verified: Malayalam, Hindi, code-mixed or noisy real speech; repeats; release build; thermal behaviour over a sustained run; analysis integration (one event per clip with text and audio-time anchors) and the app screens, which are not built yet.
