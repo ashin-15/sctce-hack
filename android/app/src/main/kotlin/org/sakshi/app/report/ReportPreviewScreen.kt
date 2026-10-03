@@ -3,9 +3,13 @@ package org.sakshi.app.report
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,21 +18,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import java.util.Locale
 import org.sakshi.app.R
 import org.sakshi.app.ui.components.EpistemicBlock
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.ProgressBlock
-import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SecondaryButton
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatTile
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.formatByteSize
-import org.sakshi.app.ui.plural
 import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
 
@@ -86,7 +94,12 @@ private fun ActionBar(actions: ReportPreviewActions) {
         Modifier.fillMaxWidth().padding(horizontal = Spacing.gutter, vertical = Spacing.md),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        PrimaryButton(stringResource(R.string.report_create_export), actions.create)
+        PrimaryButton(
+            stringResource(R.string.report_create_export),
+            actions.create,
+            Modifier.fillMaxWidth(),
+            icon = ImageVector.vectorResource(R.drawable.ic_document),
+        )
         SecondaryButton(stringResource(R.string.report_change_selection), actions.back, Modifier.fillMaxWidth())
     }
 }
@@ -99,9 +112,9 @@ private fun ReadyContent(ready: PreviewState.Ready, export: ExportState, actions
         contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        item(key = "intro") { SupportingText(stringResource(R.string.report_preview_intro)) }
         item(key = "notice") { ExportNotice(export, actions.noticeShown) }
-        item(key = "summary") { SummaryCard(ready.summary, locale) }
+        item(key = "summary") { Summary(ready.summary, locale) }
+        item(key = "about") { AboutFile() }
         items(ready.rows, key = { it.key }) { row -> PreviewRowView(row) }
     }
 }
@@ -120,24 +133,31 @@ private fun ExportNotice(export: ExportState, onShown: () -> Unit) {
 }
 
 @Composable
-private fun SummaryCard(summary: PreviewSummary, locale: Locale) {
-    SakshiCard {
-        Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            SectionHeader(stringResource(R.string.report_summary_heading))
-            Text(plural(R.plurals.report_summary_messages, summary.messages, summary.messages).text(), style = MaterialTheme.typography.bodyLarge)
-            Text(
-                if (summary.originals == 0) {
-                    stringResource(R.string.report_summary_no_originals)
-                } else {
-                    plural(R.plurals.report_summary_originals, summary.originals, summary.originals, formatByteSize(summary.originalBytes, locale)).text()
-                },
-                style = MaterialTheme.typography.bodyLarge,
+private fun Summary(summary: PreviewSummary, locale: Locale) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            val tile = Modifier.weight(1f).fillMaxHeight()
+            StatTile(summary.messages.toString(), stringResource(R.string.report_stat_messages), tile)
+            StatTile(summary.originals.toString(), stringResource(R.string.report_stat_originals), tile)
+            StatTile(summary.leftOut.toString(), stringResource(R.string.report_stat_left_out), tile)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            StatusChip(
+                stringResource(if (summary.includesUnreviewed) R.string.report_chip_unreviewed_in else R.string.report_chip_unreviewed_out),
+                tone = if (summary.includesUnreviewed) Tone.Warning else Tone.Neutral,
             )
-            Text(plural(R.plurals.report_summary_left_out, summary.leftOut, summary.leftOut).text(), style = MaterialTheme.typography.bodyLarge)
-            Text(
-                stringResource(if (summary.includesUnreviewed) R.string.report_summary_unreviewed_on else R.string.report_summary_unreviewed_off),
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            if (summary.originals > 0) StatusChip(formatByteSize(summary.originalBytes, locale))
+        }
+    }
+}
+
+@Composable
+private fun AboutFile() {
+    MoreInfo(stringResource(R.string.report_preview_about)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            SupportingText(stringResource(R.string.report_preview_pdf))
+            SupportingText(stringResource(R.string.export_caution_control))
+            SupportingText(stringResource(R.string.export_caution_plain))
         }
     }
 }

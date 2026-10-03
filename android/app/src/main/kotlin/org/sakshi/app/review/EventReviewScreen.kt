@@ -2,7 +2,9 @@ package org.sakshi.app.review
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,7 +44,9 @@ import org.sakshi.app.ui.components.EpistemicBlock
 import org.sakshi.app.ui.components.EpistemicLabel
 import org.sakshi.app.ui.components.FormDialog
 import org.sakshi.app.ui.components.LabelValue
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.NoteKind
+import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.RadioRow
 import org.sakshi.app.ui.components.SakshiCard
@@ -47,13 +54,16 @@ import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.ScreenTitle
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.plural
 import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.BoundaryMarker
 import org.sakshi.core.model.CategoryLabel
+import org.sakshi.core.model.CategoryReviewStatus
 import org.sakshi.core.model.Direction
 import org.sakshi.core.model.EpistemicStatus
 import org.sakshi.core.model.Event
@@ -168,7 +178,6 @@ private fun locale(): Locale = LocalConfiguration.current.locales[0]
 
 @Composable
 private fun SavedSection(state: EventReviewState, event: Event, zone: ZoneId, onOpenPicture: () -> Unit) {
-    var explainFingerprint by remember { mutableStateOf(false) }
     val body = state.body
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         ScreenTitle(stringResource(R.string.review_saved_heading))
@@ -190,17 +199,21 @@ private fun SavedSection(state: EventReviewState, event: Event, zone: ZoneId, on
                 }
             }
         }
-        LabelValue(stringResource(R.string.review_source_label), stringResource(sourceWords(event.source.kind)))
         val reading = readTime(event.timestamp)
-        LabelValue(
-            stringResource(R.string.review_time_label),
-            dateTimeText(reading.label, zone, locale()).text() +
-                if (reading.label is TimeLabel.Unknown) "" else ", " + basisText(reading.basis).text(),
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
+            LabelValue(stringResource(R.string.review_source_label), stringResource(sourceWords(event.source.kind)), Modifier.weight(1f))
+            LabelValue(
+                stringResource(R.string.review_time_label),
+                dateTimeText(reading.label, zone, locale()).text() +
+                    if (reading.label is TimeLabel.Unknown) "" else ", " + basisText(reading.basis).text(),
+                Modifier.weight(1f),
+            )
+        }
         event.evidenceReferences.firstOrNull()?.sha256?.let { hash ->
             LabelValue(stringResource(R.string.review_fingerprint_label), hash.take(FINGERPRINT_CHARS))
-            QuietTextButton(stringResource(R.string.review_fingerprint_what), { explainFingerprint = !explainFingerprint })
-            if (explainFingerprint) SupportingText(stringResource(R.string.review_fingerprint_explained))
+            MoreInfo(stringResource(R.string.review_fingerprint_what)) {
+                SupportingText(stringResource(R.string.review_fingerprint_explained))
+            }
         }
     }
 }
@@ -229,18 +242,22 @@ private fun markedBody(body: String, marks: List<CueMark>): AnnotatedString = bu
 private fun WhoAndWhenSection(state: EventReviewState, event: Event, actions: EventReviewActions) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         ScreenTitle(stringResource(R.string.review_who_heading))
-        val sender = event.sender.displayLabel ?: stringResource(R.string.sender_none)
-        val status = if (event.sender.associationReview == AssociationReview.CONFIRMED && event.sender.actorId != null) {
-            val person = state.people.firstOrNull { it.id == event.sender.actorId }?.displayLabel
-            if (person != null) stringResource(R.string.sender_confirmed_as, person) else stringResource(R.string.sender_confirmed)
-        } else {
-            stringResource(R.string.sender_not_confirmed)
+        val confirmed = event.sender.associationReview == AssociationReview.CONFIRMED && event.sender.actorId != null
+        val person = if (confirmed) state.people.firstOrNull { it.id == event.sender.actorId }?.displayLabel else null
+        Text(event.sender.displayLabel ?: stringResource(R.string.sender_none), style = MaterialTheme.typography.titleSmall)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            when {
+                person != null -> StatusChip(stringResource(R.string.sender_confirmed_as, person), tone = Tone.Success, icon = Icons.Default.Check)
+                confirmed -> StatusChip(stringResource(R.string.sender_confirmed), tone = Tone.Success, icon = Icons.Default.Check)
+                else -> StatusChip(stringResource(R.string.sender_not_confirmed))
+            }
+            StatusChip(directionText(event.direction).text())
         }
-        LabelValue(stringResource(R.string.review_sender_label), "$sender ($status)")
-        LabelValue(stringResource(R.string.review_direction_label), directionText(event.direction).text())
-        state.senderClaim?.let { claim -> SecondaryButton(stringResource(R.string.review_this_is), { actions.openWhoIsWho(claim) }, Modifier.fillMaxWidth()) }
-        SecondaryButton(stringResource(R.string.review_from_me), { actions.setDirection(Direction.OUTGOING) }, Modifier.fillMaxWidth())
-        SecondaryButton(stringResource(R.string.review_to_me), { actions.setDirection(Direction.INCOMING) }, Modifier.fillMaxWidth())
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            state.senderClaim?.let { claim -> SecondaryButton(stringResource(R.string.review_this_is), { actions.openWhoIsWho(claim) }) }
+            SecondaryButton(stringResource(R.string.review_from_me), { actions.setDirection(Direction.OUTGOING) })
+            SecondaryButton(stringResource(R.string.review_to_me), { actions.setDirection(Direction.INCOMING) })
+        }
         if (event.direction != Direction.OUTGOING) WantednessActions(event, actions)
     }
 }
@@ -254,10 +271,12 @@ private fun WantednessActions(event: Event, actions: EventReviewActions) {
         UnwantedContact.UNKNOWN, UnwantedContact.NOT_APPLICABLE -> R.string.review_wantedness_none
     }
     LabelValue(stringResource(R.string.review_wantedness_label), stringResource(word))
-    SecondaryButton(stringResource(R.string.review_mark_unwanted), { actions.markWantedness(UnwantedContact.USER_MARKED_UNWANTED) }, Modifier.fillMaxWidth())
-    SecondaryButton(stringResource(R.string.review_mark_wanted), { actions.markWantedness(UnwantedContact.USER_MARKED_WANTED) }, Modifier.fillMaxWidth())
-    if (current == UnwantedContact.USER_MARKED_UNWANTED || current == UnwantedContact.USER_MARKED_WANTED) {
-        QuietTextButton(stringResource(R.string.review_clear_wantedness), { actions.markWantedness(UnwantedContact.UNKNOWN) })
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        SecondaryButton(stringResource(R.string.review_mark_unwanted), { actions.markWantedness(UnwantedContact.USER_MARKED_UNWANTED) })
+        SecondaryButton(stringResource(R.string.review_mark_wanted), { actions.markWantedness(UnwantedContact.USER_MARKED_WANTED) })
+        if (current == UnwantedContact.USER_MARKED_UNWANTED || current == UnwantedContact.USER_MARKED_WANTED) {
+            QuietTextButton(stringResource(R.string.review_clear_wantedness), { actions.markWantedness(UnwantedContact.UNKNOWN) })
+        }
     }
 }
 
@@ -268,7 +287,7 @@ private fun SuggestionsSection(state: EventReviewState, actions: EventReviewActi
         if (state.categories.isEmpty()) SupportingText(stringResource(R.string.review_no_cue))
         state.threatAnalysis?.let { run -> ThreatAnalysisStatus(run) }
         state.categories.forEach { view -> CategoryCard(view, actions, onDisagree = { onDialog(ReviewDialog.Disagree(view.index)) }) }
-        SecondaryButton(stringResource(R.string.review_add_tag), { onDialog(ReviewDialog.OwnTag) }, Modifier.fillMaxWidth())
+        SecondaryButton(stringResource(R.string.review_add_tag), { onDialog(ReviewDialog.OwnTag) })
     }
 }
 
@@ -288,14 +307,23 @@ private fun ThreatAnalysisStatus(run: ThreatAnalysisRunEntity) {
     StatusNote(NoteKind.Caution, stringResource(copy))
 }
 
+/**
+ * One suggestion or tag as a card: its epistemic label and state, the category as the title, the matched words, and
+ * Agree, Disagree and Not sure for a suggestion. What a word-list match cannot do is behind one disclosure.
+ */
 @Composable
 private fun CategoryCard(view: CategoryView, actions: EventReviewActions, onDisagree: () -> Unit) {
     SakshiCard {
         Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            if (view.isOwnTag) {
-                Text(stringResource(R.string.review_your_tag), style = MaterialTheme.typography.labelLarge)
-            } else {
-                EpistemicLabel(EpistemicStatus.INFERRED)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Box(Modifier.weight(1f)) {
+                    if (view.isOwnTag) {
+                        Text(stringResource(R.string.review_your_tag), style = MaterialTheme.typography.labelLarge)
+                    } else {
+                        EpistemicLabel(EpistemicStatus.INFERRED)
+                    }
+                }
+                if (!view.isOwnTag) ReviewStatusChip(view.category.reviewStatus)
             }
             val label = if (
                 view.category.label == CategoryLabel.EXPLICIT_THREAT &&
@@ -305,17 +333,29 @@ private fun CategoryCard(view: CategoryView, actions: EventReviewActions, onDisa
             } else {
                 categoryLabelText(view.category.label).text()
             }
-            Text(label, style = MaterialTheme.typography.titleSmall)
-            SupportingText(categoryBasisText(view.category.basis, view.cues.map { it.quote }).text())
-            Text(reviewStatusText(view.category.reviewStatus).text(), style = MaterialTheme.typography.bodyMedium)
+            Text(label, style = MaterialTheme.typography.titleMedium)
             if (!view.isOwnTag) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    SecondaryButton(stringResource(R.string.review_agree), { actions.agree(view.index) }, Modifier.weight(1f))
-                    SecondaryButton(stringResource(R.string.review_disagree), onDisagree, Modifier.weight(1f))
-                    SecondaryButton(stringResource(R.string.review_not_sure), { actions.notSure(view.index) }, Modifier.weight(1f))
+                SupportingText(categoryBasisText(view.category.basis, view.cues.map { it.quote }).text())
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    PrimaryButton(stringResource(R.string.review_agree), { actions.agree(view.index) }, icon = Icons.Default.Check)
+                    SecondaryButton(stringResource(R.string.review_disagree), onDisagree)
+                    SecondaryButton(stringResource(R.string.review_not_sure), { actions.notSure(view.index) })
+                }
+                if (view.category.basis == org.sakshi.core.model.CategoryBasis.RULE_SUGGESTION) {
+                    MoreInfo(stringResource(R.string.review_suggestion_more)) { SupportingText(stringResource(R.string.review_list_limits)) }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ReviewStatusChip(status: CategoryReviewStatus) {
+    val text = reviewStatusText(status).text()
+    when (status) {
+        CategoryReviewStatus.UNREVIEWED -> StatusChip(text, tone = Tone.Warning, icon = Icons.Default.Warning)
+        CategoryReviewStatus.ACCEPTED -> StatusChip(text, tone = Tone.Success, icon = Icons.Default.Check)
+        CategoryReviewStatus.REJECTED, CategoryReviewStatus.UNCERTAIN -> StatusChip(text)
     }
 }
 
@@ -327,8 +367,8 @@ private fun BoundarySection(state: EventReviewState, actions: EventReviewActions
         ScreenTitle(stringResource(R.string.review_boundary_heading))
         SupportingText(stringResource(R.string.review_boundary_body))
         if (people.isEmpty()) {
-            StatusNote(NoteKind.Info, stringResource(R.string.review_boundary_need_person))
-            SecondaryButton(stringResource(R.string.review_open_who), { actions.openWhoIsWho(state.senderClaim) }, Modifier.fillMaxWidth())
+            SupportingText(stringResource(R.string.review_boundary_need_person))
+            SecondaryButton(stringResource(R.string.review_open_who), { actions.openWhoIsWho(state.senderClaim) })
         } else {
             SectionHeader(stringResource(R.string.review_boundary_person))
             Column(Modifier.selectableGroup()) {
@@ -362,8 +402,9 @@ private fun HistorySection(state: EventReviewState, zone: ZoneId) {
             val whenText = line.at?.let { formatDayTime(it, zone, locale) } ?: stringResource(R.string.time_unknown)
             Column(Modifier.fillMaxWidth()) {
                 Text(line.text.text(), style = MaterialTheme.typography.bodyMedium)
-                line.reason?.let { SupportingText(stringResource(R.string.review_history_reason, it.text())) }
-                SupportingText(whenText)
+                SupportingText(
+                    listOfNotNull(line.reason?.let { stringResource(R.string.review_history_reason, it.text()) }, whenText).joinToString(", "),
+                )
             }
         }
     }
@@ -379,7 +420,6 @@ private fun DisagreeDialog(onChoose: (String) -> Unit, onDismiss: () -> Unit) {
         onDismiss = onDismiss,
         confirmEnabled = reason != null,
     ) {
-        SupportingText(stringResource(R.string.review_disagree_body))
         Column(Modifier.selectableGroup()) {
             DISAGREE_REASONS.forEach { code -> RadioRow(reasonText(code).text(), selected = reason == code, onSelect = { reason = code }) }
         }

@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,16 +24,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
 import org.sakshi.app.session.FailureReason
 import org.sakshi.app.session.SessionState
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.PrimaryButton
+import org.sakshi.app.ui.components.SakshiBrandLogo
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.theme.Spacing
 
-/** Shown for every state except [SessionState.Unlocked]. Centred and minimal; the app name is small. */
+private val LOGO_SIZE = 64.dp
+
+/** Shown for every state except [SessionState.Unlocked]. Centred and minimal: the logo and a short title. */
 @Composable
 fun LockScreen(
     state: SessionState,
@@ -46,27 +54,25 @@ fun LockScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.lg),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                SakshiBrandLogo(size = LOGO_SIZE)
                 when (state) {
-                    SessionState.Locked -> Message(R.string.lock_title, R.string.lock_body) {
+                    SessionState.Locked -> Message(R.string.lock_title, null) {
                         if (sharePending) StatusNote(NoteKind.Info, stringResource(R.string.lock_share_pending))
                         if (notCompleted) StatusNote(NoteKind.Info, stringResource(R.string.lock_not_completed))
-                        PrimaryButton(stringResource(R.string.lock_unlock), onUnlock)
+                        PrimaryButton(stringResource(R.string.lock_unlock), onUnlock, icon = Icons.Default.Lock)
                     }
-                    SessionState.Unlocking -> Message(R.string.lock_title, R.string.lock_unlocking) { CircularProgressIndicator() }
+                    SessionState.Unlocking -> Message(R.string.lock_unlocking, null) { CircularProgressIndicator() }
                     SessionState.NoDeviceLock -> Message(R.string.no_lock_title, R.string.no_lock_body) {
                         val context = LocalContext.current
-                        PrimaryButton(stringResource(R.string.no_lock_open_settings), {
-                            context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                        })
+                        PrimaryButton(
+                            stringResource(R.string.no_lock_open_settings),
+                            { context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) },
+                            icon = Icons.Default.Settings,
+                        )
                     }
                     SessionState.KeyInvalidated -> Message(R.string.invalidated_title, R.string.invalidated_body) {}
                     is SessionState.Failed -> Message(R.string.failed_title, failureBody(state.reason)) {
-                        PrimaryButton(stringResource(R.string.failed_retry), onRetry)
+                        PrimaryButton(stringResource(R.string.failed_retry), onRetry, icon = Icons.Default.Refresh)
                     }
                     is SessionState.Unlocked -> Unit
                 }
@@ -81,13 +87,13 @@ private fun failureBody(reason: FailureReason): Int = when (reason) {
 }
 
 @Composable
-private fun Message(title: Int, body: Int, extra: @Composable () -> Unit) {
+private fun Message(title: Int, body: Int?, extra: @Composable () -> Unit) {
     Text(
         stringResource(title),
         style = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center,
         modifier = Modifier.semantics { heading() },
     )
-    Text(stringResource(body), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
+    if (body != null) Text(stringResource(body), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
     extra()
 }

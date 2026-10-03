@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="analysis_refused_no_speech">No speech was found that this phone could read. This does not mean nothing was said. The recording is kept as received.</string>
-    <string name="analysis_refused_audio_too_long">This recording is longer than 60 seconds, which is the most this version reads. It is kept as received.</string>
-    <string name="analysis_refused_audio_not_decodable">This recording could not be opened on this phone, so no speech was read. It is kept as received.</string>
-    <string name="analysis_refused_speech_model_unavailable">Speech recognition is not ready on this phone yet. The recording is kept as received.</string>
-    <string name="analysis_refused_transcription_failed">Reading the speech in this recording stopped before it finished. The recording is kept as received. You can try again.</string>
-    <string name="analysis_warn_audio_may_contain_errors">The words were written down from speech by software on this phone. They can contain mistakes, and they are not a translation. Listen to the recording and compare.</string>
+    <string name="analysis_refused_no_speech">No speech could be read. This does not mean nothing was said. The recording is kept as received.</string>
+    <string name="analysis_refused_audio_too_long">This recording is over 60 seconds, the most this version reads. It is kept as received.</string>
+    <string name="analysis_refused_audio_not_decodable">This recording could not be opened, so no speech was read. It is kept as received.</string>
+    <string name="analysis_refused_speech_model_unavailable">Speech recognition is not ready yet. The recording is kept as received.</string>
+    <string name="analysis_refused_transcription_failed">Reading the speech stopped. The recording is kept as received. You can try again.</string>
+    <string name="analysis_warn_audio_may_contain_errors">Speech was written down by software and can contain mistakes. Listen and compare.</string>
     <plurals name="analysis_warn_audio_low_confidence">
-        <item quantity="one">%1$d part of the speech was hard to make out, so its words may be wrong. Check it against the recording.</item>
-        <item quantity="other">%1$d parts of the speech were hard to make out, so their words may be wrong. Check them against the recording.</item>
+        <item quantity="one">%1$d part of the speech was hard to make out and may be wrong. Compare it with the recording.</item>
+        <item quantity="other">%1$d parts of the speech were hard to make out and may be wrong. Compare them with the recording.</item>
     </plurals>
     <string name="speech_setup_title">Prepare speech recognition</string>
-    <string name="speech_setup_body">To read speech in recordings, this phone needs a speech model file. You choose it once from the files on this phone. The file stays on this phone, and Sakshi downloads nothing.</string>
-    <string name="speech_setup_choose">Choose the speech model file</string>
-    <string name="speech_setup_installing">Copying and checking the speech model file</string>
-    <string name="speech_setup_ready">Speech recognition is ready. Analyse the recording again.</string>
-    <string name="speech_setup_analyse_again">Analyse the recording again</string>
-    <string name="speech_setup_wrong_file">This is not the speech model file Sakshi expects. Nothing was changed.</string>
-    <string name="speech_setup_too_large">This file is larger than the speech model file Sakshi expects. Nothing was changed.</string>
-    <string name="speech_setup_failed">The file could not be copied. Nothing was changed. You can choose it again.</string>
+    <string name="speech_setup_body">Choose the speech model file once. It stays on this phone and nothing is downloaded.</string>
+    <string name="speech_setup_choose">Choose model file</string>
+    <string name="speech_setup_installing">Checking the speech model file</string>
+    <string name="speech_setup_ready">Speech recognition is ready.</string>
+    <string name="speech_setup_analyse_again">Analyse again</string>
+    <string name="speech_setup_wrong_file">Not the expected speech model file. Nothing was changed.</string>
+    <string name="speech_setup_too_large">Larger than the expected speech model file. Nothing was changed.</string>
+    <string name="speech_setup_failed">The file could not be copied. Nothing was changed. Choose it again.</string>
 </resources>

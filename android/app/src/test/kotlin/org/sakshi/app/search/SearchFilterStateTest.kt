@@ -134,8 +134,8 @@ class SearchFilterStateTest {
             resources,
         )
         assertEquals(
-            "Filters: Only messages with a tag you agreed with or added; person: Synthetic Sam; " +
-                "from: A chat export you saved, A note you wrote; dates: 03/10/2026 to 05/10/2026",
+            "Filters: Messages with an agreed tag; person: Synthetic Sam; " +
+                "from: Chat export, Your note; dates: 03/10/2026 to 05/10/2026",
             summary,
         )
     }
@@ -159,7 +159,7 @@ class SearchFilterStateTest {
         ).map(resources::getString)
         words.forEach { assertFalse(ForbiddenWords.hasDash(it), it) }
         assertEquals(
-            "With these filters, text and notes that have not been turned into messages yet, and messages without a known time, are not shown.",
+            "Text and notes not yet turned into messages, and messages without a known time, are not shown. Both end days are included, in this phone's time zone.",
             resources.getString(R.string.search_filters_note_dates),
         )
     }

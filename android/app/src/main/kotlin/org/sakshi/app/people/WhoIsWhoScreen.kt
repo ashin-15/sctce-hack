@@ -3,14 +3,19 @@ package org.sakshi.app.people
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -32,6 +39,7 @@ import org.sakshi.app.timeline.formatDay
 import org.sakshi.app.ui.components.ConfirmDialog
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.FormDialog
+import org.sakshi.app.ui.components.IconTile
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.RadioRow
@@ -40,8 +48,10 @@ import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.ActorId
@@ -129,7 +139,7 @@ private fun Content(state: WhoIsWhoState, zone: ZoneId, actions: WhoIsWhoActions
         contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        item(key = "statement") { StatusNote(NoteKind.Info, stringResource(R.string.people_statement)) }
+        item(key = "statement") { SupportingText(stringResource(R.string.people_statement)) }
         item(key = "claims-heading") { SectionHeader(stringResource(R.string.people_claims_heading), Modifier.padding(top = Spacing.sm)) }
         if (state.claims.isEmpty()) {
             item(key = "claims-empty") { EmptyState(stringResource(R.string.people_claims_empty_title), stringResource(R.string.people_claims_empty_body)) }
@@ -139,7 +149,7 @@ private fun Content(state: WhoIsWhoState, zone: ZoneId, actions: WhoIsWhoActions
         }
         if (state.people.isNotEmpty()) {
             item(key = "people-heading") { SectionHeader(stringResource(R.string.people_named_heading), Modifier.padding(top = Spacing.md)) }
-            items(state.people, key = { "person-${it.id.value}" }) { person -> Text(person.displayLabel, style = MaterialTheme.typography.bodyLarge) }
+            items(state.people, key = { "person-${it.id.value}" }) { person -> PersonRow(person.displayLabel) }
         }
         if (state.assignments.isNotEmpty()) {
             item(key = "linked-heading") { SectionHeader(stringResource(R.string.people_linked_heading), Modifier.padding(top = Spacing.md)) }
@@ -164,16 +174,39 @@ private fun sourceLine(kind: SourceKind, savedAt: Instant?, zone: ZoneId, locale
 }
 
 @Composable
+private fun PersonRow(name: String) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = Spacing.touchTarget).semantics(mergeDescendants = true) { },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        IconTile(Icons.Default.Person, size = PERSON_TILE_SIZE)
+        Text(name, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+private val PERSON_TILE_SIZE = 32.dp
+
+@Composable
 private fun ClaimCard(claim: SenderClaimView, zone: ZoneId, locale: Locale, actions: WhoIsWhoActions, onName: () -> Unit) {
     SakshiCard {
         Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            if (claim.focused) SupportingText(stringResource(R.string.people_focused))
-            Text(claim.selector.displayLabel.orEmpty(), style = MaterialTheme.typography.titleSmall)
-            SupportingText(sourceLine(claim.sourceKind, claim.savedAt, zone, locale))
-            Text(pluralStringResource(R.plurals.people_message_count, claim.messageCount, claim.messageCount), style = MaterialTheme.typography.bodyMedium)
-            if (claim.markedOwn) Text(stringResource(R.string.people_marked_own), style = MaterialTheme.typography.bodyMedium)
-            SecondaryButton(stringResource(R.string.people_this_is_me), { actions.markOwn(claim.selector) }, Modifier.fillMaxWidth())
-            SecondaryButton(stringResource(R.string.people_name_person), onName, Modifier.fillMaxWidth())
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                IconTile(Icons.Default.Person, tone = if (claim.markedOwn) Tone.Success else Tone.Brand)
+                Column(Modifier.weight(1f)) {
+                    Text(claim.selector.displayLabel.orEmpty(), style = MaterialTheme.typography.titleSmall)
+                    SupportingText(sourceLine(claim.sourceKind, claim.savedAt, zone, locale))
+                }
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                StatusChip(pluralStringResource(R.plurals.people_message_count, claim.messageCount, claim.messageCount))
+                if (claim.markedOwn) StatusChip(stringResource(R.string.people_marked_own), tone = Tone.Success, icon = Icons.Default.Check)
+                if (claim.focused) StatusChip(stringResource(R.string.people_focused), tone = Tone.Brand)
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                SecondaryButton(stringResource(R.string.people_this_is_me), { actions.markOwn(claim.selector) })
+                SecondaryButton(stringResource(R.string.people_name_person), onName)
+            }
         }
     }
 }
@@ -182,10 +215,17 @@ private fun ClaimCard(claim: SenderClaimView, zone: ZoneId, locale: Locale, acti
 private fun LinkCard(link: AssignmentView, zone: ZoneId, locale: Locale, onUndo: () -> Unit) {
     SakshiCard {
         Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            Text(stringResource(R.string.people_linked_line, link.selector.displayLabel.orEmpty(), link.personLabel), style = MaterialTheme.typography.titleSmall)
-            SupportingText(sourceLine(link.sourceKind, link.savedAt, zone, locale))
-            Text(pluralStringResource(R.plurals.people_message_count, link.eventIds.size, link.eventIds.size), style = MaterialTheme.typography.bodyMedium)
-            SecondaryButton(stringResource(R.string.people_undo), onUndo, Modifier.fillMaxWidth())
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                IconTile(Icons.Default.Person)
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.people_linked_line, link.selector.displayLabel.orEmpty(), link.personLabel), style = MaterialTheme.typography.titleSmall)
+                    SupportingText(sourceLine(link.sourceKind, link.savedAt, zone, locale))
+                }
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                StatusChip(pluralStringResource(R.plurals.people_message_count, link.eventIds.size, link.eventIds.size))
+            }
+            SecondaryButton(stringResource(R.string.people_undo), onUndo)
         }
     }
 }

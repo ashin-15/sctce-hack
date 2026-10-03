@@ -195,7 +195,7 @@ class AnalysisViewModelTest : AnalysisTestBase() {
     fun warningsAreSaidInWords() {
         val language = warningText(AnalysisWarning.UNSUPPORTED_LANGUAGE_PRESENT, 1).resolve(context.resources)
         assertEquals(
-            "Some messages are in a language or script this version cannot analyse. They are kept and shown, with no suggestions.",
+            "Some messages are in a language this version cannot analyse. They are kept, with no suggestions.",
             language,
         )
         val texts = AnalysisWarning.entries.map { warningText(it, 2).resolve(context.resources) }

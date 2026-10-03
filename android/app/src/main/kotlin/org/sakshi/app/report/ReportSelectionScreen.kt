@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,8 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import java.time.ZoneId
 import java.util.Locale
 import org.sakshi.app.R
@@ -32,19 +36,19 @@ import org.sakshi.app.analysis.ZonePicker
 import org.sakshi.app.evidence.kindText
 import org.sakshi.app.timeline.dateTimeText
 import org.sakshi.app.timeline.senderLine
-import org.sakshi.app.ui.components.CheckRow
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.PrimaryButton
-import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
-import org.sakshi.app.ui.components.SecondaryButton
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.components.SwitchRow
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.formatByteSize
 import org.sakshi.app.ui.text
 import org.sakshi.app.ui.theme.Spacing
@@ -89,8 +93,18 @@ fun ReportSelectionScreen(state: ReportUiState, actions: ReportSelectionActions,
 
 @Composable
 private fun PreviewBar(enabled: Boolean, onPreview: () -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = Spacing.gutter, vertical = Spacing.md)) {
-        PrimaryButton(stringResource(R.string.report_preview_action), onPreview, enabled = enabled)
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = Spacing.gutter, vertical = Spacing.md),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        SupportingText(stringResource(R.string.report_export_line))
+        PrimaryButton(
+            stringResource(R.string.report_preview_action),
+            onPreview,
+            Modifier.fillMaxWidth(),
+            enabled = enabled,
+            icon = ImageVector.vectorResource(R.drawable.ic_document),
+        )
     }
 }
 
@@ -102,11 +116,9 @@ private fun Content(state: ReportUiState, actions: ReportSelectionActions, onCha
         contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        item(key = "intro") { SupportingText(stringResource(R.string.report_select_intro)) }
         state.earlierExport?.let { earlier ->
             item(key = "earlier") { StatusNote(NoteKind.Info, ExportHistoryMapping.notice(earlier, state.zone, locale).text()) }
         }
-        item(key = "messages-heading") { SectionHeader(stringResource(R.string.report_messages_heading), Modifier.padding(top = Spacing.sm)) }
         if (state.rows.isEmpty()) {
             item(key = "empty") { EmptyState(stringResource(R.string.report_empty_title), stringResource(R.string.report_empty_body)) }
         } else {
@@ -115,29 +127,39 @@ private fun Content(state: ReportUiState, actions: ReportSelectionActions, onCha
                 EventChoice(row, checked = row.eventId in state.selected, zone = state.zone, locale = locale) { actions.toggle(row.eventId) }
             }
         }
-        item(key = "unreviewed") { UnreviewedSection(state.includeUnreviewed, actions.setUnreviewed) }
-        item(key = "originals-heading") { SectionHeader(stringResource(R.string.report_originals_heading), Modifier.padding(top = Spacing.md)) }
-        if (state.originals.isEmpty()) {
-            item(key = "originals-none") { SupportingText(stringResource(R.string.report_originals_none)) }
-        } else {
-            item(key = "originals-note") { SupportingText(stringResource(R.string.report_originals_note)) }
-            items(state.originals, key = { "original-${it.evidenceId}" }) { original -> OriginalChoiceRow(original, locale) { actions.toggleOriginal(original.evidenceId) } }
+        item(key = "options-heading") { SectionHeader(stringResource(R.string.report_options_heading), Modifier.padding(top = Spacing.sm)) }
+        item(key = "unreviewed") { SwitchCard(stringResource(R.string.report_unreviewed_switch), state.includeUnreviewed, actions.setUnreviewed) }
+        items(state.originals, key = { "original-${it.evidenceId}" }) { original ->
+            SwitchCard(
+                stringResource(R.string.report_original_switch, kindText(original.kind), formatByteSize(original.byteSize, locale)),
+                original.included,
+            ) { actions.toggleOriginal(original.evidenceId) }
         }
-        item(key = "zone") { ZoneSection(state.zone, onChangeZone) }
-        item(key = "limits") { LimitsBlock() }
+        item(key = "zone") { ZoneRow(state.zone, onChangeZone) }
+        item(key = "limits") { LimitsBlock(hasOriginals = state.originals.isNotEmpty()) }
     }
 }
 
 @Composable
 private fun CountAndHelpers(state: ReportUiState, actions: ReportSelectionActions) {
-    Column {
-        SupportingText(stringResource(R.string.report_selected_count, state.selected.size, state.selectableCount))
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        SectionHeader(stringResource(R.string.report_messages_heading))
+        Text(
+            stringResource(R.string.report_selected_count, state.selected.size, state.selectableCount),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            QuietTextButton(stringResource(R.string.report_select_all), actions.selectAll)
-            QuietTextButton(stringResource(R.string.report_select_none), actions.selectNone)
+            ShortcutChip(stringResource(R.string.report_select_all), actions.selectAll)
+            ShortcutChip(stringResource(R.string.report_select_none), actions.selectNone)
+            ShortcutChip(stringResource(R.string.report_select_tagged), actions.selectTagged)
         }
-        QuietTextButton(stringResource(R.string.report_select_tagged), actions.selectTagged)
     }
+}
+
+@Composable
+private fun ShortcutChip(label: String, onClick: () -> Unit) {
+    AssistChip(onClick = onClick, label = { Text(label) })
 }
 
 @Composable
@@ -146,57 +168,62 @@ private fun EventChoice(row: ReportEventRow, checked: Boolean, zone: ZoneId, loc
         Row(
             Modifier.fillMaxWidth().heightIn(min = Spacing.touchTarget)
                 .toggleable(value = checked, enabled = row.selectable, role = Role.Checkbox, onValueChange = { onToggle() })
-                .padding(Spacing.md),
-            verticalAlignment = Alignment.Top,
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(checked = checked, onCheckedChange = null, enabled = row.selectable)
             Column(Modifier.padding(start = Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                Text(dateTimeText(row.row.time.label, zone, locale).text(), style = MaterialTheme.typography.titleSmall)
-                Text(senderLine(row.row), style = MaterialTheme.typography.bodyMedium)
-                Text(ReportRows.previewText(row.row.body).text(), style = MaterialTheme.typography.bodyLarge)
-                row.reason?.let { SupportingText(ReportRows.blockText(it).text()) }
+                Text(
+                    dateTimeText(row.row.time.label, zone, locale).text() + " · " + senderLine(row.row),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    ReportRows.previewText(row.row.body).text(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = PREVIEW_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                row.reason?.let { StatusChip(ReportRows.blockText(it).text(), tone = Tone.Warning) }
             }
         }
     }
 }
 
-@Composable
-private fun UnreviewedSection(include: Boolean, onChange: (Boolean) -> Unit) {
-    Column(Modifier.padding(top = Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        SectionHeader(stringResource(R.string.report_unreviewed_heading))
-        SwitchRow(stringResource(R.string.report_unreviewed_switch), include, onChange)
-        SupportingText(stringResource(R.string.report_unreviewed_note))
-    }
-}
+private const val PREVIEW_LINES = 2
 
 @Composable
-private fun OriginalChoiceRow(original: OriginalChoice, locale: Locale, onToggle: () -> Unit) {
+private fun SwitchCard(text: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     SakshiCard {
-        Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            CheckRow(stringResource(R.string.report_original_include), original.included, onToggle)
-            SupportingText(stringResource(R.string.report_original_detail, kindText(original.kind), formatByteSize(original.byteSize, locale)))
-            StatusNote(NoteKind.Caution, stringResource(R.string.report_original_caution))
+        SwitchRow(text, checked, onChange, Modifier.padding(horizontal = Spacing.md))
+    }
+}
+
+@Composable
+private fun ZoneRow(zone: ZoneId, onChange: () -> Unit) {
+    SakshiCard {
+        Row(
+            Modifier.fillMaxWidth().padding(start = Spacing.md, end = Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(R.string.report_zone_current, zone.id), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            ShortcutChip(stringResource(R.string.analysis_zone_change), onChange)
         }
     }
 }
 
 @Composable
-private fun ZoneSection(zone: ZoneId, onChange: () -> Unit) {
-    Column(Modifier.padding(top = Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        SectionHeader(stringResource(R.string.report_zone_heading))
-        Text(stringResource(R.string.report_zone_current, zone.id), style = MaterialTheme.typography.bodyLarge)
-        SecondaryButton(stringResource(R.string.analysis_zone_change), onChange)
-    }
-}
-
-@Composable
-private fun LimitsBlock() {
-    Column(Modifier.padding(top = Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        SectionHeader(stringResource(R.string.report_limits_heading))
-        EpistemicBlock(EpistemicStatus.UNKNOWN) {
-            listOf(R.string.report_limit_saved, R.string.report_limit_sender, R.string.report_limit_real, R.string.report_limit_time).forEach {
-                Text(stringResource(it), style = MaterialTheme.typography.bodyLarge)
+private fun LimitsBlock(hasOriginals: Boolean) {
+    MoreInfo(stringResource(R.string.report_limits_heading)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            EpistemicBlock(EpistemicStatus.UNKNOWN) {
+                listOf(R.string.report_limit_saved, R.string.report_limit_sender, R.string.report_limit_real, R.string.report_limit_time).forEach {
+                    Text(stringResource(it), style = MaterialTheme.typography.bodyMedium)
+                }
             }
+            SupportingText(stringResource(R.string.report_unreviewed_note))
+            if (hasOriginals) SupportingText(stringResource(R.string.report_original_caution))
+            SupportingText(stringResource(R.string.export_caution_control))
         }
     }
 }

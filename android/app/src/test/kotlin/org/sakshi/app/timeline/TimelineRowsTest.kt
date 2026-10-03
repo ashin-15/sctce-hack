@@ -188,7 +188,7 @@ class TimelineRowsTest : AnalysisTestBase() {
         val media = rows.single { it.body == BodyView.MediaOmitted }
         assertEquals(Direction.INCOMING, media.direction)
         val words = context.getString(org.sakshi.app.R.string.body_media_omitted)
-        assertEquals("Text not available: the export says media was omitted", words)
+        assertEquals("No text: the export says media was omitted", words)
     }
 
     @Test
@@ -234,10 +234,10 @@ class TimelineRowsTest : AnalysisTestBase() {
         assertEquals(TimeBasis.SOURCE_CLAIM, reading.basis)
         val clock = timeText(reading.label, kolkata, Locale.US).resolve(context.resources)
         assertTrue(clock.contains("9:03"), clock)
-        assertEquals("as written in the export", basisText(reading.basis).resolve(context.resources))
+        assertEquals("from export", basisText(reading.basis).resolve(context.resources))
         assertEquals("Time not known", timeText(TimeLabel.Unknown, kolkata, Locale.US).resolve(context.resources))
         val dayOnly = timeText(TimeLabel.DayOnly(Instant.parse("2026-09-24T10:00:00Z")), kolkata, Locale.US).resolve(context.resources)
-        assertTrue(dayOnly.contains("time of day not known"), dayOnly)
+        assertTrue(dayOnly.contains("time not known"), dayOnly)
         assertEquals("Period not known", gapPeriodText(null, null, kolkata, Locale.US).resolve(context.resources))
         assertTrue(gapPeriodText(Instant.EPOCH, null, kolkata, Locale.US).resolve(context.resources).startsWith("From"))
         assertTrue(gapPeriodText(null, Instant.EPOCH, kolkata, Locale.US).resolve(context.resources).startsWith("Until"))

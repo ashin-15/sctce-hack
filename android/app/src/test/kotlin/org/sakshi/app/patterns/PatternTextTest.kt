@@ -28,10 +28,10 @@ class PatternTextTest : VaultTestBase() {
     @Test
     fun everyStatusHasItsSentence() {
         val expected = mapOf(
-            AssessmentStatus.SUPPORTED_DESCRIPTION to "Description supported by the selected records",
+            AssessmentStatus.SUPPORTED_DESCRIPTION to "Supported by the records",
             AssessmentStatus.CANDIDATE to "Possible, needs review",
-            AssessmentStatus.INSUFFICIENT_CONTEXT to "Not enough context to say",
-            AssessmentStatus.NOT_OBSERVED to "Not observed in the selected records. This does not mean nothing happened.",
+            AssessmentStatus.INSUFFICIENT_CONTEXT to "Not enough context",
+            AssessmentStatus.NOT_OBSERVED to "Not observed in the records",
         )
         assertEquals(AssessmentStatus.entries.toSet(), expected.keys)
         expected.forEach { (status, sentence) -> assertEquals(sentence, patternStatusText(status).resolve(context.resources)) }
@@ -62,7 +62,7 @@ class PatternTextTest : VaultTestBase() {
     fun everyReviewStateHasPlainWordsAndTheReasonIsAddedToARejection() {
         val resources = context.resources
         assertEquals("Not reviewed yet", patternReviewText(PatternReview.NOT_REVIEWED, null).resolve(resources))
-        assertEquals("You agreed this matches your evidence", patternReviewText(PatternReview.ACCEPTED, null).resolve(resources))
+        assertEquals("You said this matches", patternReviewText(PatternReview.ACCEPTED, null).resolve(resources))
         assertEquals("You said this does not match", patternReviewText(PatternReview.REJECTED, null).resolve(resources))
         assertEquals("You marked this as not sure", patternReviewText(PatternReview.MARKED_UNKNOWN, null).resolve(resources))
         val reasons = mapOf(
@@ -87,6 +87,7 @@ class PatternTextTest : VaultTestBase() {
                 R.string.patterns_accept, R.string.patterns_reject, R.string.patterns_unsure, R.string.patterns_withdraw,
                 R.string.patterns_review_explain, R.string.patterns_review_preview_only, R.string.patterns_refreshing,
                 R.string.patterns_reject_title, R.string.patterns_reject_body, R.string.patterns_reject_no_reason,
+                R.string.patterns_not_observed_limit, R.string.patterns_more, R.string.patterns_footer,
             ).map { resources.getString(it) }
         texts.forEach { text ->
             assertEquals(emptyList(), ForbiddenWords.found(text), text)

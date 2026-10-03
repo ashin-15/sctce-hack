@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +14,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import java.time.ZoneId
@@ -34,10 +41,8 @@ import org.sakshi.app.R
 import org.sakshi.app.review.categoryLabelText
 import org.sakshi.app.review.directionText
 import org.sakshi.app.ui.UiText
-import org.sakshi.app.ui.components.ChoiceButton
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
-import org.sakshi.app.ui.components.EpistemicLabel
 import org.sakshi.app.ui.components.FormDialog
 import org.sakshi.app.ui.components.MenuAction
 import org.sakshi.app.ui.components.NoteKind
@@ -48,8 +53,10 @@ import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.components.TopAction
 import org.sakshi.app.ui.plural
 import org.sakshi.app.ui.res
@@ -85,7 +92,7 @@ fun TimelineScreen(state: TimelineUiState, gapOutcome: GapOutcome, actions: Time
         onBack = actions.back,
         actions = listOf(
             TopAction(stringResource(R.string.action_search), actions.openSearch, icon = Icons.Default.Search),
-            TopAction(stringResource(R.string.timeline_patterns), actions.openPatterns),
+            TopAction(stringResource(R.string.timeline_patterns), actions.openPatterns, icon = ImageVector.vectorResource(R.drawable.ic_pattern)),
         ),
     ) {
         if (state.loaded) Content(state, actions, onAddGap = { addingGap = true })
@@ -134,12 +141,18 @@ private fun Content(state: TimelineUiState, actions: TimelineActions, onAddGap: 
 
 @Composable
 private fun Header(state: TimelineUiState, actions: TimelineActions, onAddGap: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            SupportingText(
-                plural(R.plurals.timeline_count, state.view.total, state.view.total, state.view.needsReview).text(),
+            FlowRow(
                 Modifier.weight(1f),
-            )
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                StatusChip(plural(R.plurals.timeline_chip_total, state.view.total, state.view.total).text())
+                if (state.view.needsReview > 0) {
+                    StatusChip(stringResource(R.string.timeline_chip_review, state.view.needsReview), tone = Tone.Warning)
+                }
+            }
             OverflowMenuButton(
                 stringResource(R.string.timeline_menu_options),
                 listOf(
@@ -148,19 +161,16 @@ private fun Header(state: TimelineUiState, actions: TimelineActions, onAddGap: (
                 ),
             )
         }
-        Row(Modifier.fillMaxWidth().selectableGroup(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            val selectedWord = stringResource(R.string.filter_selected)
+        FlowRow(Modifier.fillMaxWidth().selectableGroup(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             listOf(
                 TimelineFilter.ALL to R.string.filter_all,
                 TimelineFilter.NEEDS_REVIEW to R.string.filter_needs_review,
                 TimelineFilter.TAGGED to R.string.filter_tagged,
             ).forEach { (filter, label) ->
-                ChoiceButton(
-                    stringResource(label),
+                FilterChip(
                     selected = state.filter == filter,
-                    selectedWord = selectedWord,
                     onClick = { actions.setFilter(filter) },
-                    modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(label)) },
                 )
             }
         }
@@ -180,23 +190,66 @@ private fun EventCard(row: TimelineEventRow, zone: ZoneId, locale: Locale, onOpe
     val open = stringResource(R.string.timeline_open_event)
     SakshiCard(Modifier.clickable(onClickLabel = open, role = Role.Button, onClick = onOpen)) {
         Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            TimeLines(row, zone, locale)
-            Text(senderLine(row), style = MaterialTheme.typography.bodyMedium)
+            TimeLine(row, zone, locale)
+            SenderLine(row)
             BodyBlock(row.body)
-            row.tags.forEach { TagLineView(it) }
+            if (row.tags.isNotEmpty()) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    row.tags.forEach { TagLineView(it) }
+                }
+            }
         }
     }
 }
 
+/** The time with where it came from as a small muted suffix; the order note, when there is one, is a chip. */
 @Composable
-private fun TimeLines(row: TimelineEventRow, zone: ZoneId, locale: Locale) {
+private fun TimeLine(row: TimelineEventRow, zone: ZoneId, locale: Locale) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs), modifier = Modifier.semantics(mergeDescendants = true) { }) {
-        Text(timeText(row.time.label, zone, locale).text(), style = MaterialTheme.typography.titleSmall)
-        if (row.time.label !is TimeLabel.Unknown) SupportingText(basisText(row.time.basis).text())
-        if (row.orderNote) SupportingText(stringResource(R.string.timeline_order_note))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Text(
+                timeText(row.time.label, zone, locale).text(),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.alignByBaseline(),
+            )
+            if (row.time.label !is TimeLabel.Unknown) {
+                Text(
+                    basisText(row.time.basis).text(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.alignByBaseline(),
+                )
+            }
+        }
+        if (row.orderNote) StatusChip(stringResource(R.string.timeline_order_note))
     }
 }
 
+/** The sender name as the source gave it, then chips for whether the person confirmed it and the direction. */
+@Composable
+private fun SenderLine(row: TimelineEventRow) {
+    val sender = row.sender
+    val status: Pair<String, Tone>? = when {
+        sender.status == SenderStatus.CONFIRMED && sender.personLabel != null ->
+            stringResource(R.string.sender_confirmed_as, sender.personLabel) to Tone.Success
+        sender.status == SenderStatus.CONFIRMED -> stringResource(R.string.sender_confirmed) to Tone.Success
+        sender.label == null -> null
+        else -> stringResource(R.string.sender_not_confirmed) to Tone.Neutral
+    }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(sender.label ?: stringResource(R.string.sender_none), style = MaterialTheme.typography.bodyMedium)
+        status?.let { (text, tone) ->
+            StatusChip(text, tone = tone, icon = if (tone == Tone.Success) Icons.Default.Check else Icons.Default.Person)
+        }
+        StatusChip(directionText(row.direction).text())
+    }
+}
+
+/** The sender as one plain line, for lists that have no room for chips. */
 @Composable
 internal fun senderLine(row: TimelineEventRow): String {
     val sender = row.sender
@@ -232,18 +285,16 @@ private fun BodyBlock(body: BodyView) {
     }
 }
 
+/** One tag as a chip: a suggestion waiting is a warning, a tag the person agreed with or added is positive. */
 @Composable
 fun TagLineView(line: TagLine, modifier: Modifier = Modifier) {
     val label = categoryLabelText(line.label).text()
     when (line.kind) {
-        TagKind.SUGGESTION -> Row(modifier, horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalAlignment = Alignment.CenterVertically) {
-            EpistemicLabel(EpistemicStatus.INFERRED)
-            Text(stringResource(R.string.tag_needs_review, label), style = MaterialTheme.typography.bodyMedium)
-        }
-        TagKind.ACCEPTED -> Text(stringResource(R.string.tag_accepted, label), modifier, style = MaterialTheme.typography.bodyMedium)
-        TagKind.OWN -> Text(stringResource(R.string.tag_own, label), modifier, style = MaterialTheme.typography.bodyMedium)
-        TagKind.DISAGREED -> Text(stringResource(R.string.tag_disagreed, label), modifier, style = MaterialTheme.typography.bodyMedium)
-        TagKind.NOT_SURE -> Text(stringResource(R.string.tag_not_sure, label), modifier, style = MaterialTheme.typography.bodyMedium)
+        TagKind.SUGGESTION -> StatusChip(stringResource(R.string.tag_needs_review, label), modifier, Tone.Warning, Icons.Default.Warning)
+        TagKind.ACCEPTED -> StatusChip(stringResource(R.string.tag_accepted, label), modifier, Tone.Success, Icons.Default.Check)
+        TagKind.OWN -> StatusChip(stringResource(R.string.tag_own, label), modifier, Tone.Brand, Icons.Default.Person)
+        TagKind.DISAGREED -> StatusChip(stringResource(R.string.tag_disagreed, label), modifier)
+        TagKind.NOT_SURE -> StatusChip(stringResource(R.string.tag_not_sure, label), modifier)
     }
 }
 

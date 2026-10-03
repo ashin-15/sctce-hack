@@ -13,6 +13,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -38,7 +40,6 @@ import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.StatusNote
-import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.EpistemicStatus
 
@@ -69,7 +70,6 @@ fun ManualNoteScreen(state: NoteFormState, actions: NoteActions, modifier: Modif
                 .padding(horizontal = Spacing.gutter, vertical = Spacing.sm),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
-            SupportingText(stringResource(R.string.note_statement))
             EpistemicBlock(EpistemicStatus.USER_REPORTED) {
                 OutlinedTextField(
                     value = state.text,
@@ -82,7 +82,7 @@ fun ManualNoteScreen(state: NoteFormState, actions: NoteActions, modifier: Modif
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            Field(state.incidentTime, actions.setIncidentTime, R.string.note_time_label, R.string.note_time_hint)
+            Field(state.incidentTime, actions.setIncidentTime, R.string.note_time_label, null)
             Field(state.sender, actions.setSender, R.string.note_sender_label, R.string.note_sender_hint)
             Field(state.app, actions.setApp, R.string.note_app_label, null)
             ViewOnceSection(state, actions)
@@ -91,7 +91,7 @@ fun ManualNoteScreen(state: NoteFormState, actions: NoteActions, modifier: Modif
                 StatusNote(NoteKind.Info, stringResource(R.string.note_saving), Modifier.semantics { liveRegion = LiveRegionMode.Polite })
             }
             Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                PrimaryButton(stringResource(R.string.note_save), actions.save, enabled = !state.saving)
+                PrimaryButton(stringResource(R.string.note_save), actions.save, enabled = !state.saving, icon = Icons.Default.Check)
                 QuietTextButton(stringResource(R.string.dialog_cancel), actions.cancel, Modifier.fillMaxWidth(), enabled = !state.saving)
             }
         }

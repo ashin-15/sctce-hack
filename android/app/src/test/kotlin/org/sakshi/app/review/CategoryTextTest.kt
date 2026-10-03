@@ -58,13 +58,22 @@ class CategoryTextTest : VaultTestBase() {
     }
 
     @Test
-    fun theRuleSentenceNamesTheWordsAndTheLimits() {
+    fun theRuleSentenceNamesTheWordsAndTheLimitsAreOneTapAway() {
         val sentence = categoryBasisText(CategoryBasis.RULE_SUGGESTION, listOf("idiot", "worthless")).resolve(context.resources)
+        assertEquals("Words matched a list: 'idiot', 'worthless'", sentence)
+        assertEquals("Words matched a list.", categoryBasisText(CategoryBasis.RULE_SUGGESTION, emptyList()).resolve(context.resources))
         assertEquals(
-            "Suggested because these words matched a list: 'idiot', 'worthless'. The list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.",
-            sentence,
+            "The word list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.",
+            context.getString(org.sakshi.app.R.string.review_list_limits),
         )
-        assertTrue(categoryBasisText(CategoryBasis.RULE_SUGGESTION, emptyList()).resolve(context.resources).contains("not been reviewed"))
+    }
+
+    @Test
+    fun theModelSuggestionsSayTheyCanBeWrong() {
+        listOf(CategoryBasis.CLASSIFIER_SUGGESTION, CategoryBasis.LLM_SUGGESTION).forEach {
+            assertTrue(categoryBasisText(it, emptyList()).resolve(context.resources).contains("can be wrong"))
+        }
+        assertTrue(categoryBasisText(CategoryBasis.CLASSIFIER_SUGGESTION, emptyList()).resolve(context.resources).contains("Uncalibrated"))
     }
 
     @Test

@@ -2,16 +2,22 @@ package org.sakshi.app.importing
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -20,17 +26,18 @@ import org.sakshi.acquisition.importer.AnalysisState
 import org.sakshi.acquisition.importer.ImportReport
 import org.sakshi.acquisition.importer.ItemOutcome
 import org.sakshi.app.R
-import org.sakshi.app.ui.components.NoteKind
+import org.sakshi.app.ui.components.IconTile
 import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.ScreenTitle
-import org.sakshi.app.ui.components.StatusNote
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.theme.Spacing
 
-/** Per-item result of a save, finished or cancelled. Everything is stated as text. */
+/** Per-item result of a save, finished or cancelled. Every outcome is a chip with a word, never colour alone. */
 @Composable
 fun ResultContent(
     cancelled: Boolean,
@@ -51,6 +58,7 @@ fun ResultContent(
                     stringResource(R.string.result_done),
                     { onDone(caseId) },
                     Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.md),
+                    icon = Icons.Default.Check,
                 )
             }
         },
@@ -61,18 +69,14 @@ fun ResultContent(
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
             item(key = "heading") {
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                     val title = if (cancelled) R.string.result_cancelled_title else R.string.result_finished_title
                     ScreenTitle(stringResource(title))
-                    if (cancelled) Text(stringResource(R.string.result_cancelled_body), style = MaterialTheme.typography.bodyLarge)
                     val savedCount = report.outcomes.count { it is ItemOutcome.Saved }
-                    if (report.outcomes.isEmpty() || (cancelled && savedCount == 0)) {
-                        Text(stringResource(R.string.result_nothing_saved), style = MaterialTheme.typography.bodyLarge)
-                    } else if (!cancelled) {
-                        Text(
-                            pluralStringResource(R.plurals.result_summary, report.outcomes.size, savedCount, report.outcomes.size),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                    if (report.outcomes.isEmpty() || savedCount == 0) {
+                        SupportingText(stringResource(R.string.result_nothing_saved))
+                    } else {
+                        SupportingText(pluralStringResource(R.plurals.result_summary, report.outcomes.size, savedCount, report.outcomes.size))
                     }
                 }
             }
@@ -95,31 +99,50 @@ private fun OutcomeRow(outcome: ItemOutcome, label: ItemLabel, onAnalyse: (Strin
         ItemLabel.Unknown -> stringResource(R.string.result_item_unknown, number)
     }
     SakshiCard {
-        Column(
+        Row(
             Modifier.fillMaxWidth().padding(Spacing.md).semantics(mergeDescendants = true) { },
-            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+            verticalAlignment = Alignment.Top,
         ) {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            when (outcome) {
-                is ItemOutcome.Saved -> {
-                    Text(stringResource(R.string.result_saved), style = MaterialTheme.typography.bodyLarge)
-                    val next = when (outcome.analysisState) {
-                        AnalysisState.READY_FOR_TEXT_ANALYSIS -> R.string.result_saved_waiting
-                        AnalysisState.PRESERVED_NOT_ANALYSED -> R.string.result_saved_kept
-                    }
-                    SupportingText(stringResource(next))
-                    if (outcome.duplicateOf.isNotEmpty()) StatusNote(NoteKind.Info, stringResource(R.string.result_duplicate))
-                    if (isAnalysableText(outcome, label)) {
-                        SecondaryButton(stringResource(R.string.result_analyse_now), { onAnalyse(outcome.evidenceId) }, Modifier.padding(top = Spacing.xs))
-                    }
+            val (icon, tone) = when (outcome) {
+                is ItemOutcome.Saved -> Icons.Default.Check to Tone.Success
+                is ItemOutcome.Skipped -> Icons.Default.Warning to Tone.Warning
+                is ItemOutcome.Failed -> Icons.Default.Warning to Tone.Critical
+            }
+            IconTile(icon, tone = tone)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                when (outcome) {
+                    is ItemOutcome.Saved -> SavedDetails(outcome, label, onAnalyse)
+                    is ItemOutcome.Skipped -> NotSaved(rejectionText(outcome.reason), Tone.Warning)
+                    is ItemOutcome.Failed -> NotSaved(failureText(outcome.reason), Tone.Critical)
                 }
-                is ItemOutcome.Skipped ->
-                    StatusNote(NoteKind.Caution, stringResource(R.string.result_not_saved, rejectionText(outcome.reason)))
-                is ItemOutcome.Failed ->
-                    StatusNote(NoteKind.Problem, stringResource(R.string.result_not_saved, failureText(outcome.reason)))
             }
         }
     }
+}
+
+@Composable
+private fun SavedDetails(outcome: ItemOutcome.Saved, label: ItemLabel, onAnalyse: (String) -> Unit) {
+    val next = when (outcome.analysisState) {
+        AnalysisState.READY_FOR_TEXT_ANALYSIS -> R.string.result_saved_waiting
+        AnalysisState.PRESERVED_NOT_ANALYSED -> R.string.result_saved_kept
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.xs), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        StatusChip(stringResource(R.string.result_saved), tone = Tone.Success)
+        if (outcome.duplicateOf.isNotEmpty()) StatusChip(stringResource(R.string.result_duplicate), tone = Tone.Warning)
+        StatusChip(stringResource(next))
+    }
+    if (isAnalysableText(outcome, label)) {
+        SecondaryButton(stringResource(R.string.result_analyse_now), { onAnalyse(outcome.evidenceId) })
+    }
+}
+
+/** The chip says what happened; the reason says why, in one sentence. */
+@Composable
+private fun NotSaved(reason: String, tone: Tone) {
+    StatusChip(stringResource(R.string.result_not_saved_chip), tone = tone)
+    SupportingText(reason)
 }
 
 /**

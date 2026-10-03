@@ -11,7 +11,6 @@ import androidx.compose.ui.res.stringResource
 import org.sakshi.app.R
 import org.sakshi.app.ui.components.ProgressBlock
 import org.sakshi.app.ui.components.SakshiScaffold
-import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.theme.Spacing
 
 @Composable
@@ -27,7 +26,6 @@ fun ProgressContent(state: ImportUiState.Saving, onCancel: () -> Unit, modifier:
                 label = stringResource(R.string.import_saving_progress, state.done, state.total),
                 onCancel = onCancel,
             )
-            SupportingText(stringResource(R.string.import_saving_hint))
         }
     }
 }

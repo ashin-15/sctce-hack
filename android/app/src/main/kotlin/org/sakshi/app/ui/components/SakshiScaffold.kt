@@ -116,7 +116,7 @@ private fun TopRow(
             },
         ).semantics { heading() }
         if (brand) {
-            BrandTitle(title.orEmpty(), subtitle, titleModifier, Modifier.weight(1f))
+            BrandTitle(title.orEmpty(), subtitle, Modifier.weight(1f), titleModifier)
         } else {
             Text(
                 title.orEmpty(),
@@ -164,7 +164,7 @@ private const val HIDE_BADGE_FROM_FONT_SCALE = 1.3f
 
 /** The brand block: logo, [title] over a muted [subtitle], then the local-only badge when there is room. */
 @Composable
-private fun RowScope.BrandTitle(title: String, subtitle: String?, titleModifier: Modifier, modifier: Modifier) {
+private fun RowScope.BrandTitle(title: String, subtitle: String?, modifier: Modifier, titleModifier: Modifier) {
     Spacer(Modifier.width(Spacing.sm))
     SakshiBrandLogo(size = LOGO_SIZE, modifier = Modifier.clearAndSetSemantics { })
     Row(

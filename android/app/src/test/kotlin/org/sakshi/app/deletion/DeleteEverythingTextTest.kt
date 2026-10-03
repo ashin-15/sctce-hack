@@ -19,7 +19,7 @@ class DeleteEverythingTextTest {
         R.string.delete_all_menu, R.string.delete_all_title, R.string.delete_all_removed_heading, R.string.delete_all_removed_cases,
         R.string.delete_all_removed_files, R.string.delete_all_removed_text, R.string.delete_all_removed_answers,
         R.string.delete_all_removed_activity, R.string.delete_all_removed_keys, R.string.delete_all_not_affected,
-        R.string.delete_all_permanent, R.string.delete_all_limit, R.string.delete_all_slow, R.string.delete_all_confirm_word,
+        R.string.delete_all_permanent, R.string.delete_all_limit, R.string.delete_all_more_label, R.string.delete_all_confirm_word,
         R.string.delete_all_field_label, R.string.delete_all_button, R.string.delete_all_running_title,
         R.string.delete_all_running_body, R.string.delete_all_incomplete_title, R.string.delete_all_incomplete_body,
         R.string.delete_all_failed_title, R.string.delete_all_failed_body, R.string.delete_all_retry, R.string.delete_all_done_title,

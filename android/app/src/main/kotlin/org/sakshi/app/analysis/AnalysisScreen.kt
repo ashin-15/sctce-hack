@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,12 +23,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import java.time.ZoneId
 import org.sakshi.app.R
 import org.sakshi.app.ui.components.EpistemicBlock
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.ProgressBlock
@@ -37,6 +41,7 @@ import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.ScreenTitle
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatTile
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.text
@@ -141,7 +146,7 @@ private fun SpeechSetupContent(setup: SpeechSetup, actions: AnalysisActions) {
             }
             SpeechSetup.Needed, SpeechSetup.WrongFile, SpeechSetup.TooLarge, SpeechSetup.Failed -> {
                 ScreenTitle(stringResource(R.string.speech_setup_title))
-                Text(stringResource(R.string.speech_setup_body), style = MaterialTheme.typography.bodyLarge)
+                SupportingText(stringResource(R.string.speech_setup_body))
                 when (setup) {
                     SpeechSetup.WrongFile -> StatusNote(NoteKind.Problem, stringResource(R.string.speech_setup_wrong_file))
                     SpeechSetup.TooLarge -> StatusNote(NoteKind.Problem, stringResource(R.string.speech_setup_too_large))
@@ -168,26 +173,25 @@ private fun MessageContent(message: String, kind: NoteKind, onBack: () -> Unit) 
 
 @Composable
 private fun DoneContent(result: AnalysisOutcome.Analysed, onOpenTimeline: () -> Unit) {
+    val notes = warningTexts(result)
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         ScreenTitle(stringResource(R.string.analysis_done_title))
-        Text(
-            pluralStringResource(R.plurals.analysis_done_messages, result.eventCount, result.eventCount),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        if (result.suggestionCount == 0) {
-            Text(stringResource(R.string.analysis_done_no_cue), style = MaterialTheme.typography.bodyLarge)
-        } else {
-            Text(
-                pluralStringResource(R.plurals.analysis_done_suggestions, result.suggestionCount, result.suggestionCount),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            SupportingText(stringResource(R.string.analysis_done_suggestion_note))
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+            StatTile(result.eventCount.toString(), stringResource(R.string.analysis_stat_messages), Modifier.weight(1f))
+            StatTile(result.suggestionCount.toString(), stringResource(R.string.analysis_stat_suggestions), Modifier.weight(1f))
         }
-        warningTexts(result).forEach { StatusNote(NoteKind.Caution, it.text()) }
-        PrimaryButton(stringResource(R.string.analysis_open_timeline), onOpenTimeline)
+        SupportingText(
+            stringResource(if (result.suggestionCount == 0) R.string.analysis_done_no_cue else R.string.analysis_done_suggestion_note),
+        )
+        PrimaryButton(stringResource(R.string.analysis_open_timeline), onOpenTimeline, icon = ImageVector.vectorResource(R.drawable.ic_timeline))
+        if (notes.isNotEmpty()) {
+            MoreInfo(stringResource(R.string.analysis_notes_label)) {
+                notes.forEach { SupportingText(it.text(), Modifier.padding(bottom = Spacing.sm)) }
+            }
+        }
     }
 }
 
@@ -198,7 +202,6 @@ private fun QuestionsContent(questions: ExportQuestions, actions: AnalysisAction
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         ScreenTitle(stringResource(R.string.analysis_questions_title))
-        Text(stringResource(R.string.analysis_questions_intro), style = MaterialTheme.typography.bodyLarge)
         DateOrderQuestion(questions, actions.chooseDateOrder)
         ZoneQuestion(questions.answers.zone, onChangeZone)
         OwnerQuestion(questions, actions.chooseOwner)
@@ -210,7 +213,6 @@ private fun QuestionsContent(questions: ExportQuestions, actions: AnalysisAction
 private fun DateOrderQuestion(questions: ExportQuestions, onChoose: (DateOrder) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         SectionHeader(stringResource(R.string.analysis_dates_heading))
-        SupportingText(stringResource(R.string.analysis_dates_samples))
         EpistemicBlock(EpistemicStatus.OBSERVED) {
             questions.needs.sampleDates.take(MAX_SAMPLE_DATES).forEach { Text(it, style = MaterialTheme.typography.bodyLarge) }
         }
@@ -237,8 +239,10 @@ private fun DateOrderQuestion(questions: ExportQuestions, onChoose: (DateOrder) 
 private fun ZoneQuestion(zone: ZoneId, onChange: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         SectionHeader(stringResource(R.string.analysis_zone_heading))
-        Text(stringResource(R.string.analysis_zone_current, zone.id), style = MaterialTheme.typography.bodyLarge)
-        SecondaryButton(stringResource(R.string.analysis_zone_change), onChange)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+            Text(stringResource(R.string.analysis_zone_current, zone.id), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            SecondaryButton(stringResource(R.string.analysis_zone_change), onChange)
+        }
     }
 }
 

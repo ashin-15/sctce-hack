@@ -72,7 +72,7 @@ class EventReviewViewModelTest : AnalysisTestBase() {
         assertEquals(2, state.event?.revision)
         assertEquals(1, state.history.size)
         assertEquals(
-            "You agreed with the suggestion: Insulting or degrading wording",
+            "You agreed: Insulting or degrading wording",
             state.history.single().text.resolve(context.resources),
         )
         assertEquals(NoteKind.Info, state.notice?.kind)
@@ -135,7 +135,7 @@ class EventReviewViewModelTest : AnalysisTestBase() {
         assertEquals(listOf(ReferenceId("body")), view.category.evidenceReferenceIds)
         assertEquals(CategoryReviewStatus.ACCEPTED, view.category.reviewStatus)
         assertTrue(view.cues.isEmpty())
-        assertEquals("You added your own tag: Controlling demand", state.history.single().text.resolve(context.resources))
+        assertEquals("Your tag: Controlling demand", state.history.single().text.resolve(context.resources))
     }
 
     @Test
@@ -147,7 +147,7 @@ class EventReviewViewModelTest : AnalysisTestBase() {
         model.setDirection(Direction.OUTGOING)
         val state = await(model.state) { it.event?.direction == Direction.OUTGOING }
         assertTrue(state.boundaryOffered)
-        assertEquals("You set the direction: from you", state.history.single().text.resolve(context.resources))
+        assertEquals("Direction set: From you", state.history.single().text.resolve(context.resources))
     }
 
     @Test
@@ -163,9 +163,9 @@ class EventReviewViewModelTest : AnalysisTestBase() {
         val state = await(model.state) { it.event?.boundary?.unwantedContact == UnwantedContact.UNKNOWN && it.history.size == 3 }
         assertEquals(
             listOf(
-                "You marked this contact as unwanted.",
-                "You marked this contact as wanted.",
-                "You cleared the wanted or unwanted mark.",
+                "Marked as unwanted.",
+                "Marked as wanted.",
+                "Mark cleared.",
             ),
             state.history.map { it.text.resolve(context.resources) },
         )
@@ -218,7 +218,7 @@ class EventReviewViewModelTest : AnalysisTestBase() {
         model.markBoundary(BoundaryMarker.DO_NOT_CONTACT, actor)
         val state = await(model.state) { it.event?.boundary?.marker == BoundaryMarker.DO_NOT_CONTACT }
         assertEquals(actor, state.event?.boundary?.actorId)
-        assertEquals("You marked this message as a boundary.", state.history.single().text.resolve(context.resources))
+        assertEquals("Marked as a boundary.", state.history.single().text.resolve(context.resources))
     }
 
     @Test

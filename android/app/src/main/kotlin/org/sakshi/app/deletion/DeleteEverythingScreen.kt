@@ -3,10 +3,14 @@ package org.sakshi.app.deletion
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,17 +19,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
 import org.sakshi.app.session.DeletionState
 import org.sakshi.app.ui.components.DestructiveButton
+import org.sakshi.app.ui.components.IconTile
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.PrimaryButton
+import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.ScreenTitle
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.theme.Spacing
 
 /** True when [typed] is the confirmation [word], ignoring case and spaces around it. */
@@ -57,26 +69,42 @@ fun DeleteEverythingScreen(onConfirm: () -> Unit, onBack: () -> Unit, modifier: 
             Modifier.verticalScroll(rememberScrollState()).padding(horizontal = Spacing.gutter, vertical = Spacing.lg),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                SectionHeader(stringResource(R.string.delete_all_removed_heading))
-                listOf(
-                    R.string.delete_all_removed_cases,
-                    R.string.delete_all_removed_files,
-                    R.string.delete_all_removed_text,
-                    R.string.delete_all_removed_answers,
-                    R.string.delete_all_removed_activity,
-                    R.string.delete_all_removed_keys,
-                ).forEach { Text(stringResource(it), style = MaterialTheme.typography.bodyLarge) }
+            SakshiCard {
+                Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    SectionHeader(stringResource(R.string.delete_all_removed_heading))
+                    RemovedRow(ImageVector.vectorResource(R.drawable.ic_folder), R.string.delete_all_removed_cases)
+                    RemovedRow(ImageVector.vectorResource(R.drawable.ic_document), R.string.delete_all_removed_files)
+                    RemovedRow(ImageVector.vectorResource(R.drawable.ic_clipboard), R.string.delete_all_removed_text)
+                    RemovedRow(Icons.Default.Done, R.string.delete_all_removed_answers)
+                    RemovedRow(ImageVector.vectorResource(R.drawable.ic_timeline), R.string.delete_all_removed_activity)
+                    RemovedRow(Icons.Default.Lock, R.string.delete_all_removed_keys)
+                }
             }
-            Text(stringResource(R.string.delete_all_not_affected), style = MaterialTheme.typography.bodyLarge)
-            Text(stringResource(R.string.delete_all_permanent), style = MaterialTheme.typography.titleMedium)
-            SupportingText(stringResource(R.string.delete_all_limit))
-            SupportingText(stringResource(R.string.delete_all_slow))
+            Text(
+                stringResource(R.string.delete_all_permanent),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
             Text(stringResource(R.string.delete_all_type_prompt, word), style = MaterialTheme.typography.bodyLarge)
             SakshiTextField(typed, { typed = it }, stringResource(R.string.delete_all_field_label))
+            MoreInfo(stringResource(R.string.delete_all_more_label)) {
+                SupportingText(stringResource(R.string.delete_all_not_affected))
+                SupportingText(stringResource(R.string.delete_all_limit))
+            }
         }
     }
 }
+
+/** One thing deletion removes, with the icon the rest of the app uses for it. */
+@Composable
+private fun RemovedRow(icon: ImageVector, label: Int) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md), verticalAlignment = Alignment.CenterVertically) {
+        IconTile(icon, tone = Tone.Critical, size = REMOVED_ICON_SIZE)
+        Text(stringResource(label), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+    }
+}
+
+private val REMOVED_ICON_SIZE = 32.dp
 
 /**
  * What the whole app shows while a deletion is anything other than idle: progress with no way out, the outcome of a

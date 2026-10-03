@@ -12,6 +12,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.foundation.Image
@@ -25,9 +31,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -46,10 +55,17 @@ import org.sakshi.acquisition.projection.ProjectionCaptureState
 import org.sakshi.acquisition.projection.ProjectionDraft
 import org.sakshi.app.R
 import org.sakshi.app.SessionServices
+import org.sakshi.app.ui.components.IconTile
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.QuietTextButton
+import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
+import org.sakshi.app.ui.components.SecondaryButton
+import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.database.CaseStatus
 import org.sakshi.core.vault.AccessClass
@@ -84,26 +100,36 @@ fun VisibleCaptureScreen(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(Spacing.gutter),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
-            SupportingText(stringResource(R.string.projection_disclosure))
-            PrimaryButton(stringResource(R.string.projection_snapshot), {
-                onRequestProjection(ProjectionCaptureMode.SNAPSHOT)
-            }, enabled = projectionState !is ProjectionCaptureState.Capturing && projectionDrafts.isEmpty() && !saving)
-            PrimaryButton(stringResource(R.string.projection_start_burst), {
-                onRequestProjection(ProjectionCaptureMode.BURST)
-            }, enabled = projectionState !is ProjectionCaptureState.Capturing && projectionDrafts.isEmpty() && !saving)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                SectionHeader(stringResource(R.string.capture_section_screen), Modifier.weight(1f))
+                if (projectionState is ProjectionCaptureState.Capturing) {
+                    StatusChip(stringResource(R.string.capture_chip_on), tone = Tone.Success)
+                }
+            }
+            FactRows(R.string.projection_fact_reads, R.string.projection_fact_local, R.string.projection_fact_stop)
+            val canStart = projectionState !is ProjectionCaptureState.Capturing && projectionDrafts.isEmpty() && !saving
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                PrimaryButton(stringResource(R.string.projection_snapshot), {
+                    onRequestProjection(ProjectionCaptureMode.SNAPSHOT)
+                }, Modifier.weight(1f), enabled = canStart, icon = ImageVector.vectorResource(R.drawable.ic_screen_capture))
+                SecondaryButton(stringResource(R.string.projection_start_burst), {
+                    onRequestProjection(ProjectionCaptureMode.BURST)
+                }, Modifier.weight(1f), enabled = canStart)
+            }
             when (projectionState) {
                 is ProjectionCaptureState.Capturing -> SupportingText(stringResource(R.string.projection_active))
                 is ProjectionCaptureState.Ready -> SupportingText(stringResource(R.string.projection_ready))
                 is ProjectionCaptureState.Failed -> SupportingText(stringResource(R.string.projection_failed))
                 ProjectionCaptureState.Idle -> Unit
             }
-            QuietTextButton(
+            SecondaryButton(
                 stringResource(R.string.projection_stop),
                 { projection.stop(context) },
+                Modifier.fillMaxWidth(),
                 enabled = projectionState is ProjectionCaptureState.Capturing,
             )
             if (projectionDrafts.isNotEmpty()) {
-                Text(stringResource(R.string.projection_review_title), style = MaterialTheme.typography.titleMedium)
+                SectionHeader(stringResource(R.string.projection_review_title))
                 projectionDrafts.forEach { draft ->
                     ProjectionDraftCard(
                         draft = draft,
@@ -150,63 +176,96 @@ fun VisibleCaptureScreen(
                     )
                 }
                 if (caseId == null) SupportingText(stringResource(R.string.projection_need_case))
-                QuietTextButton(stringResource(R.string.projection_discard), { projection.discardAll() }, enabled = !saving)
-            } else if (projectionState !is ProjectionCaptureState.Capturing) {
-                SupportingText(stringResource(R.string.projection_no_drafts))
+                QuietTextButton(stringResource(R.string.projection_discard_all), { projection.discardAll() }, enabled = !saving)
             }
-            SupportingText(stringResource(R.string.capture_disclosure))
+            SectionHeader(stringResource(R.string.capture_section_text))
+            FactRows(R.string.capture_fact_reads, R.string.capture_fact_local, R.string.capture_fact_stop)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                StatusChip(
+                    stringResource(
+                        when {
+                            status.active -> R.string.capture_chip_on
+                            status.connected -> R.string.capture_chip_off
+                            else -> R.string.capture_chip_access
+                        },
+                    ),
+                    tone = if (status.active) Tone.Success else if (status.connected) Tone.Neutral else Tone.Warning,
+                )
+                Text(status.notice, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            }
             PrimaryButton(stringResource(R.string.capture_access), {
                 try {
                     capture.enable()
                     onOpenAccessSettings(capture.settingsIntent())
                 } catch (_: Exception) { notice = R.string.capture_failed }
-            })
-            Text(status.notice, style = MaterialTheme.typography.bodyMedium)
-            AccessibleCapture.SUPPORTED_PACKAGES.sorted().forEach { name ->
-                Row(Modifier.fillMaxWidth()) {
-                    Checkbox(checked = name in selected, onCheckedChange = { checked ->
-                        selected = if (checked) selected + name else selected - name
-                    }, enabled = !status.active)
-                    Text(name, Modifier.weight(1f).padding(top = Spacing.sm))
+            }, Modifier.fillMaxWidth(), icon = Icons.Default.Settings)
+            SakshiCard {
+                Column(Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
+                    AccessibleCapture.SUPPORTED_PACKAGES.sorted().forEach { name ->
+                        Row(Modifier.fillMaxWidth().heightIn(min = Spacing.touchTarget), verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(checked = name in selected, onCheckedChange = { checked ->
+                                selected = if (checked) selected + name else selected - name
+                            }, enabled = !status.active)
+                            Text(name, Modifier.weight(1f))
+                        }
+                    }
                 }
             }
-            PrimaryButton(stringResource(R.string.capture_start), {
-                notice = if (capture.startSession(selected)) R.string.capture_switch_apps else R.string.capture_not_ready
-            }, enabled = selected.isNotEmpty() && !status.active && !saving)
-            QuietTextButton(stringResource(R.string.capture_stop), { capture.stopSession() }, enabled = status.active)
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                PrimaryButton(stringResource(R.string.capture_start), {
+                    notice = if (capture.startSession(selected)) R.string.capture_switch_apps else R.string.capture_not_ready
+                }, Modifier.weight(1f), enabled = selected.isNotEmpty() && !status.active && !saving, icon = Icons.Default.PlayArrow)
+                SecondaryButton(stringResource(R.string.capture_stop), { capture.stopSession() }, Modifier.weight(1f), enabled = status.active)
+            }
             QuietTextButton(stringResource(R.string.capture_revoke), { capture.revoke() }, enabled = !saving)
             notice?.let { SupportingText(stringResource(it)) }
-            Text(stringResource(R.string.capture_choose_case), style = MaterialTheme.typography.titleMedium)
-            cases.filter { it.status != CaseStatus.ARCHIVED }.forEach { case ->
-                Row(Modifier.fillMaxWidth()) {
-                    Checkbox(caseId == case.id, { if (it) caseId = case.id else caseId = null }, enabled = !saving)
-                    Text(case.title, Modifier.weight(1f).padding(top = Spacing.sm))
-                }
-            }
-            if (cases.isEmpty()) SupportingText(stringResource(R.string.capture_no_case))
-            if (candidates.isEmpty()) SupportingText(stringResource(R.string.capture_empty))
-            candidates.forEach { candidate ->
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    Text(candidate.packageName, style = MaterialTheme.typography.labelLarge)
-                    SupportingText(stringResource(R.string.capture_uncertain))
-                    Text(candidate.text)
-                    PrimaryButton(stringResource(R.string.capture_save_analyse), {
-                        val target = caseId
-                        if (target != null && !saving) {
-                            saving = true
-                            scope.launch {
-                                try {
-                                    val saved = saveVisibleSnapshot(services, target, candidate)
-                                    capture.dismiss(candidate.id)
-                                    onAnalyse(target, saved)
-                                } catch (cancelled: CancellationException) {
-                                    throw cancelled
-                                } catch (_: Exception) { notice = R.string.capture_failed }
-                                finally { saving = false }
+            SectionHeader(stringResource(R.string.capture_choose_case))
+            if (cases.isEmpty()) {
+                SupportingText(stringResource(R.string.capture_no_case))
+            } else {
+                SakshiCard {
+                    Column(Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
+                        cases.filter { it.status != CaseStatus.ARCHIVED }.forEach { case ->
+                            Row(Modifier.fillMaxWidth().heightIn(min = Spacing.touchTarget), verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(caseId == case.id, { if (it) caseId = case.id else caseId = null }, enabled = !saving)
+                                Text(case.title, Modifier.weight(1f))
                             }
                         }
-                    }, enabled = caseId != null && !saving)
-                    QuietTextButton(stringResource(R.string.capture_discard), { capture.dismiss(candidate.id) }, enabled = !saving)
+                    }
+                }
+            }
+            candidates.forEach { candidate ->
+                SakshiCard {
+                    Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                        Text(candidate.packageName, style = MaterialTheme.typography.labelLarge)
+                        SupportingText(stringResource(R.string.capture_uncertain))
+                        Text(candidate.text)
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                            PrimaryButton(stringResource(R.string.capture_save_analyse), {
+                                val target = caseId
+                                if (target != null && !saving) {
+                                    saving = true
+                                    scope.launch {
+                                        try {
+                                            val saved = saveVisibleSnapshot(services, target, candidate)
+                                            capture.dismiss(candidate.id)
+                                            onAnalyse(target, saved)
+                                        } catch (cancelled: CancellationException) {
+                                            throw cancelled
+                                        } catch (_: Exception) { notice = R.string.capture_failed }
+                                        finally { saving = false }
+                                    }
+                                }
+                            }, Modifier.weight(1f), enabled = caseId != null && !saving)
+                            SecondaryButton(stringResource(R.string.capture_discard), { capture.dismiss(candidate.id) }, Modifier.weight(1f), enabled = !saving)
+                        }
+                    }
+                }
+            }
+            MoreInfo(stringResource(R.string.capture_about)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    SupportingText(stringResource(R.string.projection_disclosure))
+                    SupportingText(stringResource(R.string.capture_disclosure))
                 }
             }
         }
@@ -246,20 +305,40 @@ private fun ProjectionDraftCard(
     onSave: () -> Unit,
     onDiscard: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(stringResource(R.string.projection_draft_title, draft.frameIndex), style = MaterialTheme.typography.titleSmall)
-        SupportingText(
-            stringResource(
-                R.string.projection_draft_details, draft.width, draft.height, draft.byteSize / 1024,
-                DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(draft.observedAtMs)),
-            ),
-        )
-        if (draft.blankOrUnavailable) SupportingText(stringResource(R.string.projection_blank_frame))
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            OutlinedButton(onClick = onPreview, enabled = enabled) { Text(stringResource(R.string.projection_preview)) }
-            PrimaryButton(stringResource(R.string.projection_save), onSave, enabled = enabled)
+    SakshiCard {
+        Column(Modifier.fillMaxWidth().padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Text(stringResource(R.string.projection_draft_title, draft.frameIndex), style = MaterialTheme.typography.titleSmall)
+            SupportingText(
+                stringResource(
+                    R.string.projection_draft_details, draft.width, draft.height, draft.byteSize / 1024,
+                    DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(draft.observedAtMs)),
+                ),
+            )
+            if (draft.blankOrUnavailable) SupportingText(stringResource(R.string.projection_blank_frame))
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                SecondaryButton(stringResource(R.string.projection_preview), onPreview, Modifier.weight(1f), enabled = enabled)
+                PrimaryButton(stringResource(R.string.projection_save), onSave, Modifier.weight(1f), enabled = enabled)
+                SecondaryButton(stringResource(R.string.projection_discard), onDiscard, Modifier.weight(1f), enabled = enabled)
+            }
         }
-        QuietTextButton(stringResource(R.string.projection_discard), onDiscard, enabled = enabled)
+    }
+}
+
+/** What is collected, where it stays and how to stop it: shown before anything is turned on. */
+@Composable
+private fun FactRows(reads: Int, local: Int, stop: Int) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        FactRow(Icons.Default.Search, stringResource(reads))
+        FactRow(Icons.Default.Lock, stringResource(local))
+        FactRow(Icons.Default.Clear, stringResource(stop))
+    }
+}
+
+@Composable
+private fun FactRow(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        IconTile(icon, size = Spacing.xxl)
+        Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
     }
 }
 

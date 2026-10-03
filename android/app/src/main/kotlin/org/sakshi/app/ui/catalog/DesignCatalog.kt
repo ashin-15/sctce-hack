@@ -3,12 +3,19 @@ package org.sakshi.app.ui.catalog
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
@@ -31,10 +40,13 @@ import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
 import org.sakshi.app.ui.components.EpistemicLabel
 import org.sakshi.app.ui.components.FormDialog
+import org.sakshi.app.ui.components.ActionTile
 import org.sakshi.app.ui.components.HashStatusBadge
+import org.sakshi.app.ui.components.IconTile
 import org.sakshi.app.ui.components.LabelValue
 import org.sakshi.app.ui.components.LocalVaultBadge
 import org.sakshi.app.ui.components.MenuAction
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.OverflowMenuButton
 import org.sakshi.app.ui.components.PrimaryButton
@@ -49,11 +61,14 @@ import org.sakshi.app.ui.components.ScreenTitle
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.SensitiveMediaShield
+import org.sakshi.app.ui.components.StatTile
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.components.TextEntryDialog
 import org.sakshi.app.ui.components.TimelineAnchorDot
 import org.sakshi.app.ui.components.TimelineNodeState
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.components.TriStateAttributionBadge
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.EpistemicStatus
@@ -81,6 +96,7 @@ fun DesignCatalog(onClose: () -> Unit, modifier: Modifier = Modifier) {
             item { Group(R.string.catalog_buttons) { Buttons { dialog = it } } }
             item { Group(R.string.catalog_notes) { Notes() } }
             item { Group(R.string.catalog_surfaces) { Surfaces() } }
+            item { Group(R.string.catalog_stitch) { StitchSamples() } }
             item { Group(R.string.catalog_choices) { Choices() } }
             item {
                 Group(R.string.catalog_progress) {
@@ -235,6 +251,38 @@ private fun Surfaces() {
             SupportingText(stringResource(R.string.catalog_card_quiet), Modifier.padding(Spacing.lg))
         }
         EmptyState(stringResource(R.string.catalog_empty_title), stringResource(R.string.catalog_empty_body))
+    }
+}
+
+@Composable
+private fun StitchSamples() {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            StatusChip(stringResource(R.string.catalog_chip_neutral))
+            StatusChip(stringResource(R.string.catalog_chip_brand), tone = Tone.Brand)
+            StatusChip(stringResource(R.string.catalog_chip_success), tone = Tone.Success, icon = Icons.Default.Check)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            StatusChip(stringResource(R.string.catalog_chip_warning), tone = Tone.Warning, icon = Icons.Default.Warning)
+            StatusChip(stringResource(R.string.catalog_chip_critical), tone = Tone.Critical)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Tone.entries.forEach { IconTile(ImageVector.vectorResource(R.drawable.ic_document), tone = it) }
+        }
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            val tile = Modifier.weight(1f).fillMaxHeight()
+            StatTile("12", stringResource(R.string.catalog_stat_one), tile)
+            StatTile("3", stringResource(R.string.catalog_stat_two), tile)
+        }
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            val tile = Modifier.weight(1f).fillMaxHeight()
+            ActionTile(ImageVector.vectorResource(R.drawable.ic_timeline), stringResource(R.string.catalog_action_one), {}, tile)
+            ActionTile(ImageVector.vectorResource(R.drawable.ic_pattern), stringResource(R.string.catalog_action_two), {}, tile)
+            ActionTile(ImageVector.vectorResource(R.drawable.ic_document), stringResource(R.string.catalog_action_disabled), {}, tile, enabled = false)
+        }
+        MoreInfo(stringResource(R.string.catalog_more_info)) {
+            SupportingText(stringResource(R.string.catalog_more_info_body))
+        }
     }
 }
 

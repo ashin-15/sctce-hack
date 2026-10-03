@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,6 +45,7 @@ import org.sakshi.app.R
 import org.sakshi.app.ui.components.CheckRow
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.RadioRow
@@ -54,7 +54,10 @@ import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.StatusNote
+import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.formatCreatedDate
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.ActorId
@@ -222,12 +225,11 @@ private fun FiltersBar(state: SearchUiState, actions: SearchFilterActions) {
             if (state.filters.isActive) QuietTextButton(stringResource(R.string.search_filters_clear), actions.clear)
         }
         if (state.filtersOpen) FiltersPanel(state, actions)
-        Text(summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (state.filters.isActive) {
-            StatusNote(
-                NoteKind.Info,
-                stringResource(if (state.filters.hasDates) R.string.search_filters_note_dates else R.string.search_filters_note),
-            )
+            Text(summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            MoreInfo(stringResource(R.string.search_filters_more)) {
+                SupportingText(stringResource(if (state.filters.hasDates) R.string.search_filters_note_dates else R.string.search_filters_note))
+            }
         }
     }
 }
@@ -324,17 +326,7 @@ private fun HitContent(hit: SearchHit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.extraSmall,
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) {
-            Text(
-                text = derivativeKindLabel(hit.derivativeKind),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
-            )
-        }
+        StatusChip(derivativeKindLabel(hit.derivativeKind), tone = Tone.Brand)
 
         if (!actorLabel.isNullOrBlank()) {
             Text(

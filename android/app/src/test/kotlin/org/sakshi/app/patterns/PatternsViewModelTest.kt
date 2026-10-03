@@ -85,7 +85,7 @@ class PatternsViewModelTest : AnalysisTestBase() {
         val card = state.cards.single { it.type == PatternType.RECURRENCE_AFTER_BOUNDARY }
         assertEquals("Contact after a boundary", card.title.resolve(context.resources))
         assertEquals(AssessmentStatus.SUPPORTED_DESCRIPTION, card.status)
-        assertEquals("Description supported by the selected records", card.statusText.resolve(context.resources))
+        assertEquals("Supported by the records", card.statusText.resolve(context.resources))
         assertTrue(card.observed.contains("6"), card.observed)
         assertTrue(card.observed.contains("synthetic-person"), card.observed)
         assertTrue(card.limitations.isNotEmpty())
@@ -331,7 +331,7 @@ class PatternsViewModelTest : AnalysisTestBase() {
         val state = await(model.state) { !it.refreshing && it.notice == PatternNotice.CHANGED_BEFORE_SAVE }
         assertEquals(PatternReview.NOT_REVIEWED, boundaryCard(state).review)
         assertTrue(runBlocking { vault.patterns.list(CaseId(caseId), EvidenceView.CONFIRMED_ONLY) }.all { it.review == PatternReview.NOT_REVIEWED })
-        assertEquals("This description changed before your answer was saved. It has been worked out again.", patternNoticeText(PatternNotice.CHANGED_BEFORE_SAVE).resolve(context.resources))
+        assertEquals("The description changed before saving. It was worked out again.", patternNoticeText(PatternNotice.CHANGED_BEFORE_SAVE).resolve(context.resources))
     }
 
     @Test

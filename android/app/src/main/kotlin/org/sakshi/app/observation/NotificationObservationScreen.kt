@@ -19,9 +19,14 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -35,8 +40,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
@@ -57,11 +64,16 @@ import org.sakshi.acquisition.notifications.PackageAllowlist
 import org.sakshi.acquisition.notifications.UnavailableReason
 import org.sakshi.app.R
 import org.sakshi.app.SessionServices
+import org.sakshi.app.ui.components.IconTile
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.PrimaryButton
-import org.sakshi.app.ui.components.QuietTextButton
+import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
+import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.StatusChip
 import org.sakshi.app.ui.components.SupportingText
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.vault.CaseSummary
 import org.sakshi.core.database.CaseStatus
@@ -103,62 +115,81 @@ fun NotificationObservationScreen(
                 .padding(horizontal = Spacing.gutter, vertical = Spacing.sm),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
-            SupportingText(stringResource(R.string.observation_disclosure))
+            Facts()
             if (!supported) SupportingText(stringResource(R.string.observation_unsupported))
+            StateRow(coverage)
             if (!settings.enabled) {
-                PrimaryButton(stringResource(R.string.observation_enable), { settingsChange { observation.enable() } }, enabled = supported)
-            } else {
-                PrimaryButton(stringResource(R.string.observation_access), { onOpenAccessSettings(observation.accessSettingsIntent()) })
-                QuietTextButton(
-                    stringResource(if (settings.paused) R.string.observation_resume else R.string.observation_pause),
-                    { settingsChange { if (settings.paused) observation.resume() else observation.pause() } },
+                PrimaryButton(
+                    stringResource(R.string.observation_enable),
+                    { settingsChange { observation.enable() } },
+                    Modifier.fillMaxWidth(),
+                    enabled = supported,
+                    icon = Icons.Default.Check,
                 )
-                QuietTextButton(stringResource(R.string.observation_disable), { settingsChange { observation.disable() } })
+            } else {
+                PrimaryButton(
+                    stringResource(R.string.observation_access),
+                    { onOpenAccessSettings(observation.accessSettingsIntent()) },
+                    Modifier.fillMaxWidth(),
+                    icon = Icons.Default.Settings,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    SecondaryButton(
+                        stringResource(if (settings.paused) R.string.observation_resume else R.string.observation_pause),
+                        { settingsChange { if (settings.paused) observation.resume() else observation.pause() } },
+                        Modifier.weight(1f),
+                    )
+                    SecondaryButton(
+                        stringResource(R.string.observation_disable),
+                        { settingsChange { observation.disable() } },
+                        Modifier.weight(1f),
+                    )
+                }
             }
             SectionHeader(stringResource(R.string.observation_apps))
-            val names = POPULAR_APPS + settings.allowlist.names.filterNot { it in POPULAR_APPS.keys }.associateWith { it }
-            names.forEach { (packageName, title) ->
-                Choice(title, packageName in settings.allowlist, false, supported) { selected ->
-                    settingsChange {
-                        val current = observation.settingsState.value.allowlist
-                        observation.setAllowlist(if (selected) current.with(packageName) else current.without(packageName))
+            SakshiCard {
+                Column(Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
+                    val names = POPULAR_APPS + settings.allowlist.names.filterNot { it in POPULAR_APPS.keys }.associateWith { it }
+                    names.forEach { (packageName, title) ->
+                        Choice(title, packageName in settings.allowlist, false, supported) { selected ->
+                            settingsChange {
+                                val current = observation.settingsState.value.allowlist
+                                observation.setAllowlist(if (selected) current.with(packageName) else current.without(packageName))
+                            }
+                        }
                     }
                 }
             }
-            OutlinedTextField(
-                value = customPackage,
-                onValueChange = { customPackage = it.take(255) },
-                label = { Text(stringResource(R.string.observation_custom_label)) },
-                supportingText = { Text(stringResource(R.string.observation_custom_hint)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            QuietTextButton(stringResource(R.string.observation_add), {
-                val name = customPackage.trim()
-                if (!PackageAllowlist.isValidName(name)) notice = R.string.observation_invalid_package
-                else settingsChange {
-                    observation.setAllowlist(observation.settingsState.value.allowlist.with(name))
-                    customPackage = ""
-                }
-            }, enabled = supported)
-            SupportingText(stringResource(R.string.observation_background_disclosure))
-            Choice(stringResource(R.string.observation_background_opt_in), settings.backgroundObservationOptIn, true, supported) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = customPackage,
+                    onValueChange = { customPackage = it.take(255) },
+                    label = { Text(stringResource(R.string.observation_custom_label)) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+                SecondaryButton(stringResource(R.string.observation_add), {
+                    val name = customPackage.trim()
+                    if (!PackageAllowlist.isValidName(name)) notice = R.string.observation_invalid_package
+                    else settingsChange {
+                        observation.setAllowlist(observation.settingsState.value.allowlist.with(name))
+                        customPackage = ""
+                    }
+                }, enabled = supported)
+            }
+            SectionHeader(stringResource(R.string.observation_options))
+            SwitchCard(stringResource(R.string.observation_background_opt_in), stringResource(R.string.observation_background_line), settings.backgroundObservationOptIn, supported) {
                 settingsChange { observation.setBackgroundObservationOptIn(it) }
             }
-            SupportingText(stringResource(R.string.observation_alert_disclosure))
-            Choice(stringResource(R.string.observation_alert_opt_in), settings.cueAlertsOptIn, true, supported) { enabled ->
+            SwitchCard(stringResource(R.string.observation_alert_opt_in), stringResource(R.string.observation_alert_line), settings.cueAlertsOptIn, supported) { enabled ->
                 if (!enabled) settingsChange { observation.setCueAlertsOptIn(false) }
                 else if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     alertPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else settingsChange { observation.setCueAlertsOptIn(true) }
             }
-            Choice(stringResource(R.string.observation_active_opt_in), settings.includeActiveOnConnect, true, supported) {
+            SwitchCard(stringResource(R.string.observation_active_opt_in), null, settings.includeActiveOnConnect, supported) {
                 settingsChange { observation.setIncludeActiveOnConnect(it) }
             }
-            SectionHeader(stringResource(R.string.observation_coverage))
-            Text(coverageText(coverage), style = MaterialTheme.typography.bodyLarge)
-            SupportingText(stringResource(R.string.observation_limits))
-            SupportingText(stringResource(R.string.observation_counters, coverage.candidatesDropped, coverage.unreadableCount, coverage.lockedWithheldCount, coverage.queueOverflowCount))
             notice?.let { Text(stringResource(it), modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }) }
             SectionHeader(stringResource(R.string.observation_inbox))
             if (candidates.isEmpty()) SupportingText(stringResource(R.string.observation_empty))
@@ -193,6 +224,7 @@ fun NotificationObservationScreen(
                     )
                 }
             }
+            About(coverage)
         }
     }
 }
@@ -208,7 +240,7 @@ private fun CandidateCard(
 ) {
     var selectedCase by remember { mutableStateOf<String?>(null) }
     val selected = selectedCase?.takeIf { id -> cases.any { it.id == id } }
-    OutlinedCard(Modifier.fillMaxWidth()) {
+    SakshiCard {
         Column(Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             SupportingText(stringResource(R.string.observation_source, candidate.message.sourceAppClaim))
             candidate.message.senderLabel?.let { SupportingText(stringResource(R.string.observation_sender, it)) }
@@ -238,11 +270,19 @@ private fun CandidateCard(
                 }
             }
             if (saving) SupportingText(stringResource(R.string.observation_saving))
-            PrimaryButton(stringResource(R.string.observation_save), { selected?.let { onSave(it, false) } }, enabled = selected != null && !busy)
-            if (candidate.message.textStatus != ObservedTextStatus.SUMMARY_ONLY) {
-                QuietTextButton(stringResource(R.string.observation_save_analyse), { selected?.let { onSave(it, true) } }, enabled = selected != null && !busy)
+            PrimaryButton(
+                stringResource(R.string.observation_save),
+                { selected?.let { onSave(it, false) } },
+                Modifier.fillMaxWidth(),
+                enabled = selected != null && !busy,
+                icon = ImageVector.vectorResource(R.drawable.ic_folder),
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                if (candidate.message.textStatus != ObservedTextStatus.SUMMARY_ONLY) {
+                    SecondaryButton(stringResource(R.string.observation_save_analyse), { selected?.let { onSave(it, true) } }, Modifier.weight(1f), enabled = selected != null && !busy)
+                }
+                SecondaryButton(stringResource(R.string.observation_discard), onDiscard, Modifier.weight(1f), enabled = !busy)
             }
-            QuietTextButton(stringResource(R.string.observation_discard), onDiscard, enabled = !busy)
         }
     }
 }
@@ -261,6 +301,64 @@ private fun Choice(title: String, selected: Boolean, switch: Boolean, enabled: B
 }
 
 @Composable
+private fun SwitchCard(title: String, line: String?, selected: Boolean, enabled: Boolean, onChange: (Boolean) -> Unit) {
+    SakshiCard {
+        Column(Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.xs)) {
+            Choice(title, selected, true, enabled, onChange)
+            if (line != null) SupportingText(line, Modifier.padding(bottom = Spacing.sm))
+        }
+    }
+}
+
+/** What is collected, where it stays and how to stop it: shown before anything is turned on. */
+@Composable
+private fun Facts() {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        FactRow(Icons.Default.Notifications, stringResource(R.string.observation_fact_reads))
+        FactRow(Icons.Default.Lock, stringResource(R.string.observation_fact_local))
+        FactRow(Icons.Default.Clear, stringResource(R.string.observation_fact_off))
+    }
+}
+
+@Composable
+private fun FactRow(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        IconTile(icon, size = Spacing.xxl)
+        Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun StateRow(detail: CoverageDetail) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Text(stringResource(R.string.observation_coverage), style = MaterialTheme.typography.titleSmall)
+            StatusChip(coverageText(detail), tone = coverageTone(detail))
+        }
+        SupportingText(stringResource(R.string.observation_limits_line))
+    }
+}
+
+@Composable
+private fun About(coverage: CoverageDetail) {
+    MoreInfo(stringResource(R.string.observation_about)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            SupportingText(stringResource(R.string.observation_disclosure))
+            SupportingText(stringResource(R.string.observation_limits))
+            SupportingText(stringResource(R.string.observation_background_disclosure))
+            SupportingText(stringResource(R.string.observation_alert_disclosure))
+            SupportingText(stringResource(R.string.observation_counters, coverage.candidatesDropped, coverage.unreadableCount, coverage.lockedWithheldCount, coverage.queueOverflowCount))
+        }
+    }
+}
+
+private fun coverageTone(detail: CoverageDetail): Tone = when (detail.state) {
+    CoverageState.CONNECTED -> Tone.Success
+    CoverageState.ACCESS_GRANTED_NOT_CONNECTED, CoverageState.COVERAGE_UNKNOWN, CoverageState.PAUSED -> Tone.Warning
+    CoverageState.UNAVAILABLE -> if (detail.unavailableReason == UnavailableReason.ACCESS_NOT_GRANTED) Tone.Warning else Tone.Neutral
+}
+
+@Composable
 private fun coverageText(detail: CoverageDetail): String = stringResource(
     when (detail.state) {
         CoverageState.CONNECTED -> R.string.observation_connected
@@ -268,7 +366,7 @@ private fun coverageText(detail: CoverageDetail): String = stringResource(
         CoverageState.COVERAGE_UNKNOWN -> R.string.observation_unknown
         CoverageState.PAUSED -> R.string.observation_paused
         CoverageState.UNAVAILABLE -> when (detail.unavailableReason) {
-            UnavailableReason.ANDROID_VERSION -> R.string.observation_unsupported
+            UnavailableReason.ANDROID_VERSION -> R.string.observation_chip_unsupported
             UnavailableReason.ACCESS_NOT_GRANTED -> R.string.observation_access_missing
             UnavailableReason.SESSION_STOPPED -> R.string.observation_session_stopped
             else -> R.string.observation_disabled
