@@ -17,7 +17,7 @@ These limits are binding (see [AGENTS.md](AGENTS.md)).
 
 ## Current status
 
-Read this before anything else. Status as of 3 October 2026: the Android app is a working debug build, verified by unit tests and by instrumented tests on synthetic data. No person has used it end to end, there is no release build, and the on-device language model is an uncalibrated experiment.
+Read this before anything else. Status as of 3 October 2026: the Android app is a working debug build, verified by unit tests and by instrumented tests on synthetic data. The main flow was walked through once on the CPH2695 test phone (create a case, save captured WhatsApp notification previews, analyse, tag, open the timeline); it has not been used by anyone else, there is no release build, and the on-device language model is an uncalibrated experiment.
 
 | Area | State |
 |---|---|
@@ -30,19 +30,58 @@ Read this before anything else. Status as of 3 October 2026: the Android app is 
 | Acquisition | Share sheet, pickers, paste and manual notes work in the app. Three optional, off-by-default lanes are wired into the app, each behind its own disclosure and an explicit Android grant: notification collection, visible text capture (accessibility, at most five minutes) and user-started screenshots (MediaProjection). |
 | Processing | WhatsApp text-export parsing, rules cue engine, Latin-script OCR (bundled ML Kit model) and speech to text (whisper.cpp base q5_1, arm64, model installed by an explicit preparation step) feed the analysis pipeline. Devanagari and Malayalam OCR are deferred. |
 | On-device language model | Qwen2.5 1.5B Instruct Q4_K_M through llama.cpp b6500 gives threat-language suggestions on plain text, each with an exact source quote for review. It runs on the test phone: the isolated device test passes on nine synthetic messages (English threats flagged, ordinary messages left alone, quoted speech sent to review, Romanized Hindi refused). **Not calibrated and not release accepted:** there is one known false positive on a figure of speech, Malayalam and Hindi are refused so threats in them are not flagged, and a message takes about 33 s on that phone. Saved text in active cases is analysed automatically, one item at a time, only while the vault is unlocked. See [handoff.md](handoff.md). |
+| App design | Every screen follows the Stitch design in [stitch_design_specification_project/](stitch_design_specification_project/): brand top bar with the "Local & offline" badge, bottom navigation (Home, Evidence, Incidents, Vault, Reports), stat tiles, icon tiles and status chips in place of sentences. Long explanations sit behind collapsed "About" rows; the required limits (fingerprints, unconfirmed senders, exports, suggestions are not findings) are kept in short form. Rendered screens were reviewed in light theme; most large-text and dark variants, and the notification and capture screens, were only spot-checked. |
 | Review and patterns | Event review, who-is-who, timeline, stored pattern descriptions with staleness and per-pattern review, and case-scoped search are in the app. |
 | Report and export | Keystore-signed PDF and zip bundle, numbered report versions, offline verifier with a command-line tool. Text redaction exists in the export library; its app screens are not built. |
 | Security | Encrypted vault (SQLCipher, AES-256-GCM blobs, Android Keystore), audit hash chain, whole-vault deletion that destroys the key first, a manifest permission allowlist, policy guardrail tests and [docs/architecture/threat-model.md](docs/architecture/threat-model.md). |
-| Android measurements | Last full JVM run on a clean checkout (`454130e`): 1,304 tests in 15 modules, 0 failures. Modules added after that were verified by selected suites recorded in [benchmark.md](benchmark.md). Instrumented suites pass on a Samsung SM-S928B and a CPH2695, both Android 16, with synthetic data and debug builds. |
-| Not verified | Any screen used by a person, release builds, battery, thermal and memory figures, real messaging-app payloads, a MediaProjection capture on a device (the consent prompt was never approved in testing), backup exclusion, Malayalam and Hindi quality for cues, speech and the language model. |
+| Android measurements | Last full JVM run on a clean checkout (`454130e`): 1,304 tests in 15 modules, 0 failures. Modules added after that were verified by selected suites recorded in [benchmark.md](benchmark.md). After the redesign the `:app` suite ran 436 tests with 0 failures (69 skipped: the opt-in screenshot gallery), and lint, `:tools:policy:test` and `:app:verifyManifestPermissions` pass. Instrumented suites pass on a Samsung SM-S928B and a CPH2695, both Android 16, with synthetic data and debug builds. |
+| Not verified | Use by anyone other than the owner, release builds, battery, thermal and memory figures, real messaging-app payloads, a MediaProjection capture on a device (the consent prompt was never approved in testing), backup exclusion, Malayalam and Hindi quality for cues, speech and the language model. |
 
 The two handoff files record session state: [HANDOFF.md](HANDOFF.md) (megaplan phases, morning of 3 October, older than the last two feature commits) and [handoff.md](handoff.md) (the language-model work, its limits and next steps).
 
 Every benchmark number in this repository is recorded in [benchmark.md](benchmark.md). Synthetic fixture metrics and laptop proxies are explicitly distinguished from on-device measurements. The stack in [RECOMMENDATION.md](RECOMMENDATION.md) is a provisional engineering hypothesis, not a benchmark winner.
 
-## End-to-end workflow
+## Using the app: the main workflow
 
-This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
+This is the workflow the app is built around: collect messages from a chat app such as WhatsApp, let the on-device AI analyse and sort them, flag threat language and other harmful wording, and build a per-case record with a timeline and a report.
+
+```text
+ 1. COLLECT     WhatsApp and other chat messages reach Sakshi through supported Android paths:
+                notification previews (opt-in) | visible text or screenshots (opt-in) |
+                shared chat export | files, photos, pasted text, notes
+ 2. SAVE        the message goes into a case in the encrypted vault, original preserved
+ 3. ANALYSE     on-device only: parse into messages, rules cue engine, Qwen threat-language model
+ 4. FLAG        possible threats and harmful wording appear as suggestions with the exact quote
+ 5. REVIEW      the person agrees, disagrees, is not sure, or adds their own tag
+ 6. TIMELINE    messages in time order per case, with sender, flags and coverage gaps
+ 7. PATTERNS    repeated contact, contact after a boundary, wording transition, density change
+ 8. REPORT      user-selected, signed PDF and bundle, shared only when the person exports it
+```
+
+Step by step in the app:
+
+1. Unlock Sakshi and tap **New case** on Home.
+2. Turn on collection: Home, **Notifications**, enable it, grant Android notification access and tick WhatsApp. **Screen capture** offers visible text and screenshots the same way. Both are off by default and can be turned off at any time.
+3. Captured previews are listed at the bottom of the Notifications screen. For each one choose the case and tap **Save and analyse**. Anything else is added from the case screen with **Add evidence** (files, photos or videos, paste text, write a note) or by sharing to Sakshi from another app.
+4. Saved text is analysed automatically while the vault is unlocked. The case screen shows each item with chips such as "Analysed" and "Intact".
+5. Open **Timeline**. Flagged messages carry a "Suggestion" chip; tap a message to agree, disagree, mark not sure or add your own tag.
+6. Open **Patterns** to review descriptions that span several messages, then **Report** to choose what goes in, preview it and create the file to share.
+
+What is automatic today and what is not:
+
+| Step | Today |
+|---|---|
+| Collecting WhatsApp notification previews | Automatic once the person opts in and grants access. Only what the notification shows is read; chats are never read from WhatsApp's storage. |
+| Saving a captured preview into a case | Manual, one preview at a time. Unsaved previews are cleared when the app locks unless background observation is on. Automatic saving into a per-sender case is the next piece of work and is not built. |
+| Analysis and flagging of saved text | Automatic while the vault is unlocked, about half a minute to a minute per message on the test phone. Flags are suggestions and the model is uncalibrated. |
+| Per-sender profile | Not built. A case with its timeline, patterns and report is the nearest equivalent. |
+| Review, patterns and report | Always done by the person. Nothing is shared unless they export it. |
+
+Device walk-through on 3 October 2026 (CPH2695): a case was created, two captured WhatsApp previews from one sender were saved and analysed, the model flagged neither, one was tagged by hand, and both appear on the case timeline. Known fault seen there: saved notification previews are labelled "from export" on the timeline.
+
+## Processing pipeline
+
+This is the internal pipeline from the megaplan (sections 4, 10, 17, 18, 20, 21).
 
 ```text
  ACQUIRE            share sheet | file picker | photo picker | paste | manual note
@@ -80,7 +119,7 @@ This is the product workflow from the megaplan (sections 4, 10, 17, 18, 20, 21).
 |---|---|---|---|
 | 1 | Acquisition | The user shares, picks, pastes or types evidence. The optional lanes (notification collection, visible text capture, screenshots) are opt-in and never required. | Import screens built (share target, pickers, paste, manual note); tested on the JVM and through a synthetic provider on a phone, not yet with a real share from another app. The three optional lanes are in the app; notification and accessibility passed isolated synthetic device tests, screenshot capture has not run on a device. No third-party app compatibility is claimed. |
 | 2 | Validation | Incoming URIs, names and MIME types are treated as untrusted claims. Limits are enforced while streaming. | Implemented and tested (`:acquisition:importer`). |
-| 3 | Preview and save | Nothing is stored until the user chooses a case and confirms. Notification candidates stay in a bounded memory inbox and screenshot drafts stay encrypted until the user saves or discards them. | Screens built; not yet exercised by a person on a device. |
+| 3 | Preview and save | Nothing is stored until the user chooses a case and confirms. Notification candidates stay in a bounded memory inbox and screenshot drafts stay encrypted until the user saves or discards them. | Screens built. Pasted text and notification previews were saved on the test phone on 3 October; the pickers were only opened, not completed. |
 | 4 | Original preservation | Exact received bytes are encrypted, hashed with SHA-256 and recorded with provenance. Originals are never overwritten. | Implemented (`:core:crypto`, `:core:database`, `:core:vault`): encrypted blobs, hash, provenance rows and audit chain. Keystore and SQLCipher paths pass instrumented tests, including wrong-key and flipped-byte checks. |
 | 5 | Derivatives | Parsed text, OCR and transcripts are separate versioned records. They never replace the original. | WhatsApp text-export parsing and Latin OCR with line regions are in the analysis pipeline and device-tested. Speech to text is device-tested as a library and connected to the analysis pipeline; the path from an encrypted audio item to a transcript in the app has not been verified on a device. |
 | 6 | Events | Each source message becomes an event under the event schema. | Implemented: one event per parsed message, one per image and one per audio clip, stored encrypted with code-point anchors (and image regions or time ranges where they apply). |
@@ -137,7 +176,7 @@ The UI design takes the label as a required parameter with no default, so an inf
 | [data/](data/) | Synthetic fixtures, the event JSON Schema, provenance files and a third-party English tweet CSV used only as an auxiliary baseline. |
 | [results/](results/) | Benchmark CSVs, plots, per-run metadata, [SUMMARY.md](results/SUMMARY.md) and a sample report PDF. Laptop proxies only. |
 | [android/](android/) | Kotlin Gradle project with the 19 modules listed below, shared `testfixtures/` and preparation scripts in `tools/`. See [android/README.md](android/README.md). |
-| [stitch_design_specification_project/](stitch_design_specification_project/) | Design specification the app's calm colour scheme and components follow. |
+| [stitch_design_specification_project/](stitch_design_specification_project/) | Stitch design model (screens and specification) that every app screen now follows. |
 | [.lavish/](.lavish/) | HTML review views of the research reports and plans. Derived, not authoritative. |
 | [Harassment_Pattern_Guard.pptx.pdf](Harassment_Pattern_Guard.pptx.pdf) | The original pitch. A proposal, not a specification; its wording is narrowed by `AGENTS.md`. |
 
@@ -190,7 +229,7 @@ Beyond the original phases, three owner-approved additions exist: the on-device 
 
 - The main session plans, writes the brief, reviews and verifies. Code is written by subagents, one module each, and the main session reruns builds and tests before anything is claimed.
 - Newer features follow the specification set in `docs/spec-driven/<feature>/`, and the loop log records each step with its evidence.
-- Each verified addition is committed and pushed to `android-foundation`, then `master` is fast-forwarded. Handoff files are refreshed when a piece lands.
+- Each verified addition is committed and pushed, and `master` and `android-foundation` are kept at the same commit. Handoff files are refreshed when a piece lands.
 - The owner often works in the same tree. Check `git status` first and never commit someone else's uncommitted files.
 
 ### Android build and test
@@ -205,6 +244,7 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 ./gradlew test :app:assembleDebug
 ./gradlew :app:lintDebug :app:verifyManifestPermissions
 ./gradlew :tools:policy:test
+SAKSHI_SCREENSHOTS=true ./gradlew :app:testDebugUnitTest --tests '*ScreenGallery*'   # optional: render screens to app/build/screenshots
 ```
 
 Model files are never in the APK or in git. The speech model and the language model are installed on the device by explicit preparation actions. Instrumented test commands, the device preparation steps and the per-module limits are in [android/README.md](android/README.md). Run device tests with the phone unlocked and awake, and use only the isolated `QwenThreatDeviceTest` for the language model, because some older test helpers clean the normal vault folder.
