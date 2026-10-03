@@ -21,6 +21,7 @@ import org.sakshi.core.vault.AcquisitionKind
 import org.sakshi.core.vault.EvidenceRepository
 import org.sakshi.core.vault.ImportRequest
 import org.sakshi.core.vault.ImportedEvidence
+import org.sakshi.core.vault.NotificationClaims
 
 /**
  * Copies chosen items into the vault. Bytes are read while the URI grant is valid and no URI is kept.
@@ -78,6 +79,37 @@ public class EvidenceImporter(
             maxPlaintextBytes = bytes.size.toLong(),
         )
         return store(0, caseId, request, AnalysisState.READY_FOR_TEXT_ANALYSIS) { ByteArrayInputStream(bytes) }
+    }
+
+    /**
+     * Saves text the person kept from an observed notification. The original is the UTF-8 text; the access class is
+     * notification observation and the claims are recorded as capture metadata under
+     * [NotificationClaims.ROOT_KEY]. A summary-only excerpt ("3 new messages") is preserved but reported as
+     * [AnalysisState.PRESERVED_NOT_ANALYSED], because it is not a message. Identical bytes already in the case are
+     * listed in [ItemOutcome.Saved.duplicateOf], as for every other kind.
+     */
+    public suspend fun commitNotificationExcerpt(caseId: String, excerpt: NotificationExcerptImport): ItemOutcome {
+        if (excerpt.text.isEmpty()) return ItemOutcome.Skipped(0, Rejection.EMPTY_TEXT)
+        val bytes = excerpt.text.toByteArray(Charsets.UTF_8)
+        if (excerpt.text.length > limits.maxTextChars) return ItemOutcome.Skipped(0, Rejection.TEXT_TOO_LONG)
+        val request = ImportRequest(
+            caseId = caseId,
+            acquisitionKind = AcquisitionKind.NOTIFICATION_EXCERPT,
+            accessClass = AccessClass.NOTIFICATION_OBSERVATION,
+            importerMechanism = NOTIFICATION_MECHANISM,
+            declaredMime = TEXT_MIME,
+            claimedOrigin = excerpt.claims.sourceAppClaim,
+            displayNameClaim = null,
+            uriAuthorityClaim = null,
+            maxPlaintextBytes = limits.maxBytesFor(ItemKind.TEXT),
+            captureClaimsJson = excerpt.claims.toJson(),
+        )
+        val outcome = store(0, caseId, request, AnalysisState.READY_FOR_TEXT_ANALYSIS) { ByteArrayInputStream(bytes) }
+        return if (outcome is ItemOutcome.Saved && excerpt.claims.summaryOnly) {
+            outcome.copy(analysisState = AnalysisState.PRESERVED_NOT_ANALYSED)
+        } else {
+            outcome
+        }
     }
 
     private suspend fun saveText(caseId: String, batch: PendingBatch, item: PendingItem.Text): ItemOutcome {
@@ -199,5 +231,6 @@ public class EvidenceImporter(
 
     private companion object {
         const val TEXT_MIME = "text/plain; charset=utf-8"
+        const val NOTIFICATION_MECHANISM = "notification_listener"
     }
 }

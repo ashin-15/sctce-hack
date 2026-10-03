@@ -59,6 +59,7 @@ internal class EventDraft(
     val outgoingCoverage: OutgoingCoverage,
     val assessment: CueAssessment?,
     val representation: Representation = Representation.PRESERVED_IMPORT,
+    val coverageContext: CoverageContext = CoverageContext.SELECTION_PARTIAL,
 )
 
 /**
@@ -94,7 +95,7 @@ internal object EventFactory {
             evidenceReferences = listOf(body) + assessment?.cueReferences.orEmpty(),
             userConfirmation = UserConfirmation(ConfirmationStatus.CONFIRMED, context.receivedAt, ConfirmationScope.PRESERVATION_ONLY),
             deduplication = Deduplication(DedupStatus.DISTINCT_OBSERVATION, null, DEDUP_METHOD),
-            coverage = Coverage(CoverageContext.SELECTION_PARTIAL, draft.textStatus, draft.outgoingCoverage, emptyList()),
+            coverage = Coverage(draft.coverageContext, draft.textStatus, draft.outgoingCoverage, emptyList()),
             boundary = Boundary(
                 BoundaryMarker.NONE,
                 null,

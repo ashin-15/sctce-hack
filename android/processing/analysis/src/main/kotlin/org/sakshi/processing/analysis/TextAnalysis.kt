@@ -14,6 +14,7 @@ import org.sakshi.core.model.Timestamp
 import org.sakshi.core.vault.AcquisitionKind
 import org.sakshi.core.vault.BatchSaveResult
 import org.sakshi.core.vault.EvidenceDetails
+import org.sakshi.core.vault.NotificationClaims
 import org.sakshi.core.vault.Vault
 import org.sakshi.processing.ocr.OcrFailure
 import org.sakshi.processing.ocr.OcrOutcome
@@ -25,6 +26,9 @@ import org.sakshi.processing.text.RulesEngine
  * engine, a JPEG, PNG or WebP image becomes an OCR derivative with one region per recognised line, and one event
  * whose suggestions point at both the recognised text and the image regions. Without one, images are kept as
  * received and not analysed.
+ *
+ * A notification excerpt is always one plain-text event built from its recorded claims; a summary-only excerpt is
+ * refused as [NotAnalysableReason.PRESERVE_ONLY_TYPE] because it is not a message.
  *
  * Input kind rule: the text is read as a WhatsApp-style export when the parser finds at least two sender
  * messages and any text before the first record is at most 256 code points; otherwise it is plain text and
@@ -66,6 +70,13 @@ public class TextAnalysis internal constructor(
         val recogniser = ocr?.takeIf { details.detectedMime in OCR_IMAGE_TYPES && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
         if (recogniser != null) return analyseImage(details, recogniser)
         eligibility(details)?.let { return AnalysisOutcome.NotAnalysable(it) }
+        val claims = if (details.acquisitionKind == AcquisitionKind.NOTIFICATION_EXCERPT) {
+            NotificationClaims.decode(details.captureClaimsJson)
+                ?: return AnalysisOutcome.NotAnalysable(NotAnalysableReason.UNREADABLE)
+        } else {
+            null
+        }
+        if (claims?.summaryOnly == true) return AnalysisOutcome.NotAnalysable(NotAnalysableReason.PRESERVE_ONLY_TYPE)
         val derivative = when (val prepared = prepare(details)) {
             is Prepared.Refused -> return AnalysisOutcome.NotAnalysable(prepared.reason)
             is Prepared.Ready -> prepared.derivative
@@ -74,7 +85,8 @@ public class TextAnalysis internal constructor(
             return AnalysisOutcome.NotAnalysable(NotAnalysableReason.ALREADY_ANALYSED)
         }
         val built = withContext(dispatcher) {
-            EventBuilder(rules, ids, contextOf(details, derivative), details.id, limits).build(derivative.text, exportOptions)
+            val builder = EventBuilder(rules, ids, contextOf(details, derivative), details.id, limits)
+            if (claims == null) builder.build(derivative.text, exportOptions) else builder.buildNotification(derivative.text, claims)
         }
         return when (built) {
             is BuildResult.NeedsOptions -> AnalysisOutcome.NeedsExportOptions(
@@ -161,7 +173,8 @@ public class TextAnalysis internal constructor(
     private fun eligibility(details: EvidenceDetails): NotAnalysableReason? {
         val declaredText = details.declaredMime?.trim()?.lowercase()?.startsWith(TEXT_PREFIX) == true
         val sharedText = details.acquisitionKind == AcquisitionKind.SHARED_TEXT ||
-            details.acquisitionKind == AcquisitionKind.PASTED_TEXT
+            details.acquisitionKind == AcquisitionKind.PASTED_TEXT ||
+            details.acquisitionKind == AcquisitionKind.NOTIFICATION_EXCERPT
         return when {
             details.acquisitionKind == AcquisitionKind.MANUAL_NOTE -> NotAnalysableReason.MANUAL_NOTE
             details.detectedMime != null -> NotAnalysableReason.PRESERVE_ONLY_TYPE

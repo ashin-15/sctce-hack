@@ -42,6 +42,8 @@ public class ImportRequest(
     public val displayNameClaim: String?,
     public val uriAuthorityClaim: String?,
     public val maxPlaintextBytes: Long,
+    /** JSON recorded in `capture_metadata.exif_json`: claims about how the item arrived, never verified facts. */
+    public val captureClaimsJson: String? = null,
 )
 
 /** Identity of a stored original. [sha256] is lower-case hex of the received bytes. */
@@ -72,6 +74,8 @@ public data class EvidenceDetails(
     val claimedOrigin: String?,
     val displayNameClaim: String?,
     val uriAuthorityClaim: String?,
+    /** Claims recorded at capture time as JSON, for example [NotificationClaims.decode]. Null when none were recorded. */
+    val captureClaimsJson: String? = null,
 )
 
 /** Why an original could not be checked. */
@@ -189,6 +193,7 @@ public class EvidenceRepository(
             claimedOrigin = evidence.claimedOrigin,
             displayNameClaim = metadata.displayNameClaim,
             uriAuthorityClaim = metadata.uriAuthorityClaim,
+            captureClaimsJson = metadata.exifJson,
         )
     }
 
@@ -269,7 +274,7 @@ public class EvidenceRepository(
             importerMechanism = request.importerMechanism,
             uriAuthorityClaim = request.uriAuthorityClaim,
             displayNameClaim = request.displayNameClaim,
-            exifJson = null,
+            exifJson = request.captureClaimsJson,
             providerTransform = ProviderTransform.UNKNOWN,
             collectorSessionId = null,
             elapsedRealtimeMs = null,

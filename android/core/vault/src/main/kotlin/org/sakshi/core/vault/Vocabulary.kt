@@ -14,8 +14,18 @@ public object AcquisitionKind {
     public const val PASTED_TEXT: String = "pasted_text"
     public const val MANUAL_NOTE: String = "manual_note"
 
-    internal val all: Set<String> =
-        setOf(SHARED_TEXT, SHARED_STREAM, SELECTED_DOCUMENT, SELECTED_VISUAL_MEDIA, PASTED_TEXT, MANUAL_NOTE)
+    /** Text the person chose to keep from an observed notification. Always a claim by the publishing app. */
+    public const val NOTIFICATION_EXCERPT: String = "notification_excerpt"
+
+    internal val all: Set<String> = setOf(
+        SHARED_TEXT,
+        SHARED_STREAM,
+        SELECTED_DOCUMENT,
+        SELECTED_VISUAL_MEDIA,
+        PASTED_TEXT,
+        MANUAL_NOTE,
+        NOTIFICATION_EXCERPT,
+    )
 }
 
 /** Values of `evidence.access_class`. */

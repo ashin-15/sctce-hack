@@ -1,10 +1,15 @@
 package org.sakshi.processing.analysis
 
+import java.time.Instant
+import org.sakshi.core.model.AssociationReview
 import org.sakshi.core.model.CodePointSpan
+import org.sakshi.core.model.CoverageContext
 import org.sakshi.core.model.Direction
 import org.sakshi.core.model.Event
 import org.sakshi.core.model.EventId
+import org.sakshi.core.model.EventSender
 import org.sakshi.core.model.EventSource
+import org.sakshi.core.model.IdentityBasis
 import org.sakshi.core.model.OutgoingCoverage
 import org.sakshi.core.model.ReferenceId
 import org.sakshi.core.model.Representation
@@ -13,7 +18,9 @@ import org.sakshi.core.model.SourceKind
 import org.sakshi.core.model.TextStatus
 import org.sakshi.core.model.TimeBasis
 import org.sakshi.core.model.TimeBounds
+import org.sakshi.core.model.TimePrecision
 import org.sakshi.core.model.Timestamp
+import org.sakshi.core.vault.NotificationClaims
 import org.sakshi.processing.ocr.OcrEngine
 import org.sakshi.processing.text.DateOrder
 import org.sakshi.processing.text.ExportParse
@@ -90,6 +97,57 @@ internal class EventBuilder(
             representation = Representation.OCR_DERIVATIVE,
         )
         return built(listOf(EventFactory.build(context, draft)), InputKind.IMAGE_TEXT)
+    }
+
+    /**
+     * One event for a notification excerpt the person kept. Always plain text, never an export, whatever the text
+     * looks like. Sender, time, app and conversation are claims: the sender is an app-scoped hint, the event time
+     * is the source-claim time, and the collector session and monotonic reading are recorded beside it without
+     * being compared with it. Direction is incoming or unknown; outgoing messages are never claimed as covered.
+     */
+    fun buildNotification(text: String, claims: NotificationClaims): BuildResult.Built {
+        val index = CodePointIndex(text)
+        val signals = rules.analyse(text)
+        noteLanguage(signals)
+        val label = claims.senderLabelClaim?.let(::truncate)
+        val source = EventSource(
+            SourceKind.NOTIFICATION_EXCERPT,
+            claims.sourceAppClaim.takeIf { it.isNotBlank() }?.let(::truncate),
+            null,
+            claims.conversationScopeClaim.takeIf { it.isNotBlank() }?.let { ScopeId(it.take(MAX_ID_LENGTH)) },
+            null,
+            ScopeId(NOTIFICATION_PARSER_VERSION),
+        )
+        val draft = EventDraft(
+            eventId = EventId(ids()),
+            timestamp = notificationTime(claims),
+            sender = EventSender(
+                null,
+                label,
+                if (label == null) IdentityBasis.UNKNOWN else IdentityBasis.APP_SCOPED_HINT,
+                AssociationReview.UNREVIEWED,
+            ),
+            direction = if (claims.direction == Direction.INCOMING) Direction.INCOMING else Direction.UNKNOWN,
+            source = source,
+            bodySpan = CodePointSpan(0, index.length),
+            textStatus = if (claims.textStatus == TextStatus.TRUNCATED) TextStatus.TRUNCATED else TextStatus.AVAILABLE,
+            outgoingCoverage = OutgoingCoverage.UNKNOWN,
+            assessment = assess(signals, 0),
+            coverageContext = CoverageContext.NOTIFICATION_PARTIAL,
+        )
+        return built(listOf(EventFactory.build(context, draft)), InputKind.PLAIN_TEXT)
+    }
+
+    private fun notificationTime(claims: NotificationClaims): TimeBounds {
+        val session = ScopeId(claims.collectorSessionId.take(MAX_ID_LENGTH).ifEmpty { NO_SESSION })
+        val monotonic = claims.collectorElapsedRealtimeMs.takeIf { it >= 0 }
+        val claimed = claims.sourceClaimTimeMs
+        if (claimed == null) {
+            note(AnalysisWarning.UNRESOLVED_TIMES)
+            return TimeBounds(null, null, TimeBasis.UNKNOWN, TimePrecision.UNKNOWN, null, session, monotonic)
+        }
+        val at = Timestamp(Instant.ofEpochMilli(claimed).toString())
+        return TimeBounds(at, at, TimeBasis.SOURCE_CLAIM, TimePrecision.MILLISECOND, null, session, monotonic)
     }
 
     private fun built(events: List<Event>, kind: InputKind): BuildResult.Built =
@@ -239,6 +297,8 @@ internal class EventBuilder(
         const val MAX_ID_LENGTH: Int = 128
         const val MAX_ZONE_LENGTH: Int = 64
         const val PLAIN_PARSER_VERSION: String = "plain-text-v1"
+        const val NOTIFICATION_PARSER_VERSION: String = "notification-excerpt-v1"
+        const val NO_SESSION: String = "unknown-session"
         const val SOURCE_APP: String = "whatsapp-export-claim"
         const val NO_LETTERS: String = "no_letters"
     }
