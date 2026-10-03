@@ -106,7 +106,12 @@ public class ObservationDiffer(
 
         // Layer 1: the same notification again with the same content.
         if (keyState.lastSignatures == signatures) {
-            suppressed.add(SuppressionLayer.UPDATE_EQUIVALENCE, messages.size)
+            val layer = if (snapshot.origin == SnapshotOrigin.ACTIVE_SNAPSHOT) {
+                SuppressionLayer.ACTIVE_SNAPSHOT_REDELIVERY
+            } else {
+                SuppressionLayer.UPDATE_EQUIVALENCE
+            }
+            suppressed.add(layer, messages.size)
             return@synchronized DiffResult(emptyList(), suppressed, null, null)
         }
 

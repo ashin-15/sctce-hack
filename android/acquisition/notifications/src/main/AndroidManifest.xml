@@ -18,13 +18,11 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
             <!--
-                API 31+ filter types the listener asks to receive by default: conversations, alerting and silent.
-                Ongoing notifications are left out. Silent messages can be relevant, so silent is not disabled.
-                The person can still change this in system settings.
+                No filter-type meta-data (android.service.notification.default_filter_types, API 31+) is declared.
+                The meta-data names are verified in the platform jar, but the accepted value tokens could not be
+                verified locally. An absent default means all notification types, which is wanted here because
+                silent messages can be relevant. The person can still narrow this in system settings.
             -->
-            <meta-data
-                android:name="android.service.notification.default_filter_types"
-                android:value="conversations|alerting|silent" />
         </service>
     </application>
 </manifest>

@@ -4,30 +4,39 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 
 /**
- * The NotificationListenerService that Android binds when notification access is granted. Declared
- * disabled in the manifest; [NotificationObservation.enable] flips the component on when the person
- * makes an affirmative choice in the app.
- *
- * This is a skeleton for phase 12. The service receives callbacks but does not process them yet.
- * It will be wired to [NotificationNormalizer], [ObservationDiffer] and [CandidateInbox] once the
- * app screens for the notification lane exist.
+ * The system-bound listener. It is declared disabled in the manifest and is switched on only by
+ * [NotificationObservation.enable] after the person's affirmative choice. It is read-only and thin: each callback hands
+ * the notification to the intake, which checks consent and the package allowlist before any extras are read, takes a
+ * bounded snapshot and does a non-blocking send. No disk, crypto or analysis happens here.
  */
 public class SakshiNotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        // Phase 12 stub: will forward to the normaliser and differ pipeline.
+        val observation = NotificationObservation.from(applicationContext)
+        observation.intake.onPosted(sbn.toSource())
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification, rankingMap: RankingMap, reason: Int) {
-        // Phase 12 stub: will record removal lifecycle for candidates.
+        val observation = NotificationObservation.from(applicationContext)
+        observation.intake.onRemoved(sbn.toSource(), reason)
     }
 
     override fun onListenerConnected() {
-        // Phase 12 stub: will seed de-duplication state from active notifications
-        // if settings.includeActiveOnConnect is true.
+        val observation = NotificationObservation.from(applicationContext)
+        observation.onListenerConnected()
+        // Only packages on the allowlist are read, and only once the person has enabled the lane.
+        val active = try {
+            activeNotifications
+        } catch (ignored: SecurityException) {
+            null
+        }
+        observation.intake.onActiveSnapshot(active.orEmpty().map { it.toSource() })
     }
 
     override fun onListenerDisconnected() {
-        // Phase 12 stub: will transition coverage to COVERAGE_UNKNOWN.
+        NotificationObservation.from(applicationContext).onListenerDisconnected()
     }
+
+    private fun StatusBarNotification.toSource(): NotificationSource =
+        PlatformNotificationSource(packageName, key, groupKey, postTime, notification)
 }

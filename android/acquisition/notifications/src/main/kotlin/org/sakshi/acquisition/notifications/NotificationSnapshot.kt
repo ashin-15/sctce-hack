@@ -98,27 +98,37 @@ public class TextBudget(private var remaining: Int = NotificationBounds.MAX_TOTA
     public val isExhausted: Boolean get() = remaining <= 0
 }
 
+/** One message as read from the platform, before any bound is applied. Text and sender may be arbitrarily long. */
+public data class RawMessage(
+    val senderLabel: CharSequence?,
+    val text: CharSequence?,
+    val timestampMs: Long?,
+    val fromCurrentUserHint: Boolean,
+)
+
 /** Bounding of a message list. Pure so that the cap behaviour is testable without Android. */
 public object SnapshotBounds {
     /**
      * Keeps the newest [limit] of [raw] (the platform lists oldest first), clips each text against [budget] starting
-     * with the newest, and returns them oldest first again. The flag says that entries were left out.
+     * with the newest, and returns them oldest first again. The flag says that entries were left out, either by the
+     * count cap or because no text allowance remained. Cut text is flagged on the message and never presented as complete.
      */
-    public fun boundMessages(raw: List<SnapshotMessage>, limit: Int, budget: TextBudget): Pair<List<SnapshotMessage>, Boolean> {
+    public fun boundMessages(raw: List<RawMessage>, limit: Int, budget: TextBudget): Pair<List<SnapshotMessage>, Boolean> {
         val newest = raw.takeLast(limit)
         var omitted = raw.size > newest.size
         val kept = ArrayList<SnapshotMessage>(newest.size)
         for (message in newest.asReversed()) {
             val clipped = budget.clip(message.text)
-            if (clipped == null) {
+            if (clipped == null || clipped.value.isEmpty()) {
                 omitted = true
                 continue
             }
-            val sender = budget.clip(message.senderLabel)?.value
-            kept += message.copy(
+            kept += SnapshotMessage(
+                senderLabel = budget.clip(message.senderLabel)?.value?.takeIf { it.isNotEmpty() },
                 text = clipped.value,
-                senderLabel = sender,
-                textTruncated = message.textTruncated || clipped.truncated,
+                timestampMs = message.timestampMs,
+                fromCurrentUserHint = message.fromCurrentUserHint,
+                textTruncated = clipped.truncated,
             )
         }
         return kept.asReversed() to omitted
