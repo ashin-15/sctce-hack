@@ -3,6 +3,7 @@ package org.sakshi.processing.analysis
 import java.util.Locale
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -170,6 +171,39 @@ class PlainTextAnalysisTest : AnalysisTestBase() {
         assertEquals(1, outcome.eventCount)
         assertEquals("cancelled", vault.threatAnalysisRuns.forEvent(event.eventId.value).single().status)
         assertEquals(SupportState.ANALYZED, vault.evidence.details(evidenceId)?.supportState)
+    }
+
+    @Test
+    fun automaticRunCancelledDuringInferenceWritesNothingAndCanRunAgain() = runBlocking<Unit> {
+        val evidenceId = importText("Synthetic incoming text for an interrupted automatic run.")
+        var interrupt = true
+        val classifier = ThreatLanguageClassifier { _, inputs ->
+            if (interrupt) throw kotlinx.coroutines.CancellationException("synthetic lock during inference")
+            inputs.map { ThreatLanguageResult(ThreatLanguageResultStatus.NO_SIGNAL_UNCALIBRATED) }
+        }
+        val withClassifier = TextAnalysis(
+            vault,
+            VaultTextDerivatives(vault.derivatives),
+            RulesEngineFactory.default(),
+            clock,
+            ids,
+            AnalysisLimits(),
+            kotlinx.coroutines.Dispatchers.Default,
+            threatClassifier = classifier,
+        )
+
+        assertFailsWith<kotlinx.coroutines.CancellationException> {
+            withClassifier.analyse(evidenceId, exportOptions = null, requestId = "first", discardCancelledRun = true)
+        }
+        assertTrue(events().isEmpty())
+        assertEquals(SupportState.SAVED, vault.evidence.details(evidenceId)?.supportState)
+
+        interrupt = false
+        assertIs<AnalysisOutcome.Analysed>(
+            withClassifier.analyse(evidenceId, exportOptions = null, requestId = "second", discardCancelledRun = true),
+        )
+        val event = events().single()
+        assertEquals("no_signal_uncalibrated", vault.threatAnalysisRuns.forEvent(event.eventId.value).single().status)
     }
 
     @Test

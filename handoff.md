@@ -16,6 +16,10 @@ Implement offline incoming-text threat-language analysis using the Qwen2.5 1.5B 
 - Known false positive: "I could kill for a cup of tea right now." is labelled a possible threat. The fixture records it and does not gate on it.
 - About 33 s per message on this phone. Do not describe the feature as validated, calibrated or release accepted.
 
+## Automatic analysis (added 3 October 2026)
+
+Owner decision: analysis may run without a button, but only once the vault is unlocked. `android/app/.../analysis/AnalysisQueue.kt` is created in `SessionServices`, started at unlock and closed at lock. It analyses saved text in active cases one item at a time; pictures, recordings and notes are not started automatically. A lock in the middle of a run writes nothing and the item runs again after the next unlock. JVM tests and one real-Qwen device test pass; see `benchmark.md`. Still to build: the status line with pause and stop, a settings switch, battery and thermal guards, and one model load per batch.
+
 ## Next steps
 
 1. End-user check on the phone (needs the owner to unlock): share a text into Sakshi, run analysis, confirm the suggestion and its quote on the review screen, accept or reject it.

@@ -14,10 +14,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.sakshi.app.analysis.AnalysisQueue
+import org.sakshi.app.analysis.unanalysedText
 import org.sakshi.core.model.CategoryBasis
 import org.sakshi.core.model.CategoryReviewStatus
 import org.sakshi.core.model.CaseId
@@ -134,6 +141,55 @@ class QwenThreatDeviceTest {
         }
         assertEquals(originalSize, file.length())
         assertEquals(digest, models.computeSha256(file), "Verification must preserve the provisioned model")
+    }
+
+    /** The automatic queue over a separate synthetic vault: nothing starts the runs except the queue itself. */
+    @Test
+    fun automaticQueueClassifiesSavedTextWithRealQwen() = runBlocking<Unit> {
+        assumeTrue(InstrumentationRegistry.getArguments().getString("qwenDeviceVerification") == "true")
+        val target = InstrumentationRegistry.getInstrumentation().targetContext
+        val models = ModelManager(target)
+        assertTrue(models.getModelFile(ModelManager.QWEN_2_5_1_5B.id).isFile, "Import the Qwen preset first")
+        val scratch = File(target.cacheDir, "synthetic-qwen-queue-${UUID.randomUUID()}")
+        check(scratch.mkdir())
+        val isolated = object : ContextWrapper(target) {
+            override fun getNoBackupFilesDir(): File = scratch
+        }
+        val wrapper = KeystoreKeyWrapper("synthetic-qwen-queue-${UUID.randomUUID()}", false)
+        val vault = Vault.openForTests(isolated, wrapper, Instant::now, { UUID.randomUUID().toString() })
+        try {
+            val analysis = TextAnalysis(
+                vault, RulesEngineFactory.default(), Instant::now, { UUID.randomUUID().toString() },
+                threatClassifier = QwenThreatLanguageClassifier(LlmSessionManager(models)),
+            )
+            val case = vault.cases.create("Synthetic Qwen queue verification")
+            val texts = listOf("I will break your arm if you come back." to "possible_threat_language", "Lunch at one tomorrow?" to "no_signal_uncalibrated")
+            for ((index, fixture) in texts.withIndex()) {
+                vault.evidence.import(
+                    ImportRequest(case.id, AcquisitionKind.SHARED_TEXT, AccessClass.USER_MEDIATED,
+                        "synthetic-device-verification", "text/plain", "synthetic", "queue-$index.txt", null, 4096L),
+                    ByteArrayInputStream(fixture.first.toByteArray(Charsets.UTF_8)),
+                )
+            }
+            val started = SystemClock.elapsedRealtime()
+            AnalysisQueue(
+                vault.unanalysedText(),
+                { id -> analysis.analyse(id, null, UUID.randomUUID().toString(), discardCancelledRun = true) },
+                CoroutineScope(SupervisorJob() + Dispatchers.IO),
+            ).use { queue ->
+                queue.start()
+                val done = withTimeout(300_000L) { queue.state.first { it.analysed + it.notAnalysed + it.needsAnswers == texts.size && it.current == null } }
+                receipt("queue", "analysed=${done.analysed};not_analysed=${done.notAnalysed};elapsed_ms=${SystemClock.elapsedRealtime() - started}")
+                assertEquals(texts.size, done.analysed)
+            }
+            val events = vault.events.loadLatest(CaseId(case.id), Instant.ofEpochMilli(Long.MAX_VALUE))
+            val statuses = events.associate { EventText(vault).bodyOf(it).orEmpty() to vault.threatAnalysisRuns.forEvent(it.eventId.value).single().status }
+            assertEquals(texts.toMap(), statuses)
+        } finally {
+            vault.close()
+            wrapper.delete()
+            check(scratch.deleteRecursively())
+        }
     }
 
     private fun receipt(label: String, detail: String) {

@@ -102,7 +102,20 @@ public class TextAnalysis internal constructor(
     override suspend fun analyse(evidenceId: String, exportOptions: ExportOptions?): AnalysisOutcome =
         analyse(evidenceId, exportOptions, UUID.randomUUID().toString())
 
-    override suspend fun analyse(evidenceId: String, exportOptions: ExportOptions?, requestId: String): AnalysisOutcome {
+    override suspend fun analyse(evidenceId: String, exportOptions: ExportOptions?, requestId: String): AnalysisOutcome =
+        analyse(evidenceId, exportOptions, requestId, discardCancelledRun = false)
+
+    /**
+     * With [discardCancelledRun], a run cancelled during local model inference writes no events and no run record, so
+     * the next call starts again from the stored derivative. Automatic analysis uses this: a lock in the middle of a
+     * run must not leave a message whose threat-language check was never made.
+     */
+    public suspend fun analyse(
+        evidenceId: String,
+        exportOptions: ExportOptions?,
+        requestId: String,
+        discardCancelledRun: Boolean,
+    ): AnalysisOutcome {
         val details = vault.evidence.details(evidenceId)
             ?: return AnalysisOutcome.NotAnalysable(NotAnalysableReason.EVIDENCE_MISSING)
         val recogniser = ocr?.takeIf { details.detectedMime in OCR_IMAGE_TYPES && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
@@ -140,7 +153,7 @@ public class TextAnalysis internal constructor(
                 built.recordCount,
                 built.sampleDates,
             )
-            is BuildResult.Built -> save(details, derivative, built, requestId)
+            is BuildResult.Built -> save(details, derivative, built, requestId, discardCancelledRun)
         }
     }
 
@@ -260,6 +273,7 @@ public class TextAnalysis internal constructor(
         derivative: DerivativeText,
         built: BuildResult.Built,
         threatRequestId: String? = null,
+        discardCancelledRun: Boolean = false,
     ): AnalysisOutcome {
         val lengthOfDerivative = CodePointIndex(derivative.text).length
         val threatEligible = built.kind in THREAT_ELIGIBLE_INPUT_KINDS &&
@@ -282,6 +296,7 @@ public class TextAnalysis internal constructor(
             return result
         }
         if (threat?.inferenceCancelled == true) {
+            if (discardCancelledRun) throw kotlinx.coroutines.CancellationException("Automatic analysis was cancelled")
             withContext(NonCancellable) { persist() }
         } else {
             persist()
