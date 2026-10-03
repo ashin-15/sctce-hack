@@ -14,10 +14,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.sakshi.app.analysis.AnalysisQueue
+import org.sakshi.app.analysis.unanalysedText
 import org.sakshi.core.model.CategoryBasis
 import org.sakshi.core.model.CategoryReviewStatus
 import org.sakshi.core.model.CaseId
@@ -79,11 +86,21 @@ class QwenThreatDeviceTest {
                 vault, RulesEngineFactory.default(), Instant::now, { UUID.randomUUID().toString() },
                 threatClassifier = QwenThreatLanguageClassifier(sessions),
             )
+            val threat = setOf("possible_threat_language")
+            val noSignal = setOf("no_signal_uncalibrated")
             val fixtures = listOf(
-                Triple("direct", "🙂 I will kill you tonight.", "possible_threat_language"),
-                Triple("ordinary", "Can you bring the documents tomorrow?", "no_signal_uncalibrated"),
-                Triple("quoted", "She said \"I will kill you\" in the film.", "needs_review"),
+                Triple("direct", "🙂 I will kill you tonight.", threat),
+                Triple("ordinary", "Can you bring the documents tomorrow?", noSignal),
+                Triple("quoted", "She said \"I will kill you\" in the film.", setOf("needs_review")),
+                Triple("conditional", "If you go to the police I will hurt your family.", threat),
+                Triple("location", "I know where you live. I will come there and beat you.", threat),
+                Triple("greeting", "Happy birthday! See you at dinner.", noSignal),
+                Triple("insult", "You are a useless idiot and everyone hates you.", noSignal),
+                // Recorded, not gated: on 3 October 2026 the model labelled this figure of speech as a possible threat.
+                Triple("idiom", "I could kill for a cup of tea right now.", threat + noSignal + "needs_review"),
+                Triple("romanized", "Tum ruk jao, main tumhe maarunga.", setOf("unsupported_language")),
             )
+            val mismatches = mutableListOf<String>()
             for ((label, text, expected) in fixtures) {
                 val case = vault.cases.create("Synthetic Qwen verification $label")
                 val evidence = vault.evidence.import(
@@ -95,11 +112,14 @@ class QwenThreatDeviceTest {
                 assertIs<AnalysisOutcome.Analysed>(analysis.analyse(evidence.id, null, UUID.randomUUID().toString()))
                 val event = vault.events.loadLatest(CaseId(case.id), Instant.ofEpochMilli(Long.MAX_VALUE)).single()
                 val run = vault.threatAnalysisRuns.forEvent(event.eventId.value).single()
-                receipt(label, "status=${run.status};elapsed_ms=${SystemClock.elapsedRealtime() - started};digest=${run.weightSha256}")
-                assertEquals(expected, run.status, "Synthetic $label fixture")
-                assertEquals(digest, run.weightSha256)
+                receipt(label, "status=${run.status};reason=${run.reasonCode};elapsed_ms=${SystemClock.elapsedRealtime() - started};digest=${run.weightSha256}")
+                if (run.status !in expected) {
+                    mismatches += "$label expected $expected but was ${run.status} (${run.reasonCode})"
+                    continue
+                }
+                assertEquals(if (run.status == "unsupported_language") null else digest, run.weightSha256)
                 assertEquals(text, EventText(vault).bodyOf(event))
-                if (expected == "possible_threat_language") {
+                if (run.status == "possible_threat_language") {
                     val categoryIndex = event.categories.indexOfFirst { it.basis == CategoryBasis.CLASSIFIER_SUGGESTION }
                     assertTrue(categoryIndex >= 0)
                     val category = event.categories[categoryIndex]
@@ -113,6 +133,7 @@ class QwenThreatDeviceTest {
                     assertEquals(run, vault.threatAnalysisRuns.forEvent(event.eventId.value).single())
                 }
             }
+            assertEquals(emptyList(), mismatches, "Synthetic fixtures")
         } finally {
             vault.close()
             wrapper.delete()
@@ -120,6 +141,55 @@ class QwenThreatDeviceTest {
         }
         assertEquals(originalSize, file.length())
         assertEquals(digest, models.computeSha256(file), "Verification must preserve the provisioned model")
+    }
+
+    /** The automatic queue over a separate synthetic vault: nothing starts the runs except the queue itself. */
+    @Test
+    fun automaticQueueClassifiesSavedTextWithRealQwen() = runBlocking<Unit> {
+        assumeTrue(InstrumentationRegistry.getArguments().getString("qwenDeviceVerification") == "true")
+        val target = InstrumentationRegistry.getInstrumentation().targetContext
+        val models = ModelManager(target)
+        assertTrue(models.getModelFile(ModelManager.QWEN_2_5_1_5B.id).isFile, "Import the Qwen preset first")
+        val scratch = File(target.cacheDir, "synthetic-qwen-queue-${UUID.randomUUID()}")
+        check(scratch.mkdir())
+        val isolated = object : ContextWrapper(target) {
+            override fun getNoBackupFilesDir(): File = scratch
+        }
+        val wrapper = KeystoreKeyWrapper("synthetic-qwen-queue-${UUID.randomUUID()}", false)
+        val vault = Vault.openForTests(isolated, wrapper, Instant::now, { UUID.randomUUID().toString() })
+        try {
+            val analysis = TextAnalysis(
+                vault, RulesEngineFactory.default(), Instant::now, { UUID.randomUUID().toString() },
+                threatClassifier = QwenThreatLanguageClassifier(LlmSessionManager(models)),
+            )
+            val case = vault.cases.create("Synthetic Qwen queue verification")
+            val texts = listOf("I will break your arm if you come back." to "possible_threat_language", "Lunch at one tomorrow?" to "no_signal_uncalibrated")
+            for ((index, fixture) in texts.withIndex()) {
+                vault.evidence.import(
+                    ImportRequest(case.id, AcquisitionKind.SHARED_TEXT, AccessClass.USER_MEDIATED,
+                        "synthetic-device-verification", "text/plain", "synthetic", "queue-$index.txt", null, 4096L),
+                    ByteArrayInputStream(fixture.first.toByteArray(Charsets.UTF_8)),
+                )
+            }
+            val started = SystemClock.elapsedRealtime()
+            AnalysisQueue(
+                vault.unanalysedText(),
+                { id -> analysis.analyse(id, null, UUID.randomUUID().toString(), discardCancelledRun = true) },
+                CoroutineScope(SupervisorJob() + Dispatchers.IO),
+            ).use { queue ->
+                queue.start()
+                val done = withTimeout(300_000L) { queue.state.first { it.analysed + it.notAnalysed + it.needsAnswers == texts.size && it.current == null } }
+                receipt("queue", "analysed=${done.analysed};not_analysed=${done.notAnalysed};elapsed_ms=${SystemClock.elapsedRealtime() - started}")
+                assertEquals(texts.size, done.analysed)
+            }
+            val events = vault.events.loadLatest(CaseId(case.id), Instant.ofEpochMilli(Long.MAX_VALUE))
+            val statuses = events.associate { EventText(vault).bodyOf(it).orEmpty() to vault.threatAnalysisRuns.forEvent(it.eventId.value).single().status }
+            assertEquals(texts.toMap(), statuses)
+        } finally {
+            vault.close()
+            wrapper.delete()
+            check(scratch.deleteRecursively())
+        }
     }
 
     private fun receipt(label: String, detail: String) {

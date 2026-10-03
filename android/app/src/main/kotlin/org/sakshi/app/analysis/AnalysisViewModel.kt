@@ -289,7 +289,7 @@ class AnalysisViewModel(
             initializer {
                 AnalysisViewModel(
                     evidenceId,
-                    services.textAnalysis::analyse,
+                    services.analyse,
                     installSpeechModel = services.speechProvisioner::importFrom,
                     openSpeechFile = { uri -> services.resolver.openInputStream(uri) },
                     io = services.io,

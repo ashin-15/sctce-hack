@@ -65,3 +65,11 @@ Current plan review: GPT-6.1 Sol completed documentation-only native implementat
 - **Python baseline:** `python -m unittest discover -s bench/tests -v` ran 14 tests but errored in three test modules because installed Python 3.14 environment lacks `scikit-learn` and `Pillow`; one optional Whisper dependency test skipped. This benchmark-suite result is unrelated to the Android implementation and is not a pass.
 - **Judgment:** Native source, Kotlin wiring, app compilation and APK assembly are verified. Runtime inference on the connected phone remains unverified because the exact Qwen file was not confirmed through Sakshi's model manager and no app-mediated model smoke was run. Do not describe the device feature as validated or release accepted.
 - **Next state:** Implementation complete; device/model and quality acceptance gates remain open.
+
+## Loop 6 - grammar fix and first passing device run (3 October 2026)
+
+- **Fix:** Removed the duplicate `llama_sampler_accept` in `sakshi_llm.cpp`; `llama_sampler_sample` already accepts the token in the pinned runtime.
+- **Task change:** Six-kind sorting task with a quote allowed only for the threat kind; quoted-speech guard in `QwenThreatLanguageClassifier`; `QwenThreatOutputTest` covers the output parser.
+- **Evidence:** `QwenThreatDeviceTest` passed on CPH2695 with nine synthetic fixtures; model digest unchanged. Table and timings are in `benchmark.md` under "Android local Qwen threat-language suggestions".
+- **Judgment:** The feature runs on the device and flags the three synthetic English threats with exact source quotes. One figure of speech is a known false positive. This is a smoke result, not a quality measurement.
+- **Open acceptance gates:** AC-004/AC-010 evaluation and calibration; AC-005 Malayalam and Hindi (currently refused); AC-008 cancellation and resources on device; the end-user UI flow.

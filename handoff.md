@@ -2,19 +2,31 @@
 
 Date: 2026-10-03
 Repository: `/home/ashin/Hackathon/sctce-hack`
-Status: **Stopped at user request. Implementation exists, but threat classification has not passed real-device verification.**
+Status: **Runs on the device. First passing isolated device run on 3 October 2026. Not calibrated and not release accepted.**
 
 ## User intent and authorization
 
-Implement offline incoming-text threat-language analysis using the Qwen2.5 1.5B model already on the connected Android phone. The user requested GPT-6.1 Sol for model identification and native-runtime planning, and GPT-6 Luna for implementation. Planning and implementation were approved. The latest request is to stop and create this handoff. Do not resume implementation or testing until asked.
+Implement offline incoming-text threat-language analysis using the Qwen2.5 1.5B model already on the connected Android phone. The owner asked on 3 October 2026 to continue this work and get the feature working.
 
 ## Current result
 
-- Native llama.cpp is packaged in the updated debug APK and loads on the phone.
-- The installed GGUF now loads and produces nonempty real generation output in an app-owned instrumentation smoke.
-- The first threat-classification fixture still fails: persisted status is `inference_failed`, expected `possible_threat_language`.
-- Ordinary and quoted-message fixtures did not run because the first assertion stopped the test.
-- **Do not report the feature as working, validated, calibrated, or release accepted.**
+- The earlier `inference_failed` was the duplicate `llama_sampler_accept` in the JNI loop. It is removed and grammar-constrained generation works.
+- The classifier now asks the model to sort a message into six kinds and maps them to the three stored statuses; a guard sends quotes that sit inside quotation marks to `needs_review`.
+- `QwenThreatDeviceTest` passes on CPH2695 with nine synthetic fixtures: three English threats flagged with exact source quotes, ordinary, greeting and insult messages without a suggestion, quoted speech to review, Romanized Hindi refused. Results and timings are in `benchmark.md` ("Android local Qwen threat-language suggestions").
+- Known false positive: "I could kill for a cup of tea right now." is labelled a possible threat. The fixture records it and does not gate on it.
+- About 33 s per message on this phone. Do not describe the feature as validated, calibrated or release accepted.
+
+## Automatic analysis (added 3 October 2026)
+
+Owner decision: analysis may run without a button, but only once the vault is unlocked. `android/app/.../analysis/AnalysisQueue.kt` is created in `SessionServices`, started at unlock and closed at lock. It analyses saved text in active cases one item at a time; pictures, recordings and notes are not started automatically. A lock in the middle of a run writes nothing and the item runs again after the next unlock. JVM tests and one real-Qwen device test pass; see `benchmark.md`. Still to build: the status line with pause and stop, a settings switch, battery and thermal guards, and one model load per batch.
+
+## Next steps
+
+1. End-user check on the phone (needs the owner to unlock): share a text into Sakshi, run analysis, confirm the suggestion and its quote on the review screen, accept or reject it.
+2. Malayalam and Hindi, native script and Romanized, are refused today, so threats in those languages are not flagged. Qualifying them needs labelled synthetic data and native-speaker review (owner question Q6).
+3. Speed: measure where the 33 s goes (per-run 1.1 GB hash, model load, prompt evaluation, per-token grammar pass over the full vocabulary) before changing anything.
+4. A labelled evaluation set for false-positive and false-negative rates; figures of speech are the first known weakness.
+5. Device cancellation, memory, battery and thermal checks.
 
 ## Implementation already present
 
@@ -67,29 +79,6 @@ The original guard capped parameters at 1.7 billion. App-native metadata reporte
 
 Native initialization now returns typed load-stage failure and safe metadata: parameter count, file type and Qwen architecture flag. Kotlin `NativeLoadResult`, `LlamaCppEngine.loadResult` and `LlmSessionUnavailable.metadata` preserve these diagnostics without exposing evidence text.
 
-## First next fix to investigate when resumed
-
-**Strong source-level diagnosis: the native generation loop accepts each sampled token twice. This has not yet been fixed or tested.**
-
-In `android/processing/llm/src/main/cpp/sakshi_llm.cpp`, the loop calls:
-
-```cpp
-const llama_token token = llama_sampler_sample(sampler, session->context, -1);
-// ... append token piece ...
-llama_sampler_accept(sampler, token);
-```
-
-Pinned `android/third_party/llama.cpp/src/llama-sampling.cpp`, function `llama_sampler_sample` around lines 407-437, already calls `llama_sampler_accept(smpl, token)` before returning. The second call advances the grammar twice for one output token. The plain generation smoke has no grammar and succeeds; the classifier uses a JSON grammar and fails. This is a concrete integration defect and the leading explanation for the observed classification failure.
-
-On authorized resume:
-
-1. Remove the duplicate explicit acceptance after confirming the pinned sampler contract.
-2. Add an appropriate regression for grammar generation/token acceptance and rerun the existing isolated device test.
-3. If classification still fails, add safe typed generation-stage diagnostics. Do not log source prompts, evidence or arbitrary model output.
-4. Run all three fixtures and check exact Unicode quote anchors, persisted results and immutable review revisions.
-5. Preserve/check the model digest after verification, including failure paths if practical.
-6. Update `LOOP.md`, `benchmark.md` and a durable device receipt with actual outcomes and timings. This turn's device results have not yet been added to those documents.
-
 ## Isolated device verification harness
 
 File: `android/app/src/androidTest/kotlin/org/sakshi/app/QwenThreatDeviceTest.kt`
@@ -105,13 +94,7 @@ Opt-in test: `realQwenClassifiesSyntheticMessagesAndPreservesSources`.
 - Does not open the user's real vault or bypass its authentication.
 - The final size/hash preservation assertions currently run only after the whole fixture loop succeeds. They were not reached in the failing run.
 
-Fixtures:
-
-| Label | Synthetic text | Expected status |
-| --- | --- | --- |
-| direct | `🙂 I will kill you tonight.` | `possible_threat_language` |
-| ordinary | `Can you bring the documents tomorrow?` | `no_signal_uncalibrated` |
-| quoted | `She said "I will kill you" in the film.` | `needs_review` |
+Fixtures: nine synthetic messages listed in the test and in `benchmark.md`.
 
 **Do not run the entire existing vault/device suite against this installed app.** Some existing test helpers clean the normal vault folder. Use this isolated test explicitly.
 
@@ -133,32 +116,14 @@ g++ -std=c++17 -Iandroid/processing/llm/src/main/cpp android/processing/llm/src/
 /tmp/sakshi-model-identity-test
 ```
 
-## Latest measured run
-
-Both app and instrumentation APK installs succeeded. Latest build and LLM JVM suite passed. Host identity regression passed.
-
-Latest actual device instrumentation output:
-
-```text
-model;digest=6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e;size=1117320736;api=36;abi=arm64-v8a;elapsed_ms=6802
-direct;status=inference_failed;elapsed_ms=21620;digest=6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e
-Time: 33.914
-Tests run: 1, Failures: 1
-```
-
-The model smoke elapsed time includes session hashing/loading and short generation, measured after an initial separate digest calculation. Fixture time includes analysis/session hashing/loading, inference and persistence. These are single-run observations, not a latency benchmark or accuracy measurement.
-
-Earlier this turn, the same test failed with `MODEL_IDENTITY_MISMATCH` before the count guard fix. All instrumentation runs shown have finished. No verification command remains active at handoff. The test APK remains installed. App updates may leave the main app locked; do not bypass user authentication.
-
 ## Remaining acceptance limits
 
-- Grammar-constrained threat generation is currently failing.
 - No calibrated threat/no-threat quality, multilingual performance, real-world safety or legal claim is supported.
 - Malayalam/Hindi and Romanized/code-mixed quality are unqualified; current classifier conservatively abstains for detected unqualified language signals.
 - No full end-user unlock/import/analyze/review UI workflow was completed this turn.
 - No device cancellation/resource/battery benchmark was completed this turn.
 - Build reports existing Gradle deprecations and inability to strip `libsakshi_llm.so`; assembly still succeeds. Do not silently suppress warnings.
-- No commits were made. Do not commit models, audio, private evidence or keys.
+- Do not commit models, audio, private evidence or keys.
 
 ## Temporary tooling
 

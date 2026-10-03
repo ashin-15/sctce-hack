@@ -5,6 +5,11 @@ import android.content.Context
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import org.sakshi.app.analysis.AnalysisQueue
+import org.sakshi.app.analysis.Analyser
+import org.sakshi.app.analysis.unanalysedText
 import org.sakshi.acquisition.importer.EvidenceImporter
 import org.sakshi.acquisition.importer.enableNoteSearch
 import org.sakshi.core.temporal.PatternConfig
@@ -45,7 +50,7 @@ import org.sakshi.processing.text.BenchCueList
  * opened vault, so that happens once per session.
  *
  * Creating the services wipes the export folder, so a file left behind by an earlier run never outlives the next unlock.
- * [close] releases the text recognition engine and the speech model when the session ends.
+ * [close] stops the automatic analysis and releases the text recognition engine and the speech model when the session ends.
  *
  * Speech recognition runs the whisper.cpp base model from [speechProvisioner]'s file. The model is never bundled or
  * downloaded; it is in memory only while a recording is being read. It shares one lock with the local language model,
@@ -101,6 +106,19 @@ class SessionServices(
         threatClassifier = threatLanguage,
     )
 
+    /**
+     * Analyses saved text on its own while this vault is open, so the person does not start each run. It starts with
+     * the session and [close] stops it at the lock. A run the lock interrupts writes nothing and starts again later.
+     */
+    val analysisQueue: AnalysisQueue = AnalysisQueue(
+        vault.unanalysedText(),
+        { evidenceId -> textAnalysis.analyse(evidenceId, null, ids(), discardCancelledRun = true) },
+        CoroutineScope(SupervisorJob() + io),
+    ).also { it.start() }
+
+    /** The run the person starts from the analysis screen. It waits for the automatic run of the moment to finish. */
+    val analyse: Analyser = { evidenceId, options -> analysisQueue.exclusive { textAnalysis.analyse(evidenceId, options) } }
+
     /** Decodes a saved picture in memory for the review screen; nothing is written to storage. */
     val images: EvidenceImageLoader = VaultImageLoader(vault.evidence, io)
 
@@ -126,6 +144,7 @@ class SessionServices(
     fun onTrimMemory(level: Int) = speechSessions.onTrimMemory(level)
 
     override fun close() {
+        analysisQueue.close()
         speech.cancelCurrent()
         speechSessions.release()
         ocr.close()
