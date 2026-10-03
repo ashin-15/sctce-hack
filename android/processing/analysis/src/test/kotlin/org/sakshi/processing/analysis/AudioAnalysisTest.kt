@@ -83,7 +83,12 @@ class AudioAnalysisTest : AnalysisTestBase() {
     private fun processor(engine: SpeechEngine, file: File = modelFile()) =
         SttProcessor(ModelSessionManager(spec, file, engine), ThermalStatusProvider { thermalStatus })
 
-    private fun analyser(stt: SttProcessor?, audio: AudioSource = PcmAudioSource(speechLike), limits: AnalysisLimits = AnalysisLimits()) =
+    private fun analyser(
+        stt: SttProcessor?,
+        audio: AudioSource = PcmAudioSource(speechLike),
+        limits: AnalysisLimits = AnalysisLimits(),
+        threatClassifier: ThreatLanguageClassifier? = null,
+    ) =
         TextAnalysis(
             vault,
             VaultTextDerivatives(vault.derivatives),
@@ -94,6 +99,7 @@ class AudioAnalysisTest : AnalysisTestBase() {
             kotlinx.coroutines.Dispatchers.Default,
             null,
             stt,
+            threatClassifier = threatClassifier,
         ) { source ->
             sources += source
             audio
@@ -160,6 +166,24 @@ class AudioAnalysisTest : AnalysisTestBase() {
         assertEquals(SupportState.ANALYZED, vault.evidence.details(id)?.supportState)
         assertReaderClosed()
         assertTrue(engine.models.single().closed, "the model is released")
+    }
+
+    @Test
+    fun transcriptTextIsNotSentToThreatClassifier() = runBlocking<Unit> {
+        val id = importAudio()
+        var classifierCalls = 0
+        val classifier = ThreatLanguageClassifier { _, inputs ->
+            classifierCalls += 1
+            inputs.map { ThreatLanguageResult(ThreatLanguageResultStatus.POSSIBLE_THREAT_LANGUAGE, "idiot") }
+        }
+
+        val outcome = assertIs<AnalysisOutcome.Analysed>(
+            analyser(processor(ScriptedEngine(speech)), threatClassifier = classifier).analyse(id),
+        )
+
+        assertEquals(InputKind.AUDIO_TRANSCRIPT, outcome.kind)
+        assertEquals(0, classifierCalls)
+        assertTrue(vault.threatAnalysisRuns.forEvent(events().single().eventId.value).isEmpty())
     }
 
     @Test

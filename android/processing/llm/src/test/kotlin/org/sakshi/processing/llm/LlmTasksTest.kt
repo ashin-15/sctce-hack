@@ -1,5 +1,10 @@
 package org.sakshi.processing.llm
 
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -12,6 +17,11 @@ import org.sakshi.processing.llm.engine.GenerationFailureReason
 import org.sakshi.processing.llm.engine.GenerationOutcome
 import org.sakshi.processing.llm.engine.LlamaCppEngine
 import org.sakshi.processing.llm.engine.LlmStatus
+import org.sakshi.processing.llm.engine.InferenceLock
+import org.sakshi.processing.llm.engine.ModelInfo
+import org.sakshi.processing.llm.engine.NativeGenerationResult
+import org.sakshi.processing.llm.engine.NativeLoadResult
+import org.sakshi.processing.llm.engine.NativeLlmRuntime
 import org.sakshi.processing.llm.tasks.IncidentExplainer
 import org.sakshi.processing.llm.tasks.IncidentSummariser
 import org.sakshi.processing.llm.tasks.StructuredExtractor
@@ -183,7 +193,7 @@ public class LlmTasksTest {
     @Test
     public fun llamaCppEngineReturnsModelNotReadyWhenLibraryUnavailable(): Unit = runTest {
         val engine = LlamaCppEngine()
-        assertEquals(LlmStatus.Unloaded, engine.status)
+        assertEquals(LlmStatus.Error, engine.status)
 
         val outcome = engine.generate(
             org.sakshi.processing.llm.engine.GenerationRequest(
@@ -195,5 +205,68 @@ public class LlmTasksTest {
         assertTrue(outcome is GenerationOutcome.Failed)
         assertEquals(GenerationFailureReason.MODEL_NOT_READY, (outcome as GenerationOutcome.Failed).reason)
         engine.close()
+    }
+
+    @Test
+    public fun cancellationKeepsInferenceLockUntilNativeWorkerReturns(): Unit = runTest {
+        val nativeStarted = CountDownLatch(1)
+        val allowNativeReturn = CountDownLatch(1)
+        val cancellationRequested = CountDownLatch(1)
+        val runtime = object : NativeLlmRuntime {
+            override val isAvailable: Boolean = true
+
+            override fun initModel(modelPath: String, contextSize: Int) = NativeLoadResult(17L, NativeLoadResult.STATUS_OK)
+
+            override fun freeModel(handle: Long): Unit = Unit
+
+            override fun cancel(handle: Long, requestId: String): Unit {
+                cancellationRequested.countDown()
+            }
+
+            override fun generate(
+                handle: Long,
+                systemPrompt: String,
+                userPrompt: String,
+                requestId: String,
+                maxTokens: Int,
+                grammar: String?,
+                stopSequences: Array<String>,
+            ): NativeGenerationResult {
+                nativeStarted.countDown()
+                check(allowNativeReturn.await(5, TimeUnit.SECONDS)) { "Test did not release native worker" }
+                return NativeGenerationResult(NativeGenerationResult.STATUS_CANCELLED, "")
+            }
+        }
+        val engine = LlamaCppEngine(
+            modelPath = "synthetic-model.gguf",
+            modelInfo = ModelInfo("synthetic-qwen", 1_500_000_000L, "Q4_K_M", 2048, "0".repeat(64)),
+            bridge = runtime,
+        )
+        val first = async(Dispatchers.Default) {
+            InferenceLock.withLock {
+                engine.generate(
+                    org.sakshi.processing.llm.engine.GenerationRequest("system", "user", maxTokens = 32),
+                )
+            }
+        }
+        try {
+            assertTrue(nativeStarted.await(5, TimeUnit.SECONDS))
+            first.cancel()
+            assertTrue(cancellationRequested.await(5, TimeUnit.SECONDS))
+
+            val secondLockAcquired = CompletableDeferred<Unit>()
+            val second = async(Dispatchers.Default) {
+                InferenceLock.withLock { secondLockAcquired.complete(Unit) }
+            }
+            assertFalse(secondLockAcquired.isCompleted)
+
+            allowNativeReturn.countDown()
+            first.join()
+            second.await()
+            assertTrue(secondLockAcquired.isCompleted)
+        } finally {
+            allowNativeReturn.countDown()
+            engine.close()
+        }
     }
 }

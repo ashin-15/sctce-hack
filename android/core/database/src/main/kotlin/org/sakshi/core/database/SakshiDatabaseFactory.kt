@@ -14,6 +14,7 @@ private object SchemaCallback : RoomDatabase.Callback() {
 
     override fun onOpen(db: SupportSQLiteDatabase) {
         db.setForeignKeyConstraintsEnabled(true)
+        SakshiSchema.immutabilityTriggers.forEach(db::execSQL)
     }
 }
 
@@ -34,6 +35,7 @@ public object SakshiDatabaseFactory {
         System.loadLibrary("sqlcipher")
         return Room.databaseBuilder(context.applicationContext, SakshiDatabase::class.java, name)
             .openHelperFactory(SupportOpenHelperFactory(passphrase.copyOf()))
+            .addMigrations(ThreatAnalysisMigrations.MIGRATION_1_2)
             .addCallback(SchemaCallback)
             .build()
     }
@@ -45,6 +47,7 @@ public object SakshiDatabaseFactory {
      */
     public fun openInMemoryForTests(context: Context): SakshiDatabase =
         Room.inMemoryDatabaseBuilder(context.applicationContext, SakshiDatabase::class.java)
+            .addMigrations(ThreatAnalysisMigrations.MIGRATION_1_2)
             .addCallback(SchemaCallback)
             .build()
 }

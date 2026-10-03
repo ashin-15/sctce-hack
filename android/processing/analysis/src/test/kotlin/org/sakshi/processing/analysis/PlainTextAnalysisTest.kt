@@ -11,6 +11,7 @@ import org.sakshi.core.database.SupportState
 import org.sakshi.core.model.CategoryBasis
 import org.sakshi.core.model.CategoryLabel
 import org.sakshi.core.model.CategoryReviewStatus
+import org.sakshi.core.model.ConfidenceSemantics
 import org.sakshi.core.model.ConfirmationScope
 import org.sakshi.core.model.ConfirmationStatus
 import org.sakshi.core.model.CoverageContext
@@ -82,6 +83,93 @@ class PlainTextAnalysisTest : AnalysisTestBase() {
         assertEquals(ReviewPriority.REVIEW, event.severity.reviewPriority)
         assertEquals(SeverityBasis.POLICY_SUGGESTION, event.severity.basis)
         assertEquals(event.categories.flatMap { it.evidenceReferenceIds }.distinct(), event.severity.evidenceReferenceIds)
+    }
+
+    @Test
+    fun qwenPositiveIsAnUnreviewedSourceLinkedSuggestionWithSeparateRunRecord() = runBlocking<Unit> {
+        val evidenceId = importText("😀 I will hurt you tomorrow.")
+        val classifier = ThreatLanguageClassifier { _, inputs ->
+            inputs.map { ThreatLanguageResult(ThreatLanguageResultStatus.POSSIBLE_THREAT_LANGUAGE, "hurt you") }
+        }
+        val withClassifier = TextAnalysis(
+            vault,
+            VaultTextDerivatives(vault.derivatives),
+            RulesEngineFactory.default(),
+            clock,
+            ids,
+            AnalysisLimits(),
+            kotlinx.coroutines.Dispatchers.Default,
+            threatClassifier = classifier,
+        )
+
+        val outcome = assertIs<AnalysisOutcome.Analysed>(withClassifier.analyse(evidenceId, exportOptions = null, requestId = "synthetic-request"))
+        val event = events().single()
+        val suggestion = event.categories.single { it.basis == CategoryBasis.CLASSIFIER_SUGGESTION }
+        val quote = event.evidenceReferences.single { it.referenceId in suggestion.evidenceReferenceIds }
+        assertEquals(CategoryLabel.EXPLICIT_THREAT, suggestion.label)
+        assertEquals(CategoryReviewStatus.UNREVIEWED, suggestion.reviewStatus)
+        assertEquals(null, suggestion.confidence.value)
+        assertEquals(ConfidenceSemantics.UNKNOWN, suggestion.confidence.semantics)
+        assertEquals("hurt you", EventText(vault).quote(event, quote))
+        assertEquals(1, outcome.eventCount)
+        assertSchemaValid(listOf(event))
+
+        val run = vault.threatAnalysisRuns.forEvent(event.eventId.value).single()
+        assertEquals("possible_threat_language", run.status)
+        assertEquals("synthetic-request", run.requestId)
+        assertEquals("qwen-threat-language-v1", run.taskVersion)
+        assertEquals(
+            "${event.eventId.value}/${event.revision}/c${event.categories.indexOf(suggestion).toString().padStart(6, '0')}",
+            run.findingId,
+        )
+    }
+
+    @Test
+    fun uncalibratedNoSignalIsPersistedWithoutAddingANegativeCategory() = runBlocking<Unit> {
+        val evidenceId = importText("A synthetic message about lunch.")
+        val classifier = ThreatLanguageClassifier { _, inputs ->
+            inputs.map { ThreatLanguageResult(ThreatLanguageResultStatus.NO_SIGNAL_UNCALIBRATED) }
+        }
+        val withClassifier = TextAnalysis(
+            vault,
+            VaultTextDerivatives(vault.derivatives),
+            RulesEngineFactory.default(),
+            clock,
+            ids,
+            AnalysisLimits(),
+            kotlinx.coroutines.Dispatchers.Default,
+            threatClassifier = classifier,
+        )
+        withClassifier.analyse(evidenceId, exportOptions = null, requestId = "synthetic-request")
+        val event = events().single()
+        assertTrue(event.categories.none { it.basis == CategoryBasis.CLASSIFIER_SUGGESTION })
+        assertEquals("no_signal_uncalibrated", vault.threatAnalysisRuns.forEvent(event.eventId.value).single().status)
+    }
+
+    @Test
+    fun inferenceCancellationStillPersistsEvidenceAndCancelledRun() = runBlocking<Unit> {
+        val evidenceId = importText("Synthetic incoming text that is retained despite cancellation.")
+        val classifier = ThreatLanguageClassifier { _, _ ->
+            throw kotlinx.coroutines.CancellationException("synthetic inference cancellation")
+        }
+        val withClassifier = TextAnalysis(
+            vault,
+            VaultTextDerivatives(vault.derivatives),
+            RulesEngineFactory.default(),
+            clock,
+            ids,
+            AnalysisLimits(),
+            kotlinx.coroutines.Dispatchers.Default,
+            threatClassifier = classifier,
+        )
+
+        val outcome = assertIs<AnalysisOutcome.Analysed>(
+            withClassifier.analyse(evidenceId, exportOptions = null, requestId = "cancelled-request"),
+        )
+        val event = events().single()
+        assertEquals(1, outcome.eventCount)
+        assertEquals("cancelled", vault.threatAnalysisRuns.forEvent(event.eventId.value).single().status)
+        assertEquals(SupportState.ANALYZED, vault.evidence.details(evidenceId)?.supportState)
     }
 
     @Test

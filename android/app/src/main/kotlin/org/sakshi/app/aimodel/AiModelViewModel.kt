@@ -17,13 +17,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.sakshi.processing.llm.engine.DeterministicFallbackEngine
 import org.sakshi.processing.llm.engine.GenerationOutcome
 import org.sakshi.processing.llm.engine.GenerationRequest
-import org.sakshi.processing.llm.engine.LlamaCppEngine
-import org.sakshi.processing.llm.engine.LlmEngine
-import org.sakshi.processing.llm.engine.LlmStatus
 import org.sakshi.processing.llm.engine.NativeLlmBridge
+import org.sakshi.processing.llm.model.LlmSessionManager
 import org.sakshi.processing.llm.model.ModelManager
 import org.sakshi.processing.llm.model.ModelPreset
 
@@ -34,7 +31,7 @@ data class InstalledModel(
     val formattedSize: String,
     val sha256Prefix: String,
     val isRunning: Boolean = false,
-    val statusDescription: String = "Ready and running on device",
+    val statusDescription: String = "Model installed; not loaded",
 )
 
 data class AiModelUiState(
@@ -57,70 +54,49 @@ class AiModelViewModel(
 
     private val mutableUiState = MutableStateFlow(AiModelUiState())
     val uiState: StateFlow<AiModelUiState> = mutableUiState.asStateFlow()
-    private var activeEngine: LlmEngine? = null
-
     init {
         refreshInstalledModel()
     }
 
     override fun onCleared() {
         super.onCleared()
-        activeEngine?.let { modelManager.unregisterActiveEngine(it) }
-        activeEngine?.close()
-        activeEngine = null
     }
 
     fun refreshInstalledModel() {
-        val files = modelManager.listModelFiles()
-        val primary = files.firstOrNull { it.name.endsWith(".gguf", ignoreCase = true) }
-        if (primary != null) {
-            val sizeMb = primary.length() / (1024.0 * 1024.0)
-            val sizeFormatted = if (sizeMb >= 1000) {
-                String.format(java.util.Locale.US, "%.2f GB", sizeMb / 1024.0)
-            } else {
-                String.format(java.util.Locale.US, "%.1f MB", sizeMb)
-            }
-            val hash = try {
-                val hex = modelManager.computeSha256(primary)
-                if (hex.length >= 12) hex.substring(0, 12) + "..." else hex
-            } catch (_: Exception) {
-                "unknown"
-            }
-            val matchedPreset = ModelManager.PRESETS.firstOrNull { it.filename.equals(primary.name, ignoreCase = true) }
-            val displayName = matchedPreset?.displayName ?: primary.name
-
-            if (activeEngine == null) {
-                val engine = if (NativeLlmBridge.isAvailable) {
-                    LlamaCppEngine(modelPath = primary.absolutePath)
-                } else {
-                    DeterministicFallbackEngine()
+        viewModelScope.launch {
+            val preset = ModelManager.QWEN_2_5_1_5B
+            val primary = modelManager.getModelFile(preset.id)
+            if (withContext(ioDispatcher) { primary.isFile && primary.length() > 0L }) {
+                val details = withContext(ioDispatcher) {
+                    val size = primary.length()
+                    val hash = runCatching { modelManager.computeSha256(primary).take(12) }.getOrDefault("unknown")
+                    val sizeMb = size / (1024.0 * 1024.0)
+                    val formatted = if (sizeMb >= 1000) {
+                        String.format(java.util.Locale.US, "%.2f GB", sizeMb / 1024.0)
+                    } else {
+                        String.format(java.util.Locale.US, "%.1f MB", sizeMb)
+                    }
+                    Triple(size, hash, formatted)
                 }
-                activeEngine = engine
-                modelManager.registerActiveEngine(engine)
-            }
-
-            val statusDesc = if (activeEngine?.status == LlmStatus.Ready) {
-                "Ready and running on device"
+                val status = if (NativeLlmBridge.isAvailable) {
+                    "Model file found; upstream provenance unverified; runtime available; not loaded"
+                } else {
+                    "Model file found; upstream provenance unverified; native runtime missing"
+                }
+                mutableUiState.value = mutableUiState.value.copy(
+                    installedModel = InstalledModel(
+                        filename = primary.name,
+                        displayName = preset.displayName,
+                        sizeBytes = details.first,
+                        formattedSize = details.third,
+                        sha256Prefix = details.second,
+                        isRunning = false,
+                        statusDescription = status,
+                    ),
+                )
             } else {
-                "Model loaded"
+                mutableUiState.value = mutableUiState.value.copy(installedModel = null, testOutput = null)
             }
-
-            mutableUiState.value = mutableUiState.value.copy(
-                installedModel = InstalledModel(
-                    filename = primary.name,
-                    displayName = displayName,
-                    sizeBytes = primary.length(),
-                    formattedSize = sizeFormatted,
-                    sha256Prefix = hash,
-                    isRunning = true,
-                    statusDescription = statusDesc,
-                ),
-            )
-        } else {
-            activeEngine?.let { modelManager.unregisterActiveEngine(it) }
-            activeEngine?.close()
-            activeEngine = null
-            mutableUiState.value = mutableUiState.value.copy(installedModel = null, testOutput = null)
         }
         scanDownloadsFolder()
     }
@@ -176,7 +152,7 @@ class AiModelViewModel(
                 refreshInstalledModel()
                 mutableUiState.value = mutableUiState.value.copy(
                     isImporting = false,
-                    notice = "Model file imported and running on device.",
+                    notice = "Model file imported. It has not been loaded.",
                 )
             } catch (e: Exception) {
                 mutableUiState.value = mutableUiState.value.copy(
@@ -218,7 +194,7 @@ class AiModelViewModel(
                 refreshInstalledModel()
                 mutableUiState.value = mutableUiState.value.copy(
                     isImporting = false,
-                    notice = "Model file imported and running on device.",
+                    notice = "Model file imported. It has not been loaded.",
                 )
             } catch (e: Exception) {
                 mutableUiState.value = mutableUiState.value.copy(
@@ -230,38 +206,38 @@ class AiModelViewModel(
     }
 
     fun testInference() {
-        val model = mutableUiState.value.installedModel ?: return
+        if (mutableUiState.value.installedModel == null) return
         mutableUiState.value = mutableUiState.value.copy(isTestingInference = true, error = null)
         viewModelScope.launch {
             try {
                 val result = withContext(ioDispatcher) {
-                    val file = modelManager.getModelFile(model.filename)
-                    val engine = activeEngine ?: (
-                        if (NativeLlmBridge.isAvailable) {
-                            LlamaCppEngine(modelPath = file.absolutePath)
-                        } else {
-                            DeterministicFallbackEngine()
-                        }
-                    ).also {
-                        activeEngine = it
-                        modelManager.registerActiveEngine(it)
-                    }
-
                     val startTime = System.currentTimeMillis()
-                    val request = GenerationRequest(
-                        systemPrompt = "You are a local AI assistant analyzing harassment patterns.",
-                        userPrompt = "Explain the predicted label [src-1] Evidence: \"threatening message\"; classifier labels: harassment",
-                    )
-                    val outcome = engine.generate(request)
+                    val outcome = LlmSessionManager(modelManager, ioDispatcher).withQwenSession { engine, _ ->
+                        engine.generate(
+                            GenerationRequest(
+                                systemPrompt = "Reply briefly and literally.",
+                                userPrompt = "Return the word READY.",
+                                maxTokens = 8,
+                            ),
+                        )
+                    }
                     val durationMs = System.currentTimeMillis() - startTime
                     when (outcome) {
-                        is GenerationOutcome.Success -> "${outcome.text} (${durationMs}ms)"
+                        is GenerationOutcome.Success -> "Local Qwen inference completed (${durationMs} ms)."
                         is GenerationOutcome.Failed -> "Inference failed: ${outcome.reason} - ${outcome.message}"
                     }
                 }
                 mutableUiState.value = mutableUiState.value.copy(
                     isTestingInference = false,
                     testOutput = result,
+                    installedModel = mutableUiState.value.installedModel?.copy(
+                        isRunning = false,
+                        statusDescription = if (result.startsWith("Local Qwen inference completed")) {
+                            "Last on-device inference succeeded; model unloaded"
+                        } else {
+                            "On-device inference failed; model unloaded"
+                        },
+                    ),
                 )
             } catch (e: Exception) {
                 mutableUiState.value = mutableUiState.value.copy(

@@ -8,7 +8,7 @@ class SchemaExportTest {
     @Test
     fun exportedSchemaListsEveryTable() {
         val dir = File(checkNotNull(System.getProperty("sakshi.schemaDir")))
-        val file = File(dir, "org.sakshi.core.database.SakshiDatabase/1.json")
+        val file = File(dir, "org.sakshi.core.database.SakshiDatabase/2.json")
         assertTrue(file.isFile, "missing $file")
         val json = file.readText()
         SakshiSchema.allTables.forEach { table ->

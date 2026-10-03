@@ -23,6 +23,9 @@ import org.sakshi.processing.analysis.CasePatterns
 import org.sakshi.processing.analysis.RulesEngineFactory
 import org.sakshi.processing.analysis.TextAnalysis
 import org.sakshi.processing.llm.engine.InferenceLock
+import org.sakshi.processing.llm.analysis.QwenThreatLanguageClassifier
+import org.sakshi.processing.llm.model.LlmSessionManager
+import org.sakshi.processing.llm.model.ModelManager
 import org.sakshi.processing.ocr.MlKitOcrProcessor
 import org.sakshi.processing.stt.HeavyModelLock
 import org.sakshi.processing.stt.ModelProvisioner
@@ -81,11 +84,22 @@ class SessionServices(
 
     private val speech = SttProcessor(speechSessions, ThermalStatusProvider.system(context))
 
+    private val languageSessions = LlmSessionManager(ModelManager(context), io)
+    private val threatLanguage = QwenThreatLanguageClassifier(languageSessions)
+
     /**
      * Reads saved text, text recognised in screenshots and photos, and speech in recordings into events. Uses the
      * demonstration word list, so every match is only a suggestion.
      */
-    val textAnalysis: TextAnalysis = TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, ocr = ocr, stt = speech)
+    val textAnalysis: TextAnalysis = TextAnalysis(
+        vault,
+        RulesEngineFactory.default(),
+        clock,
+        ids,
+        ocr = ocr,
+        stt = speech,
+        threatClassifier = threatLanguage,
+    )
 
     /** Decodes a saved picture in memory for the review screen; nothing is written to storage. */
     val images: EvidenceImageLoader = VaultImageLoader(vault.evidence, io)

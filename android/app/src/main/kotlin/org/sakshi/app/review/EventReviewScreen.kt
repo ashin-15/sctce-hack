@@ -62,6 +62,7 @@ import org.sakshi.core.model.UnwantedContact
 import org.sakshi.core.vault.SenderSelector
 import org.sakshi.core.model.ActorId
 import org.sakshi.core.model.AssociationReview
+import org.sakshi.core.database.ThreatAnalysisRunEntity
 
 class EventReviewActions(
     val back: () -> Unit,
@@ -265,9 +266,26 @@ private fun SuggestionsSection(state: EventReviewState, actions: EventReviewActi
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         ScreenTitle(stringResource(R.string.review_signal_heading))
         if (state.categories.isEmpty()) SupportingText(stringResource(R.string.review_no_cue))
+        state.threatAnalysis?.let { run -> ThreatAnalysisStatus(run) }
         state.categories.forEach { view -> CategoryCard(view, actions, onDisagree = { onDialog(ReviewDialog.Disagree(view.index)) }) }
         SecondaryButton(stringResource(R.string.review_add_tag), { onDialog(ReviewDialog.OwnTag) }, Modifier.fillMaxWidth())
     }
+}
+
+@Composable
+private fun ThreatAnalysisStatus(run: ThreatAnalysisRunEntity) {
+    val copy = when (run.status) {
+        "possible_threat_language" -> return
+        "no_signal_uncalibrated" -> R.string.review_threat_no_signal_uncalibrated
+        "needs_review" -> R.string.review_threat_needs_review
+        "unsupported_language" -> R.string.review_threat_unsupported_language
+        "model_unavailable" -> R.string.review_threat_model_unavailable
+        "inference_failed" -> R.string.review_threat_inference_failed
+        "cancelled" -> R.string.review_threat_cancelled
+        "truncated" -> R.string.review_threat_truncated
+        else -> return
+    }
+    StatusNote(NoteKind.Caution, stringResource(copy))
 }
 
 @Composable
@@ -279,7 +297,15 @@ private fun CategoryCard(view: CategoryView, actions: EventReviewActions, onDisa
             } else {
                 EpistemicLabel(EpistemicStatus.INFERRED)
             }
-            Text(categoryLabelText(view.category.label).text(), style = MaterialTheme.typography.titleSmall)
+            val label = if (
+                view.category.label == CategoryLabel.EXPLICIT_THREAT &&
+                view.category.basis == org.sakshi.core.model.CategoryBasis.CLASSIFIER_SUGGESTION
+            ) {
+                stringResource(R.string.review_possible_threat_language)
+            } else {
+                categoryLabelText(view.category.label).text()
+            }
+            Text(label, style = MaterialTheme.typography.titleSmall)
             SupportingText(categoryBasisText(view.category.basis, view.cues.map { it.quote }).text())
             Text(reviewStatusText(view.category.reviewStatus).text(), style = MaterialTheme.typography.bodyMedium)
             if (!view.isOwnTag) {

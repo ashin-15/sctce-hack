@@ -145,6 +145,25 @@ suspend fun SakshiDatabase.insertFullGraph() {
     events.insertCoverageGap(gapRow(scopeId = "scope-1"))
     findingDao().insertWithAnchors(findingRow(modelId = "model-1"), listOf("anchor-1"))
     findingDao().insertDecision(decisionRow("decision-1"))
+    threatAnalysisRunDao().insertIfAbsent(
+        ThreatAnalysisRunEntity(
+            id = "threat-run-1",
+            caseId = CASE_ID,
+            eventId = EVENT_ID,
+            eventRevision = 1,
+            derivativeId = "deriv-1",
+            requestId = "request-1",
+            status = "possible_threat_language",
+            reasonCode = null,
+            modelPreset = "qwen2.5-1.5b-instruct-q4_k_m",
+            weightSha256 = "cd".repeat(32),
+            runtimeCommit = "a7a98e0fffed794396b3fbad4dcdbbc184963645",
+            runtimeVersion = "llama.cpp-b6500",
+            taskVersion = "qwen-threat-language-v1",
+            createdAt = "2026-10-03T10:00:00Z",
+            findingId = "finding-1",
+        ),
+    )
     patternDao().insertWithSupport(patternRow(), listOf(supportRow()))
     reportDao().insertReport(reportRow())
     reportDao().insertSnapshot(snapshotRow())

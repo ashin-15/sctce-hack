@@ -1,0 +1,2735 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "203e327a0b35fde7966d69265763cfb1",
+    "entities": [
+      {
+        "tableName": "case_file",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `created_at` TEXT NOT NULL, `status` TEXT NOT NULL, `owner_note` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerNote",
+            "columnName": "owner_note",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "actor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `display_label` TEXT NOT NULL, `identity_basis` TEXT NOT NULL, `association_review` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayLabel",
+            "columnName": "display_label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identityBasis",
+            "columnName": "identity_basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "associationReview",
+            "columnName": "association_review",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_actor_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_actor_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "source_scope",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `source_app_claim` TEXT, `profile_scope` TEXT, `conversation_scope` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceAppClaim",
+            "columnName": "source_app_claim",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "profileScope",
+            "columnName": "profile_scope",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conversationScope",
+            "columnName": "conversation_scope",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_source_scope_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_source_scope_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evidence",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `acquisition_kind` TEXT NOT NULL, `access_class` TEXT NOT NULL, `received_at` TEXT NOT NULL, `received_at_epoch_ms` INTEGER NOT NULL, `claimed_origin` TEXT, `declared_mime` TEXT, `detected_mime` TEXT, `byte_size` INTEGER NOT NULL, `sha256` TEXT NOT NULL, `retention_mode` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "acquisitionKind",
+            "columnName": "acquisition_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accessClass",
+            "columnName": "access_class",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "received_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAtEpochMs",
+            "columnName": "received_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "claimedOrigin",
+            "columnName": "claimed_origin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "declaredMime",
+            "columnName": "declared_mime",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "detectedMime",
+            "columnName": "detected_mime",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "byteSize",
+            "columnName": "byte_size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sha256",
+            "columnName": "sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retentionMode",
+            "columnName": "retention_mode",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_evidence_case_id_received_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "case_id",
+              "received_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_case_id_received_at_epoch_ms` ON `${TABLE_NAME}` (`case_id`, `received_at_epoch_ms`)"
+          },
+          {
+            "name": "index_evidence_case_id_sha256",
+            "unique": false,
+            "columnNames": [
+              "case_id",
+              "sha256"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_case_id_sha256` ON `${TABLE_NAME}` (`case_id`, `sha256`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evidence_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`evidence_id` TEXT NOT NULL, `support_state` TEXT NOT NULL, `updated_at_epoch_ms` INTEGER NOT NULL, PRIMARY KEY(`evidence_id`), FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supportState",
+            "columnName": "support_state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtEpochMs",
+            "columnName": "updated_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "evidence_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evidence_blob",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`evidence_id` TEXT NOT NULL, `path` TEXT NOT NULL, `envelope_version` INTEGER NOT NULL, `wrapped_key` BLOB NOT NULL, `chunk_size` INTEGER NOT NULL, `chunk_count` INTEGER NOT NULL, `plaintext_length` INTEGER NOT NULL, PRIMARY KEY(`evidence_id`), FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "envelopeVersion",
+            "columnName": "envelope_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wrappedKey",
+            "columnName": "wrapped_key",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chunkSize",
+            "columnName": "chunk_size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chunkCount",
+            "columnName": "chunk_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plaintextLength",
+            "columnName": "plaintext_length",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "evidence_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "capture_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`evidence_id` TEXT NOT NULL, `importer_mechanism` TEXT NOT NULL, `uri_authority_claim` TEXT, `display_name_claim` TEXT, `exif_json` TEXT, `provider_transform` TEXT NOT NULL, `collector_session_id` TEXT, `elapsed_realtime_ms` INTEGER, PRIMARY KEY(`evidence_id`), FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "importerMechanism",
+            "columnName": "importer_mechanism",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uriAuthorityClaim",
+            "columnName": "uri_authority_claim",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayNameClaim",
+            "columnName": "display_name_claim",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exifJson",
+            "columnName": "exif_json",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "providerTransform",
+            "columnName": "provider_transform",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectorSessionId",
+            "columnName": "collector_session_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "elapsedRealtimeMs",
+            "columnName": "elapsed_realtime_ms",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "evidence_id"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "derivative",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `evidence_id` TEXT NOT NULL, `parent_derivative_id` TEXT, `revision` INTEGER NOT NULL, `kind` TEXT NOT NULL, `text` TEXT NOT NULL, `source_map_json` TEXT, `quality_json` TEXT, `tool_id` TEXT NOT NULL, `tool_version` TEXT NOT NULL, `model_version_id` TEXT, `created_at` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`parent_derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`model_version_id`) REFERENCES `model_version`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentDerivativeId",
+            "columnName": "parent_derivative_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "revision",
+            "columnName": "revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceMapJson",
+            "columnName": "source_map_json",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "qualityJson",
+            "columnName": "quality_json",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "toolId",
+            "columnName": "tool_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toolVersion",
+            "columnName": "tool_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modelVersionId",
+            "columnName": "model_version_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_derivative_evidence_id_kind_revision",
+            "unique": false,
+            "columnNames": [
+              "evidence_id",
+              "kind",
+              "revision"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_derivative_evidence_id_kind_revision` ON `${TABLE_NAME}` (`evidence_id`, `kind`, `revision`)"
+          },
+          {
+            "name": "index_derivative_parent_derivative_id",
+            "unique": false,
+            "columnNames": [
+              "parent_derivative_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_derivative_parent_derivative_id` ON `${TABLE_NAME}` (`parent_derivative_id`)"
+          },
+          {
+            "name": "index_derivative_model_version_id",
+            "unique": false,
+            "columnNames": [
+              "model_version_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_derivative_model_version_id` ON `${TABLE_NAME}` (`model_version_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "derivative",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "parent_derivative_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "model_version",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "model_version_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "region",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `derivative_id` TEXT NOT NULL, `page_index` INTEGER NOT NULL, `polygon_json` TEXT NOT NULL, `transform_json` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "derivativeId",
+            "columnName": "derivative_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageIndex",
+            "columnName": "page_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "polygonJson",
+            "columnName": "polygon_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transformJson",
+            "columnName": "transform_json",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_region_derivative_id",
+            "unique": false,
+            "columnNames": [
+              "derivative_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_region_derivative_id` ON `${TABLE_NAME}` (`derivative_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "derivative",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "derivative_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "event",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_event_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "event_revision",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `revision` INTEGER NOT NULL, `kind` TEXT NOT NULL, `observed_at` TEXT NOT NULL, `available_at` TEXT NOT NULL, `available_at_epoch_ms` INTEGER NOT NULL, `ts_earliest` TEXT, `ts_earliest_epoch_ms` INTEGER, `ts_latest` TEXT, `ts_latest_epoch_ms` INTEGER, `ts_basis` TEXT NOT NULL, `ts_precision` TEXT NOT NULL, `ts_timezone` TEXT, `collector_session_id` TEXT, `monotonic_ms` INTEGER, `actor_id` TEXT, `source_scope_id` TEXT, `sender_display_label` TEXT, `sender_identity_basis` TEXT NOT NULL, `sender_association_review` TEXT NOT NULL, `source_kind` TEXT NOT NULL, `source_app` TEXT, `profile_scope_id` TEXT, `conversation_scope_id` TEXT, `source_record_id` TEXT, `parser_version` TEXT, `direction` TEXT NOT NULL, `review_priority` TEXT NOT NULL, `severity_basis` TEXT NOT NULL, `severity_reference_ids_json` TEXT NOT NULL, `confirmation_status` TEXT NOT NULL, `confirmation_scope` TEXT NOT NULL, `reviewed_at` TEXT, `dedup_status` TEXT NOT NULL, `canonical_event_id` TEXT, `dedup_method` TEXT, `coverage_context` TEXT NOT NULL, `text_status` TEXT NOT NULL, `outgoing_coverage` TEXT NOT NULL, `gap_reference_ids_json` TEXT NOT NULL, `unwanted_contact` TEXT NOT NULL, `retention_mode` TEXT NOT NULL, `expires_at` TEXT, `consent_generation` INTEGER NOT NULL, PRIMARY KEY(`event_id`, `revision`), FOREIGN KEY(`event_id`) REFERENCES `event`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`actor_id`) REFERENCES `actor`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`source_scope_id`) REFERENCES `source_scope`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revision",
+            "columnName": "revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observedAt",
+            "columnName": "observed_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "availableAt",
+            "columnName": "available_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "availableAtEpochMs",
+            "columnName": "available_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tsEarliest",
+            "columnName": "ts_earliest",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "tsEarliestEpochMs",
+            "columnName": "ts_earliest_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tsLatest",
+            "columnName": "ts_latest",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "tsLatestEpochMs",
+            "columnName": "ts_latest_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tsBasis",
+            "columnName": "ts_basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tsPrecision",
+            "columnName": "ts_precision",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tsTimezone",
+            "columnName": "ts_timezone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "collectorSessionId",
+            "columnName": "collector_session_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "monotonicMs",
+            "columnName": "monotonic_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actorId",
+            "columnName": "actor_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceScopeId",
+            "columnName": "source_scope_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "senderDisplayLabel",
+            "columnName": "sender_display_label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "senderIdentityBasis",
+            "columnName": "sender_identity_basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderAssociationReview",
+            "columnName": "sender_association_review",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceKind",
+            "columnName": "source_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceApp",
+            "columnName": "source_app",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "profileScopeId",
+            "columnName": "profile_scope_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conversationScopeId",
+            "columnName": "conversation_scope_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceRecordId",
+            "columnName": "source_record_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parserVersion",
+            "columnName": "parser_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewPriority",
+            "columnName": "review_priority",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "severityBasis",
+            "columnName": "severity_basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "severityReferenceIdsJson",
+            "columnName": "severity_reference_ids_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confirmationStatus",
+            "columnName": "confirmation_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confirmationScope",
+            "columnName": "confirmation_scope",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewedAt",
+            "columnName": "reviewed_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dedupStatus",
+            "columnName": "dedup_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canonicalEventId",
+            "columnName": "canonical_event_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dedupMethod",
+            "columnName": "dedup_method",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "coverageContext",
+            "columnName": "coverage_context",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "textStatus",
+            "columnName": "text_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "outgoingCoverage",
+            "columnName": "outgoing_coverage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gapReferenceIdsJson",
+            "columnName": "gap_reference_ids_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unwantedContact",
+            "columnName": "unwanted_contact",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retentionMode",
+            "columnName": "retention_mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresAt",
+            "columnName": "expires_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "consentGeneration",
+            "columnName": "consent_generation",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id",
+            "revision"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_event_revision_ts_earliest_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "ts_earliest_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_revision_ts_earliest_epoch_ms` ON `${TABLE_NAME}` (`ts_earliest_epoch_ms`)"
+          },
+          {
+            "name": "index_event_revision_available_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "available_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_revision_available_at_epoch_ms` ON `${TABLE_NAME}` (`available_at_epoch_ms`)"
+          },
+          {
+            "name": "index_event_revision_actor_id",
+            "unique": false,
+            "columnNames": [
+              "actor_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_revision_actor_id` ON `${TABLE_NAME}` (`actor_id`)"
+          },
+          {
+            "name": "index_event_revision_source_scope_id",
+            "unique": false,
+            "columnNames": [
+              "source_scope_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_revision_source_scope_id` ON `${TABLE_NAME}` (`source_scope_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "event",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "actor",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actor_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "source_scope",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "source_scope_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evidence_anchor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `reference_id` TEXT NOT NULL, `artifact_id` TEXT NOT NULL, `evidence_id` TEXT, `derivative_id` TEXT, `sha256` TEXT, `representation` TEXT NOT NULL, `locator_kind` TEXT NOT NULL, `start_cp` INTEGER, `end_cp` INTEGER, `start_ms` INTEGER, `end_ms` INTEGER, `page_index` INTEGER, `region_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventRevision",
+            "columnName": "event_revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referenceId",
+            "columnName": "reference_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artifactId",
+            "columnName": "artifact_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "derivativeId",
+            "columnName": "derivative_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sha256",
+            "columnName": "sha256",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "representation",
+            "columnName": "representation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locatorKind",
+            "columnName": "locator_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startCp",
+            "columnName": "start_cp",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "endCp",
+            "columnName": "end_cp",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "startMs",
+            "columnName": "start_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "endMs",
+            "columnName": "end_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pageIndex",
+            "columnName": "page_index",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "regionId",
+            "columnName": "region_id",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_evidence_anchor_event_id_event_revision_reference_id",
+            "unique": true,
+            "columnNames": [
+              "event_id",
+              "event_revision",
+              "reference_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_evidence_anchor_event_id_event_revision_reference_id` ON `${TABLE_NAME}` (`event_id`, `event_revision`, `reference_id`)"
+          },
+          {
+            "name": "index_evidence_anchor_evidence_id",
+            "unique": false,
+            "columnNames": [
+              "evidence_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_anchor_evidence_id` ON `${TABLE_NAME}` (`evidence_id`)"
+          },
+          {
+            "name": "index_evidence_anchor_derivative_id",
+            "unique": false,
+            "columnNames": [
+              "derivative_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evidence_anchor_derivative_id` ON `${TABLE_NAME}` (`derivative_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "event_revision",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id",
+              "event_revision"
+            ],
+            "referencedColumns": [
+              "event_id",
+              "revision"
+            ]
+          },
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "derivative",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "derivative_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "event_link",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `from_event` TEXT NOT NULL, `to_event` TEXT NOT NULL, `type` TEXT NOT NULL, `basis` TEXT NOT NULL, `confidence_value` REAL, `confidence_semantics` TEXT NOT NULL, `calibration_version` TEXT, `review_status` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`from_event`) REFERENCES `event`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`to_event`) REFERENCES `event`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fromEvent",
+            "columnName": "from_event",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toEvent",
+            "columnName": "to_event",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "basis",
+            "columnName": "basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidenceValue",
+            "columnName": "confidence_value",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "confidenceSemantics",
+            "columnName": "confidence_semantics",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calibrationVersion",
+            "columnName": "calibration_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reviewStatus",
+            "columnName": "review_status",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_event_link_from_event",
+            "unique": false,
+            "columnNames": [
+              "from_event"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_link_from_event` ON `${TABLE_NAME}` (`from_event`)"
+          },
+          {
+            "name": "index_event_link_to_event",
+            "unique": false,
+            "columnNames": [
+              "to_event"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_link_to_event` ON `${TABLE_NAME}` (`to_event`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "event",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "from_event"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "event",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "to_event"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "boundary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `marker` TEXT NOT NULL, `actor_id` TEXT, `review_status` TEXT NOT NULL, `communication_status` TEXT NOT NULL, `scope_note` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`event_id`) REFERENCES `event`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`actor_id`) REFERENCES `actor`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "marker",
+            "columnName": "marker",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorId",
+            "columnName": "actor_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reviewStatus",
+            "columnName": "review_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "communicationStatus",
+            "columnName": "communication_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scopeNote",
+            "columnName": "scope_note",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_boundary_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_boundary_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          },
+          {
+            "name": "index_boundary_event_id",
+            "unique": false,
+            "columnNames": [
+              "event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_boundary_event_id` ON `${TABLE_NAME}` (`event_id`)"
+          },
+          {
+            "name": "index_boundary_actor_id",
+            "unique": false,
+            "columnNames": [
+              "actor_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_boundary_actor_id` ON `${TABLE_NAME}` (`actor_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "event",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "actor",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "actor_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "coverage_gap",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `source_scope_id` TEXT, `start_at` TEXT, `start_at_epoch_ms` INTEGER, `end_at` TEXT, `end_at_epoch_ms` INTEGER, `reason` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`source_scope_id`) REFERENCES `source_scope`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceScopeId",
+            "columnName": "source_scope_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "startAt",
+            "columnName": "start_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "startAtEpochMs",
+            "columnName": "start_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "endAt",
+            "columnName": "end_at",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "endAtEpochMs",
+            "columnName": "end_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_coverage_gap_case_id_start_at_epoch_ms",
+            "unique": false,
+            "columnNames": [
+              "case_id",
+              "start_at_epoch_ms"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_coverage_gap_case_id_start_at_epoch_ms` ON `${TABLE_NAME}` (`case_id`, `start_at_epoch_ms`)"
+          },
+          {
+            "name": "index_coverage_gap_source_scope_id",
+            "unique": false,
+            "columnNames": [
+              "source_scope_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_coverage_gap_source_scope_id` ON `${TABLE_NAME}` (`source_scope_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "source_scope",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "source_scope_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "finding",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `label` TEXT NOT NULL, `source_label` TEXT, `basis` TEXT NOT NULL, `confidence_value` REAL, `confidence_semantics` TEXT NOT NULL, `calibration_version` TEXT, `producer_version` TEXT NOT NULL, `model_version_id` TEXT, `epistemic_status` TEXT NOT NULL, `created_at` TEXT NOT NULL, `review_status_at_import` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`model_version_id`) REFERENCES `model_version`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventRevision",
+            "columnName": "event_revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceLabel",
+            "columnName": "source_label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "basis",
+            "columnName": "basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidenceValue",
+            "columnName": "confidence_value",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "confidenceSemantics",
+            "columnName": "confidence_semantics",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calibrationVersion",
+            "columnName": "calibration_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "producerVersion",
+            "columnName": "producer_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modelVersionId",
+            "columnName": "model_version_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "epistemicStatus",
+            "columnName": "epistemic_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewStatusAtImport",
+            "columnName": "review_status_at_import",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_finding_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finding_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          },
+          {
+            "name": "index_finding_event_id_event_revision",
+            "unique": false,
+            "columnNames": [
+              "event_id",
+              "event_revision"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finding_event_id_event_revision` ON `${TABLE_NAME}` (`event_id`, `event_revision`)"
+          },
+          {
+            "name": "index_finding_model_version_id",
+            "unique": false,
+            "columnNames": [
+              "model_version_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finding_model_version_id` ON `${TABLE_NAME}` (`model_version_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "event_revision",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id",
+              "event_revision"
+            ],
+            "referencedColumns": [
+              "event_id",
+              "revision"
+            ]
+          },
+          {
+            "table": "model_version",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "model_version_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "finding_anchor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`finding_id` TEXT NOT NULL, `anchor_id` TEXT NOT NULL, PRIMARY KEY(`finding_id`, `anchor_id`), FOREIGN KEY(`finding_id`) REFERENCES `finding`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`anchor_id`) REFERENCES `evidence_anchor`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "findingId",
+            "columnName": "finding_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anchorId",
+            "columnName": "anchor_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "finding_id",
+            "anchor_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_finding_anchor_anchor_id",
+            "unique": false,
+            "columnNames": [
+              "anchor_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finding_anchor_anchor_id` ON `${TABLE_NAME}` (`anchor_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "finding",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "finding_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "evidence_anchor",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "anchor_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "review_decision",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `target_type` TEXT NOT NULL, `target_id` TEXT NOT NULL, `target_revision` INTEGER, `action` TEXT NOT NULL, `reason_code` TEXT, `edited_value_json` TEXT, `note` TEXT, `decided_at` TEXT NOT NULL, `decided_at_epoch_ms` INTEGER NOT NULL, `seq` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetType",
+            "columnName": "target_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetId",
+            "columnName": "target_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetRevision",
+            "columnName": "target_revision",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonCode",
+            "columnName": "reason_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "editedValueJson",
+            "columnName": "edited_value_json",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "decidedAt",
+            "columnName": "decided_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decidedAtEpochMs",
+            "columnName": "decided_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seq",
+            "columnName": "seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "seq"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_review_decision_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_review_decision_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_review_decision_target_type_target_id",
+            "unique": false,
+            "columnNames": [
+              "target_type",
+              "target_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_review_decision_target_type_target_id` ON `${TABLE_NAME}` (`target_type`, `target_id`)"
+          },
+          {
+            "name": "index_review_decision_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_review_decision_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pattern",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `type` TEXT NOT NULL, `rule_version` TEXT NOT NULL, `actor_scope` TEXT, `evidence_view` TEXT NOT NULL, `knowledge_cutoff` TEXT NOT NULL, `window_start` TEXT, `window_end` TEXT, `clock_basis` TEXT NOT NULL, `measurements_json` TEXT NOT NULL, `interpretation_text` TEXT, `limitations_json` TEXT NOT NULL, `assessment_status` TEXT NOT NULL, `generated_at` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruleVersion",
+            "columnName": "rule_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorScope",
+            "columnName": "actor_scope",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "evidenceView",
+            "columnName": "evidence_view",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "knowledgeCutoff",
+            "columnName": "knowledge_cutoff",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "windowStart",
+            "columnName": "window_start",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "windowEnd",
+            "columnName": "window_end",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "clockBasis",
+            "columnName": "clock_basis",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "measurementsJson",
+            "columnName": "measurements_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "interpretationText",
+            "columnName": "interpretation_text",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "limitationsJson",
+            "columnName": "limitations_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assessmentStatus",
+            "columnName": "assessment_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generatedAt",
+            "columnName": "generated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pattern_case_id_type",
+            "unique": false,
+            "columnNames": [
+              "case_id",
+              "type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pattern_case_id_type` ON `${TABLE_NAME}` (`case_id`, `type`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pattern_support",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pattern_id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `role` TEXT NOT NULL, PRIMARY KEY(`pattern_id`, `event_id`, `role`), FOREIGN KEY(`pattern_id`) REFERENCES `pattern`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "patternId",
+            "columnName": "pattern_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventRevision",
+            "columnName": "event_revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pattern_id",
+            "event_id",
+            "role"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pattern_support_event_id_event_revision",
+            "unique": false,
+            "columnNames": [
+              "event_id",
+              "event_revision"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pattern_support_event_id_event_revision` ON `${TABLE_NAME}` (`event_id`, `event_revision`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "pattern",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "pattern_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "event_revision",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id",
+              "event_revision"
+            ],
+            "referencedColumns": [
+              "event_id",
+              "revision"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "report",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `title` TEXT NOT NULL, `created_at` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_report_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_report_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "report_snapshot",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `report_id` TEXT NOT NULL, `version` INTEGER NOT NULL, `created_at` TEXT NOT NULL, `manifest_sha256` TEXT NOT NULL, `merkle_root` TEXT NOT NULL, `signature` TEXT, `signer_key_id` TEXT, `superseded_by` TEXT, `dependency_json` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`report_id`) REFERENCES `report`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reportId",
+            "columnName": "report_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "manifestSha256",
+            "columnName": "manifest_sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "merkleRoot",
+            "columnName": "merkle_root",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signature",
+            "columnName": "signature",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "signerKeyId",
+            "columnName": "signer_key_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "supersededBy",
+            "columnName": "superseded_by",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dependencyJson",
+            "columnName": "dependency_json",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_report_snapshot_report_id_version",
+            "unique": true,
+            "columnNames": [
+              "report_id",
+              "version"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_report_snapshot_report_id_version` ON `${TABLE_NAME}` (`report_id`, `version`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "report",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "report_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "audit_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seq` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `at` TEXT NOT NULL, `at_epoch_ms` INTEGER NOT NULL, `action` TEXT NOT NULL, `subject_type` TEXT NOT NULL, `subject_id` TEXT NOT NULL, `payload_sha256` TEXT NOT NULL, `prev_hash` BLOB NOT NULL, `this_hash` BLOB NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "seq",
+            "columnName": "seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "at",
+            "columnName": "at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "atEpochMs",
+            "columnName": "at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subjectType",
+            "columnName": "subject_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subjectId",
+            "columnName": "subject_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payloadSha256",
+            "columnName": "payload_sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prevHash",
+            "columnName": "prev_hash",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thisHash",
+            "columnName": "this_hash",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "seq"
+          ]
+        }
+      },
+      {
+        "tableName": "model_version",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `role` TEXT NOT NULL, `artefact_sha256` TEXT NOT NULL, `tokenizer_sha256` TEXT, `runtime` TEXT NOT NULL, `runtime_version` TEXT NOT NULL, `quantisation` TEXT, `licence` TEXT NOT NULL, `calibration_id` TEXT, `supported_languages_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artefactSha256",
+            "columnName": "artefact_sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenizerSha256",
+            "columnName": "tokenizer_sha256",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "runtime",
+            "columnName": "runtime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "runtimeVersion",
+            "columnName": "runtime_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantisation",
+            "columnName": "quantisation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "licence",
+            "columnName": "licence",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calibrationId",
+            "columnName": "calibration_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "supportedLanguagesJson",
+            "columnName": "supported_languages_json",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "processing_job",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `evidence_id` TEXT NOT NULL, `stage` TEXT NOT NULL, `status` TEXT NOT NULL, `source_sha256` TEXT NOT NULL, `attempt` INTEGER NOT NULL, `consent_generation` INTEGER NOT NULL, `last_error_code` TEXT, `enqueued_at_epoch_ms` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`evidence_id`) REFERENCES `evidence`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evidenceId",
+            "columnName": "evidence_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stage",
+            "columnName": "stage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceSha256",
+            "columnName": "source_sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "attempt",
+            "columnName": "attempt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "consentGeneration",
+            "columnName": "consent_generation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastErrorCode",
+            "columnName": "last_error_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "enqueuedAtEpochMs",
+            "columnName": "enqueued_at_epoch_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_processing_job_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_processing_job_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_processing_job_evidence_id",
+            "unique": false,
+            "columnNames": [
+              "evidence_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_processing_job_evidence_id` ON `${TABLE_NAME}` (`evidence_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "evidence",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evidence_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "label_mapping",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`producer` TEXT NOT NULL, `producer_label` TEXT NOT NULL, `schema_label` TEXT NOT NULL, `mapping_version` INTEGER NOT NULL, PRIMARY KEY(`producer`, `producer_label`, `mapping_version`))",
+        "fields": [
+          {
+            "fieldPath": "producer",
+            "columnName": "producer",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "producerLabel",
+            "columnName": "producer_label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schemaLabel",
+            "columnName": "schema_label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mappingVersion",
+            "columnName": "mapping_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "producer",
+            "producer_label",
+            "mapping_version"
+          ]
+        }
+      },
+      {
+        "tableName": "threat_analysis_run",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `case_id` TEXT NOT NULL, `event_id` TEXT NOT NULL, `event_revision` INTEGER NOT NULL, `derivative_id` TEXT, `request_id` TEXT NOT NULL, `status` TEXT NOT NULL, `reason_code` TEXT, `model_preset` TEXT, `weight_sha256` TEXT, `runtime_commit` TEXT, `runtime_version` TEXT, `task_version` TEXT NOT NULL, `created_at` TEXT NOT NULL, `finding_id` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`case_id`) REFERENCES `case_file`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`event_id`, `event_revision`) REFERENCES `event_revision`(`event_id`, `revision`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`derivative_id`) REFERENCES `derivative`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`finding_id`) REFERENCES `finding`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "caseId",
+            "columnName": "case_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventRevision",
+            "columnName": "event_revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "derivativeId",
+            "columnName": "derivative_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "requestId",
+            "columnName": "request_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reasonCode",
+            "columnName": "reason_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "modelPreset",
+            "columnName": "model_preset",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "weightSha256",
+            "columnName": "weight_sha256",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "runtimeCommit",
+            "columnName": "runtime_commit",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "runtimeVersion",
+            "columnName": "runtime_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "taskVersion",
+            "columnName": "task_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "findingId",
+            "columnName": "finding_id",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_threat_analysis_run_case_id",
+            "unique": false,
+            "columnNames": [
+              "case_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_threat_analysis_run_case_id` ON `${TABLE_NAME}` (`case_id`)"
+          },
+          {
+            "name": "index_threat_analysis_run_event_id_event_revision",
+            "unique": false,
+            "columnNames": [
+              "event_id",
+              "event_revision"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_threat_analysis_run_event_id_event_revision` ON `${TABLE_NAME}` (`event_id`, `event_revision`)"
+          },
+          {
+            "name": "index_threat_analysis_run_derivative_id",
+            "unique": false,
+            "columnNames": [
+              "derivative_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_threat_analysis_run_derivative_id` ON `${TABLE_NAME}` (`derivative_id`)"
+          },
+          {
+            "name": "index_threat_analysis_run_finding_id",
+            "unique": false,
+            "columnNames": [
+              "finding_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_threat_analysis_run_finding_id` ON `${TABLE_NAME}` (`finding_id`)"
+          },
+          {
+            "name": "index_threat_analysis_run_event_id_event_revision_request_id",
+            "unique": true,
+            "columnNames": [
+              "event_id",
+              "event_revision",
+              "request_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_threat_analysis_run_event_id_event_revision_request_id` ON `${TABLE_NAME}` (`event_id`, `event_revision`, `request_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "case_file",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "case_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "event_revision",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id",
+              "event_revision"
+            ],
+            "referencedColumns": [
+              "event_id",
+              "revision"
+            ]
+          },
+          {
+            "table": "derivative",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "derivative_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "finding",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "finding_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '203e327a0b35fde7966d69265763cfb1')"
+    ]
+  }
+}

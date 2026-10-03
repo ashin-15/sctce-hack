@@ -29,6 +29,7 @@ public class Vault private constructor(
     public val search: EvidenceSearch,
     public val reports: ReportHistory,
     public val patterns: PatternStore,
+    public val threatAnalysisRuns: ThreatAnalysisRunStore,
     private val destruction: () -> VaultDestroyResult,
 ) : Closeable {
 
@@ -173,6 +174,7 @@ public class Vault private constructor(
                 search = VaultEvidenceSearch(database, dispatcher),
                 reports = ReportHistory(database, events, audit, clock, ids, dispatcher),
                 patterns = PatternStore(database, events, actors, audit, clock, ids, dispatcher),
+                threatAnalysisRuns = ThreatAnalysisRunStore(database, dispatcher),
                 destruction = destruction,
             )
         }

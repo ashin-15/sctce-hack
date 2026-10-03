@@ -59,8 +59,11 @@ class ImageAnalysisTest : AnalysisTestBase() {
         ),
     )
 
-    private fun analyser(ocr: OcrProcessor?, limits: AnalysisLimits = AnalysisLimits()) =
-        TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, limits, ocr = ocr)
+    private fun analyser(
+        ocr: OcrProcessor?,
+        limits: AnalysisLimits = AnalysisLimits(),
+        threatClassifier: ThreatLanguageClassifier? = null,
+    ) = TextAnalysis(vault, RulesEngineFactory.default(), clock, ids, limits, ocr = ocr, threatClassifier = threatClassifier)
 
     private fun importImage(bytes: ByteArray = pngBytes, mime: String = "image/png"): String =
         importBytes(bytes, declaredMime = mime, kind = AcquisitionKind.SELECTED_VISUAL_MEDIA)
@@ -116,6 +119,24 @@ class ImageAnalysisTest : AnalysisTestBase() {
         assertEquals("[[10,300],[500,300],[500,340],[10,340]]", stored.polygonJson, "the cue points at the line it was read from")
         assertEquals(0, region.pageIndex)
         assertEquals(SupportState.ANALYZED, vault.evidence.details(evidenceId)?.supportState)
+    }
+
+    @Test
+    fun ocrTextIsNotSentToThreatClassifier() = runBlocking<Unit> {
+        val evidenceId = importImage()
+        var classifierCalls = 0
+        val classifier = ThreatLanguageClassifier { _, inputs ->
+            classifierCalls += 1
+            inputs.map { ThreatLanguageResult(ThreatLanguageResultStatus.POSSIBLE_THREAT_LANGUAGE, "idiot") }
+        }
+
+        val outcome = assertIs<AnalysisOutcome.Analysed>(
+            analyser(FakeOcr(screenshot), threatClassifier = classifier).analyse(evidenceId),
+        )
+
+        assertEquals(InputKind.IMAGE_TEXT, outcome.kind)
+        assertEquals(0, classifierCalls)
+        assertTrue(vault.threatAnalysisRuns.forEvent(events().single().eventId.value).isEmpty())
     }
 
     @Test

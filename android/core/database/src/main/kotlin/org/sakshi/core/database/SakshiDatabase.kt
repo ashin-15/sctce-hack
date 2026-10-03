@@ -14,8 +14,9 @@ import androidx.room.RoomDatabase
         ReviewDecisionEntity::class, PatternEntity::class, PatternSupportEntity::class,
         ReportEntity::class, ReportSnapshotEntity::class, AuditRecordEntity::class,
         ModelVersionEntity::class, ProcessingJobEntity::class, LabelMappingEntity::class,
+        ThreatAnalysisRunEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 public abstract class SakshiDatabase : RoomDatabase() {
@@ -30,4 +31,5 @@ public abstract class SakshiDatabase : RoomDatabase() {
     public abstract fun jobDao(): JobDao
     public abstract fun modelVersionDao(): ModelVersionDao
     public abstract fun labelMappingDao(): LabelMappingDao
+    public abstract fun threatAnalysisRunDao(): ThreatAnalysisRunDao
 }
