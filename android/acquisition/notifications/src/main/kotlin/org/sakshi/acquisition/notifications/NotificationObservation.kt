@@ -41,6 +41,9 @@ public class NotificationObservation internal constructor(
     dispatcher: CoroutineDispatcher,
 ) {
     private val tracker = CoverageTracker(clock)
+    private val connectionLock = Any()
+    private var listenerConnected = false
+    private var activeSnapshotProvider: (() -> List<NotificationSource>?)? = null
     private val scope = CoroutineScope(SupervisorJob() + dispatcher)
     private val differ = ObservationDiffer(activePolicy = {
         if (settings.state.value.includeActiveOnConnect) ActiveSnapshotPolicy.REPORT_AS_ACTIVE_SNAPSHOT else ActiveSnapshotPolicy.SEED_ONLY
@@ -102,8 +105,7 @@ public class NotificationObservation internal constructor(
         if (availability != NotificationAvailability.AVAILABLE) return availability
         settings.update { it.copy(enabled = true, paused = false) }
         setComponent(PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
-        intake.beginSession()
-        refresh()
+        beginSession()
         return availability
     }
 
@@ -144,6 +146,14 @@ public class NotificationObservation internal constructor(
         settings.update { it.copy(includeActiveOnConnect = include) }
     }
 
+    public fun setBackgroundObservationOptIn(optIn: Boolean) {
+        settings.update { it.copy(backgroundObservationOptIn = optIn) }
+    }
+
+    public fun setCueAlertsOptIn(optIn: Boolean) {
+        settings.update { it.copy(cueAlertsOptIn = optIn) }
+    }
+
     /**
      * Ends the session: queued work is discarded and the inbox, de-duplication state and coverage counters are cleared.
      * Call it when the app locks. [beginSession] starts the next session.
@@ -156,18 +166,40 @@ public class NotificationObservation internal constructor(
     /** Starts a new session after [stopAndClear], for example when the app unlocks. */
     public fun beginSession() {
         if (!environment.isAvailable()) return
-        intake.beginSession()
+        synchronized(connectionLock) {
+            intake.beginSession()
+            refresh()
+            if (listenerConnected) {
+                intake.onConnected()
+                activeSnapshotProvider?.let { intake.onActiveSnapshot(it) }
+            }
+        }
+    }
+
+    /** Recheck the user's system grant on returning from settings; revoke invalidates held content. */
+    public fun refreshAccess() {
+        if (!isAccessGranted()) intake.stopAndClear()
         refresh()
     }
 
-    internal fun onListenerConnected() {
-        intake.onConnected()
-        refresh()
+    /** The provider returns null when Android could not read a real active snapshot. */
+    internal fun onListenerConnected(snapshotProvider: (() -> List<NotificationSource>?)? = null) {
+        synchronized(connectionLock) {
+            listenerConnected = true
+            activeSnapshotProvider = snapshotProvider
+            intake.onConnected()
+            refresh()
+            snapshotProvider?.let { intake.onActiveSnapshot(it) }
+        }
     }
 
     internal fun onListenerDisconnected() {
-        intake.onDisconnected()
-        refresh()
+        synchronized(connectionLock) {
+            listenerConnected = false
+            activeSnapshotProvider = null
+            intake.onDisconnected()
+            refresh()
+        }
         if (environment.isAvailable() && settings.state.value.enabled && !isAccessGranted()) {
             // Access was revoked in system settings: capture stops and nothing is kept.
             intake.stopAndClear()

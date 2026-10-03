@@ -7,4 +7,8 @@ public interface TextAnalyser {
      * only the derivative is stored and [AnalysisOutcome.NeedsExportOptions] asks the open questions.
      */
     public suspend fun analyse(evidenceId: String, exportOptions: ExportOptions? = null): AnalysisOutcome
+
+    /** Uses a stable opaque caller token to make retries of one explicit analysis request idempotent. */
+    public suspend fun analyse(evidenceId: String, exportOptions: ExportOptions?, requestId: String): AnalysisOutcome =
+        analyse(evidenceId, exportOptions)
 }

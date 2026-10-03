@@ -29,13 +29,14 @@ public object SakshiSchema {
     public const val MODEL_VERSION: String = "model_version"
     public const val PROCESSING_JOB: String = "processing_job"
     public const val LABEL_MAPPING: String = "label_mapping"
+    public const val THREAT_ANALYSIS_RUN: String = "threat_analysis_run"
 
     /** Every table in the database. */
     public val allTables: List<String> = listOf(
         CASE_FILE, ACTOR, SOURCE_SCOPE, EVIDENCE, EVIDENCE_STATE, EVIDENCE_BLOB, CAPTURE_METADATA,
         DERIVATIVE, REGION, EVENT, EVENT_REVISION, EVIDENCE_ANCHOR, EVENT_LINK, BOUNDARY,
         COVERAGE_GAP, FINDING, FINDING_ANCHOR, REVIEW_DECISION, PATTERN, PATTERN_SUPPORT, REPORT,
-        REPORT_SNAPSHOT, AUDIT_RECORD, MODEL_VERSION, PROCESSING_JOB, LABEL_MAPPING,
+        REPORT_SNAPSHOT, AUDIT_RECORD, MODEL_VERSION, PROCESSING_JOB, LABEL_MAPPING, THREAT_ANALYSIS_RUN,
     )
 
     /**
@@ -48,7 +49,7 @@ public object SakshiSchema {
         SOURCE_SCOPE, EVIDENCE, EVIDENCE_BLOB, CAPTURE_METADATA, DERIVATIVE, REGION, EVENT,
         EVENT_REVISION, EVIDENCE_ANCHOR, EVENT_LINK, BOUNDARY, COVERAGE_GAP, FINDING,
         FINDING_ANCHOR, REVIEW_DECISION, PATTERN_SUPPORT, AUDIT_RECORD, MODEL_VERSION,
-        LABEL_MAPPING,
+        LABEL_MAPPING, THREAT_ANALYSIS_RUN,
     )
 
     /** Tables that allow update of exactly one column, mapped to that column. */

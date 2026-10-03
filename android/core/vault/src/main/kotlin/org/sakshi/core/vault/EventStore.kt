@@ -15,6 +15,7 @@ import org.sakshi.core.database.EventEntity
 import org.sakshi.core.database.EventRevisionEntity
 import org.sakshi.core.database.FindingAnchorEntity
 import org.sakshi.core.database.SakshiDatabase
+import org.sakshi.core.database.ThreatAnalysisRunEntity
 import org.sakshi.core.database.SakshiSchema
 import org.sakshi.core.model.ArtifactId
 import org.sakshi.core.model.AssociationReview
@@ -102,6 +103,60 @@ public class EventStore(
                 saveAllInTransaction(events, artifactLengths).also {
                     if (it is BatchSaveResult.Saved) database.patternDao().markStaleForCase(events.first().caseId.value)
                 }
+            }
+        }
+    }
+
+    /** Saves events, linked pending suggestions, and their analysis statuses in one database transaction. */
+    public suspend fun saveAllWithThreatAnalysis(
+        events: List<Event>,
+        runs: List<ThreatAnalysisRunDraft>,
+        artifactLengths: (ArtifactId) -> Int? = { null },
+    ): BatchSaveResult {
+        require(runs.all { run -> events.any { it.eventId.value == run.eventId && it.revision == run.eventRevision } }) {
+            "Every analysis run must belong to an event in the same batch"
+        }
+        if (events.isEmpty()) return BatchSaveResult.Saved(0)
+        return withContext(dispatcher) {
+            database.withTransaction {
+                val saved = saveAllInTransaction(events, artifactLengths)
+                if (saved is BatchSaveResult.Saved) {
+                    database.threatAnalysisRunDao().let { dao ->
+                    runs.forEach { run ->
+                        val linkedFindingId = run.findingId ?: if (run.status == ThreatAnalysisRunStatus.POSSIBLE_THREAT_LANGUAGE) {
+                            val event = events.single { it.eventId.value == run.eventId && it.revision == run.eventRevision }
+                            val categoryIndex = event.categories.indexOfLast {
+                                it.basis == org.sakshi.core.model.CategoryBasis.CLASSIFIER_SUGGESTION &&
+                                    it.producerVersion.value == "qwen-threat-language-v1"
+                            }
+                            if (categoryIndex >= 0) RowKeys.finding(run.eventId, run.eventRevision, categoryIndex) else null
+                        } else {
+                            null
+                        }
+                        dao.insertIfAbsent(
+                                ThreatAnalysisRunEntity(
+                                    id = run.id,
+                                    caseId = run.caseId,
+                                    eventId = run.eventId,
+                                    eventRevision = run.eventRevision,
+                                    derivativeId = run.derivativeId,
+                                    requestId = run.requestId,
+                                    status = run.status.name.lowercase(),
+                                    reasonCode = run.reasonCode,
+                                    modelPreset = run.modelPreset,
+                                    weightSha256 = run.weightSha256,
+                                    runtimeCommit = run.runtimeCommit,
+                                    runtimeVersion = run.runtimeVersion,
+                                    taskVersion = run.taskVersion,
+                                    createdAt = run.createdAt,
+                                findingId = linkedFindingId,
+                                ),
+                            )
+                        }
+                    }
+                    database.patternDao().markStaleForCase(events.first().caseId.value)
+                }
+                saved
             }
         }
     }

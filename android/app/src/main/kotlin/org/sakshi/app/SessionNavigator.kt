@@ -15,9 +15,12 @@ class SessionNavigator : ViewModel() {
     private val stack = ArrayDeque<SessionScreen>().apply { addLast(SessionScreen.CaseList) }
     private val mutableCurrent = MutableStateFlow<SessionScreen>(SessionScreen.CaseList)
     val current: StateFlow<SessionScreen> = mutableCurrent.asStateFlow()
+    private val mutableCanGoBack = MutableStateFlow(false)
+    val canGoBack: StateFlow<Boolean> = mutableCanGoBack.asStateFlow()
 
     private fun publish() {
         mutableCurrent.value = stack.last()
+        mutableCanGoBack.value = stack.size > 1
     }
 
     private fun reset(vararg screens: SessionScreen) {
@@ -58,6 +61,10 @@ class SessionNavigator : ViewModel() {
     fun openExportResult(caseId: String) = push(SessionScreen.ExportResult(caseId))
  
     fun openAiModel() = push(SessionScreen.AiModel)
+
+    fun openObservation() = push(SessionScreen.Observation)
+
+    fun openVisibleCapture() = push(SessionScreen.VisibleCapture)
 
     /** Swaps the screen on top, for a step that should not be returned to (the analysis result becomes the timeline). */
     fun replaceTopWithTimeline(caseId: String) {

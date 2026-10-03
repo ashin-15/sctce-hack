@@ -31,4 +31,20 @@ public class VaultTextDerivatives(private val store: DerivativeStore) : TextDeri
         )
         return OcrDerivative(saved.id, saved.text, saved.sourceMapJson)
     }
+
+    override suspend fun latestTranscript(evidenceId: String): DerivativeText? =
+        store.latest(evidenceId, DerivativeKind.TRANSCRIPT)?.let { DerivativeText(it.id, it.text) }
+
+    override suspend fun saveTranscript(evidenceId: String, draft: TranscriptDraft): DerivativeText {
+        val saved = store.save(
+            evidenceId = evidenceId,
+            kind = DerivativeKind.TRANSCRIPT,
+            text = draft.text,
+            toolId = draft.toolId,
+            toolVersion = draft.toolVersion,
+            sourceMapJson = draft.sourceMapJson,
+            qualityJson = draft.qualityJson,
+        )
+        return DerivativeText(saved.id, saved.text)
+    }
 }

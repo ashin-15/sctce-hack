@@ -1,100 +1,148 @@
 package org.sakshi.processing.llm.engine
 
+import java.util.UUID
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
+/** One model/context lease. Callers hold [InferenceLock]'s process-wide lock for its full lifetime. */
 public class LlamaCppEngine public constructor(
     private val modelPath: String? = null,
     public val modelInfo: ModelInfo? = null,
-    private val bridge: NativeLlmBridge = NativeLlmBridge,
-    private val inferenceLock: InferenceLock = InferenceLock(),
+    private val bridge: NativeLlmRuntime = NativeLlmBridge,
 ) : LlmEngine {
 
+    private val worker = Executors.newSingleThreadExecutor { runnable ->
+        Thread(runnable, "sakshi-llama-inference").apply { isDaemon = true }
+    }
     private var nativeHandle: Long = 0L
     private var _status: LlmStatus = LlmStatus.Unloaded
+    @Volatile private var activeRequestId: String? = null
+    @Volatile private var activeCompletion: CompletableDeferred<Unit>? = null
 
-    override val status: LlmStatus
-        get() = _status
+    override val status: LlmStatus get() = _status
+    public val loadResult: NativeLoadResult
 
     init {
-        if (!bridge.isAvailable || modelPath.isNullOrBlank()) {
-            _status = LlmStatus.Unloaded
+        if (bridge.isAvailable && !modelPath.isNullOrBlank()) {
+            val load = bridge.initModel(modelPath, modelInfo?.contextWindowTokens ?: 2048)
+            loadResult = load
+            nativeHandle = load.handle
+            _status = if (load.isReady) LlmStatus.Ready else LlmStatus.Error
         } else {
-            val contextSize = modelInfo?.contextWindowTokens ?: 2048
-            nativeHandle = bridge.initModel(modelPath, contextSize)
-            _status = if (nativeHandle != 0L) {
-                LlmStatus.Ready
-            } else {
-                LlmStatus.Error
-            }
+            loadResult = NativeLoadResult(0L, NativeLoadResult.STATUS_ERROR)
+            _status = LlmStatus.Error
         }
     }
 
     override suspend fun generate(request: GenerationRequest): GenerationOutcome {
-        if (!bridge.isAvailable || _status != LlmStatus.Ready || nativeHandle == 0L) {
-            return GenerationOutcome.Failed(
-                reason = GenerationFailureReason.MODEL_NOT_READY,
-                message = "Native LLM engine is not ready or library is not available",
-            )
+        if (_status != LlmStatus.Ready || nativeHandle == 0L) {
+            return GenerationOutcome.Failed(GenerationFailureReason.MODEL_NOT_READY, "Native Qwen runtime is unavailable")
         }
-
+        if (request.maxTokens !in 1..96 || request.systemPrompt.toByteArray(Charsets.UTF_8).size +
+            request.userPrompt.toByteArray(Charsets.UTF_8).size > 64 * 1024
+        ) {
+            return GenerationOutcome.Failed(GenerationFailureReason.CONTEXT_LIMIT_EXCEEDED, "Request exceeds the local task budget")
+        }
+        val handle = nativeHandle
+        val requestId = UUID.randomUUID().toString()
+        val nativeCompletion = CompletableDeferred<Unit>()
+        activeRequestId = requestId
+        activeCompletion = nativeCompletion
         return try {
-            currentCoroutineContext().ensureActive()
-            inferenceLock.withLock {
-                currentCoroutineContext().ensureActive()
-
-                val contextLimit = modelInfo?.contextWindowTokens ?: 2048
-                val combinedPrompt = "${request.systemPrompt}\n${request.userPrompt}"
-                if (combinedPrompt.length / 3 > contextLimit) {
-                    return@withLock GenerationOutcome.Failed(
-                        reason = GenerationFailureReason.CONTEXT_LIMIT_EXCEEDED,
-                        message = "Prompt exceeds context window limit",
-                    )
+            suspendCancellableCoroutine { continuation ->
+                continuation.invokeOnCancellation {
+                    bridge.cancel(handle, requestId)
                 }
-
-                val stopArray = request.stopSequences.toTypedArray()
-                val result = bridge.generate(
-                    handle = nativeHandle,
-                    prompt = combinedPrompt,
-                    maxTokens = request.maxTokens,
-                    temperature = request.temperature,
-                    grammar = request.grammar,
-                    stopSequences = stopArray,
-                )
-
-                if (result != null) {
-                    GenerationOutcome.Success(text = result)
-                } else {
-                    GenerationOutcome.Failed(
-                        reason = GenerationFailureReason.ENGINE_ERROR,
-                        message = "Native generation returned null",
-                    )
+                try {
+                    worker.execute {
+                        var outcome: GenerationOutcome? = null
+                        var failure: Throwable? = null
+                        try {
+                            val result = bridge.generate(
+                                handle,
+                                request.systemPrompt,
+                                request.userPrompt,
+                                requestId,
+                                request.maxTokens,
+                                request.grammar,
+                                request.stopSequences.toTypedArray(),
+                            )
+                            outcome = when (result.statusCode) {
+                                NativeGenerationResult.STATUS_OK -> GenerationOutcome.Success(result.text)
+                                NativeGenerationResult.STATUS_TRUNCATED -> GenerationOutcome.Failed(
+                                    GenerationFailureReason.TRUNCATED,
+                                    "Native generation did not complete within the token budget",
+                                )
+                                NativeGenerationResult.STATUS_CANCELLED -> GenerationOutcome.Failed(
+                                    GenerationFailureReason.CANCELLED,
+                                    "Native generation was cancelled",
+                                )
+                                else -> GenerationOutcome.Failed(GenerationFailureReason.ENGINE_ERROR, "Native generation failed")
+                            }
+                        } catch (thrown: Throwable) {
+                            failure = thrown
+                        } finally {
+                            activeRequestId = null
+                            activeCompletion = null
+                            nativeCompletion.complete(Unit)
+                        }
+                        if (continuation.isActive) {
+                            val thrown = failure
+                            if (thrown == null) continuation.resume(checkNotNull(outcome))
+                            else continuation.resumeWithException(thrown)
+                        }
+                    }
+                } catch (_: RejectedExecutionException) {
+                    activeRequestId = null
+                    activeCompletion = null
+                    nativeCompletion.complete(Unit)
+                    if (continuation.isActive) {
+                        continuation.resume(GenerationOutcome.Failed(GenerationFailureReason.ENGINE_ERROR, "Inference worker is closed"))
+                    }
                 }
             }
-        } catch (_: CancellationException) {
-            GenerationOutcome.Failed(
-                reason = GenerationFailureReason.CANCELLED,
-                message = "Inference was cancelled",
-            )
-        } catch (_: OutOfMemoryError) {
-            GenerationOutcome.Failed(
-                reason = GenerationFailureReason.OUT_OF_MEMORY,
-                message = "Native generation ran out of memory",
-            )
-        } catch (e: Exception) {
-            GenerationOutcome.Failed(
-                reason = GenerationFailureReason.ENGINE_ERROR,
-                message = e.message ?: "Unknown engine error",
-            )
+        } catch (cancelled: CancellationException) {
+            bridge.cancel(handle, requestId)
+            withContext(NonCancellable) { nativeCompletion.await() }
+            throw cancelled
         }
     }
 
     override fun close(): Unit {
-        if (nativeHandle != 0L) {
-            bridge.freeModel(nativeHandle)
+        val handle = nativeHandle
+        if (handle != 0L) {
+            activeRequestId?.let { bridge.cancel(handle, it) }
+            awaitActiveNativeCall()
+            bridge.freeModel(handle)
             nativeHandle = 0L
         }
         _status = LlmStatus.Unloaded
+        worker.shutdown()
+    }
+
+    private fun awaitActiveNativeCall() {
+        val completion = activeCompletion ?: return
+        if (completion.isCompleted) return
+        val latch = CountDownLatch(1)
+        completion.invokeOnCompletion { latch.countDown() }
+        var interrupted = false
+        while (true) {
+            try {
+                latch.await(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+                break
+            } catch (_: InterruptedException) {
+                interrupted = true
+            }
+        }
+        if (interrupted) Thread.currentThread().interrupt()
     }
 }

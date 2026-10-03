@@ -86,7 +86,13 @@ fun SearchScreen(
     actions: SearchActions,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler(onBack = actions.back)
+    BackHandler {
+        if (state.filtersOpen) {
+            actions.filters.setOpen(false)
+        } else {
+            actions.back()
+        }
+    }
 
     SakshiScaffold(
         title = stringResource(R.string.search_title),

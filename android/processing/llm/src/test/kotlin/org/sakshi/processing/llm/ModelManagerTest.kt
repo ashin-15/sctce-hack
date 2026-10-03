@@ -5,6 +5,7 @@ import java.nio.file.Files
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.sakshi.core.integrity.Sha256
 import org.sakshi.processing.llm.engine.DeterministicFallbackEngine
@@ -105,6 +106,28 @@ public class ModelManagerTest {
             assertEquals(sampleBytes.size.toLong(), importedFile.length())
             assertEquals(sampleBytes.size.toLong(), reportedProgress)
             assertTrue(manager.hasModel("imported.gguf"))
+        } finally {
+            tempDir.deleteRecursively()
+        }
+    }
+
+    @Test
+    public fun qwenPresetResolvesExactFilenameAndImportNeverReplacesIt(): Unit {
+        val tempDir = Files.createTempDirectory("qwen_model_test").toFile()
+        try {
+            val manager = ModelManager(tempDir)
+            val preset = ModelManager.QWEN_2_5_1_5B
+            val target = manager.getModelFile(preset.id)
+            assertEquals(preset.filename, target.name)
+            target.writeText("existing-user-model")
+
+            assertThrows(IllegalArgumentException::class.java) {
+                manager.importModelStream(
+                    java.io.ByteArrayInputStream("replacement".toByteArray()),
+                    targetFileName = preset.filename,
+                )
+            }
+            assertEquals("existing-user-model", target.readText())
         } finally {
             tempDir.deleteRecursively()
         }

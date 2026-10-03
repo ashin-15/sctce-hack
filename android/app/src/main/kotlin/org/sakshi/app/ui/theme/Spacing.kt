@@ -20,6 +20,11 @@ object Spacing {
 
     /** Left and right gutter of every screen. */
     val gutter: Dp = lg
+    val gutterMobile: Dp = md
+
+    /** Canvas margins. */
+    val margin: Dp = xl
+    val marginMobile: Dp = lg
 
     /** Height of the top row. */
     val topRow: Dp = 56.dp

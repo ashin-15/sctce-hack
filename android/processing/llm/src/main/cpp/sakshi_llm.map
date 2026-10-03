@@ -1,0 +1,6 @@
+SAKSHI_LLM_1 {
+    global:
+        JNI_OnLoad;
+        Java_org_sakshi_processing_llm_engine_NativeLlmBridge_*;
+    local: *;
+};

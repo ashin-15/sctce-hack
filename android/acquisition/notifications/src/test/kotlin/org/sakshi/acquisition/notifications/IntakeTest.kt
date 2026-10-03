@@ -227,6 +227,46 @@ class IntakeTest {
     }
 
     @Test
+    fun `an active platform batch interrupted by lock cannot reconcile the next session`() {
+        ready()
+        val source = FakeSource()
+        intake.onActiveSnapshot {
+            intake.stopAndClear()
+            intake.beginSession()
+            intake.onConnected()
+            listOf(source)
+        }
+        drain()
+        assertEquals(0, source.reads)
+        assertTrue(inbox.candidates.value.isEmpty())
+        assertEquals(CoverageState.COVERAGE_UNKNOWN, tracker.state.value)
+        intake.onActiveSnapshot(emptyList())
+        drain()
+        assertEquals(CoverageState.CONNECTED, tracker.state.value)
+    }
+
+    @Test
+    fun `an extras read interrupted by lock cannot leak into the next collector session`() {
+        ready()
+        val underlying = FakeSource()
+        val interrupted = object : NotificationSource by underlying {
+            override fun read(request: SnapshotRequest): NotificationSnapshot {
+                val snapshot = underlying.read(request)
+                intake.stopAndClear()
+                intake.beginSession()
+                intake.onConnected()
+                return snapshot
+            }
+        }
+        intake.onPosted(interrupted)
+        drain()
+        assertTrue(inbox.candidates.value.isEmpty())
+        intake.onPosted(FakeSource(notificationKey = "new-session-key"))
+        drain()
+        assertEquals(1, inbox.candidates.value.size)
+    }
+
+    @Test
     fun `an active snapshot is reported and tagged when the person opted in`() {
         val reporting = NotificationIntake(
             { settings }, environment, tracker, differ(ActiveSnapshotPolicy.REPORT_AS_ACTIVE_SNAPSHOT), inbox, scope,

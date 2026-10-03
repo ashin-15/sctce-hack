@@ -78,7 +78,7 @@ class ProjectionSessionTest {
         val session = ProjectionSession(source)
 
         val collected = mutableListOf<CapturedFrame>()
-        val count = session.captureBurst(maxFrames = 3, intervalMs = 0L) { frame ->
+        val count = session.captureBurst(maxFrames = 3, intervalMs = 1_000L) { frame ->
             collected.add(frame)
             true
         }
@@ -97,7 +97,7 @@ class ProjectionSessionTest {
         val session = ProjectionSession(source)
 
         val collected = mutableListOf<CapturedFrame>()
-        val count = session.captureBurst(maxFrames = 10, intervalMs = 0L) { frame ->
+        val count = session.captureBurst(maxFrames = 10, intervalMs = 1_000L) { frame ->
             collected.add(frame)
             true
         }

@@ -138,6 +138,77 @@ class NotificationObservationTest {
     }
 
     @Test
+    fun `unlock reuses bound listener and reconciles a fresh real snapshot`() {
+        val observation = observation()
+        grantAccess(true)
+        observation.setAllowlist(PackageAllowlist.of(listOf(APP)))
+        observation.enable()
+        var snapshotReads = 0
+        observation.onListenerConnected {
+            snapshotReads += 1
+            emptyList()
+        }
+        scheduler.runCurrent()
+        assertEquals(CoverageState.CONNECTED, observation.coverage.value)
+        observation.stopAndClear()
+        observation.beginSession()
+        scheduler.runCurrent()
+        assertEquals(2, snapshotReads)
+        assertEquals(CoverageState.CONNECTED, observation.coverage.value)
+        post(observation, "synthetic after unlock")
+        assertEquals(1, observation.inbox.candidates.value.size)
+    }
+
+    @Test
+    fun `unlock without real snapshot does not invent reconciled coverage`() {
+        val observation = observation()
+        grantAccess(true)
+        observation.enable()
+        observation.onListenerConnected()
+        observation.intake.onActiveSnapshot(emptyList())
+        scheduler.runCurrent()
+        observation.stopAndClear()
+        observation.beginSession()
+        scheduler.runCurrent()
+        assertEquals(CoverageState.COVERAGE_UNKNOWN, observation.coverage.value)
+    }
+
+    @Test
+    fun `failed snapshot remains unknown and disconnected provider is not retained`() {
+        val observation = observation()
+        grantAccess(true)
+        observation.enable()
+        var reads = 0
+        observation.onListenerConnected {
+            reads += 1
+            null
+        }
+        scheduler.runCurrent()
+        assertEquals(CoverageState.COVERAGE_UNKNOWN, observation.coverage.value)
+        observation.onListenerDisconnected()
+        observation.stopAndClear()
+        observation.beginSession()
+        scheduler.runCurrent()
+        assertEquals(1, reads)
+        assertEquals(CoverageState.ACCESS_GRANTED_NOT_CONNECTED, observation.coverage.value)
+    }
+
+    @Test
+    fun `reenabling while service still bound resnapshots instead of waiting for callback`() {
+        val observation = observation()
+        grantAccess(true)
+        observation.enable()
+        var reads = 0
+        observation.onListenerConnected { reads += 1; emptyList() }
+        scheduler.runCurrent()
+        observation.disable()
+        observation.enable()
+        scheduler.runCurrent()
+        assertEquals(2, reads)
+        assertEquals(CoverageState.CONNECTED, observation.coverage.value)
+    }
+
+    @Test
     fun `revoking access in system settings stops capture and clears`() {
         val observation = observation()
         grantAccess(true)

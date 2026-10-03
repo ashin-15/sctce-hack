@@ -60,7 +60,8 @@ public class ModelManager public constructor(
     }
 
     public fun getModelFile(modelId: String): File {
-        return File(modelsDir, modelId)
+        val preset = PRESETS.firstOrNull { it.id == modelId }
+        return File(modelsDir, preset?.filename ?: modelId)
     }
 
     public fun hasModel(modelId: String): Boolean {
@@ -93,6 +94,7 @@ public class ModelManager public constructor(
     ): File {
         val tempFile = File(modelsDir, "$targetFileName.tmp")
         val targetFile = File(modelsDir, targetFileName)
+        require(!targetFile.exists()) { "A model with this filename is already installed; existing model files are never replaced" }
         if (tempFile.exists()) tempFile.delete()
         val step = 4 * 1024 * 1024L
         var lastReported = 0L
@@ -113,9 +115,8 @@ public class ModelManager public constructor(
                 onProgress?.invoke(total)
             }
         }
-        if (targetFile.exists()) targetFile.delete()
         if (!tempFile.renameTo(targetFile)) {
-            tempFile.copyTo(targetFile, overwrite = true)
+            tempFile.copyTo(targetFile, overwrite = false)
             tempFile.delete()
         }
         return targetFile

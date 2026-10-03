@@ -21,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import org.sakshi.app.R
+import org.sakshi.app.ui.components.AttributionKind
 import org.sakshi.app.ui.components.ChoiceButton
 import org.sakshi.app.ui.components.ConfirmDialog
 import org.sakshi.app.ui.components.DestructiveButton
@@ -29,7 +31,9 @@ import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.EpistemicBlock
 import org.sakshi.app.ui.components.EpistemicLabel
 import org.sakshi.app.ui.components.FormDialog
+import org.sakshi.app.ui.components.HashStatusBadge
 import org.sakshi.app.ui.components.LabelValue
+import org.sakshi.app.ui.components.LocalVaultBadge
 import org.sakshi.app.ui.components.MenuAction
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.OverflowMenuButton
@@ -37,15 +41,20 @@ import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.ProgressBlock
 import org.sakshi.app.ui.components.QuietTextButton
 import org.sakshi.app.ui.components.RadioRow
+import org.sakshi.app.ui.components.SakshiBrandLogo
 import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SakshiTextField
 import org.sakshi.app.ui.components.ScreenTitle
 import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
+import org.sakshi.app.ui.components.SensitiveMediaShield
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
 import org.sakshi.app.ui.components.TextEntryDialog
+import org.sakshi.app.ui.components.TimelineAnchorDot
+import org.sakshi.app.ui.components.TimelineNodeState
+import org.sakshi.app.ui.components.TriStateAttributionBadge
 import org.sakshi.app.ui.theme.Spacing
 import org.sakshi.core.model.EpistemicStatus
 
@@ -66,6 +75,7 @@ fun DesignCatalog(onClose: () -> Unit, modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(Spacing.gutter),
             verticalArrangement = Arrangement.spacedBy(Spacing.xl),
         ) {
+            item { Group(R.string.catalog_calm_sanctuary) { CalmSanctuarySamples() } }
             item { Group(R.string.catalog_type) { TypeScale() } }
             item { Group(R.string.catalog_epistemic) { EpistemicSamples() } }
             item { Group(R.string.catalog_buttons) { Buttons { dialog = it } } }
@@ -227,3 +237,64 @@ private fun Surfaces() {
         EmptyState(stringResource(R.string.catalog_empty_title), stringResource(R.string.catalog_empty_body))
     }
 }
+
+@Composable
+private fun CalmSanctuarySamples() {
+    var isShielded by remember { mutableStateOf(true) }
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        // Logo & Air-Gap Badge
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+        ) {
+            SakshiBrandLogo(size = 36.dp)
+            Text("Sakshi", style = MaterialTheme.typography.titleLarge)
+            LocalVaultBadge()
+        }
+
+        // Tri-State Attribution Badges
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            TriStateAttributionBadge(AttributionKind.Observed, stringResource(R.string.catalog_badge_observed))
+            TriStateAttributionBadge(AttributionKind.Inferred, stringResource(R.string.catalog_badge_inferred))
+            TriStateAttributionBadge(AttributionKind.Confirmed, stringResource(R.string.catalog_badge_confirmed))
+        }
+
+        // Cryptographic Hash Status Indicator
+        HashStatusBadge(hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", verified = true)
+
+        // Timeline progression anchors
+        SupportingText(stringResource(R.string.catalog_timeline_anchors))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                TimelineAnchorDot(TimelineNodeState.Confirmed)
+                Text("Confirmed", style = MaterialTheme.typography.bodySmall)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                TimelineAnchorDot(TimelineNodeState.WarningEscalation)
+                Text("Signal", style = MaterialTheme.typography.bodySmall)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                TimelineAnchorDot(TimelineNodeState.PassiveMetadata)
+                Text("Metadata", style = MaterialTheme.typography.bodySmall)
+            }
+        }
+
+        // Shielded media / excerpt preview
+        SupportingText(stringResource(R.string.catalog_shield_preview))
+        SensitiveMediaShield(
+            isShielded = isShielded,
+            onToggleShield = { isShielded = !isShielded },
+        ) {
+            SakshiCard {
+                Column(Modifier.padding(Spacing.md), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    Text(stringResource(R.string.catalog_shield_sample_text), style = MaterialTheme.typography.bodyMedium)
+                    HashStatusBadge(hash = "3b5f4c20d7e411b2", verified = true)
+                }
+            }
+        }
+    }
+}
+

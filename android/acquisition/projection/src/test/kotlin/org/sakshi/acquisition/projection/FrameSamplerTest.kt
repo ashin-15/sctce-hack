@@ -18,7 +18,7 @@ class FrameSamplerTest {
         bitmap.eraseColor(Color.BLACK)
 
         val kind = FrameSampler.detectFrameKind(bitmap)
-        assertEquals(FrameKind.SECURE_CONTENT_DETECTED, kind)
+        assertEquals(FrameKind.BLANK, kind)
     }
 
     @Test

@@ -21,7 +21,7 @@ private fun Modifier.target(): Modifier = heightIn(min = Spacing.touchTarget).wi
 @Composable
 private fun Label(text: String) = Text(text, textAlign = TextAlign.Center)
 
-/** The one main action of a screen: filled with the plum ink colour, full width by default. */
+/** The one main action of a screen: filled with deep teal (#0F766E), full width by default. */
 @Composable
 fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     Button(
@@ -29,10 +29,14 @@ fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifi
         modifier = modifier.fillMaxWidth().target(),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
     ) { Label(text) }
 }
 
-/** An alternative action: outlined, no fill. */
+/** An alternative action: outlined, 1px border with primary teal text. */
 @Composable
 fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     OutlinedButton(
@@ -40,6 +44,10 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
         modifier = modifier.target(),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
+        ),
         border = BorderStroke(
             1.dp,
             if (enabled) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outlineVariant,
@@ -50,7 +58,15 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
 /** A low-emphasis action that is only text. */
 @Composable
 fun QuietTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
-    TextButton(onClick = onClick, modifier = modifier.target(), enabled = enabled, shape = MaterialTheme.shapes.medium) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.target(),
+        enabled = enabled,
+        shape = MaterialTheme.shapes.medium,
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+    ) {
         Label(text)
     }
 }
@@ -63,10 +79,14 @@ fun DestructiveButton(text: String, onClick: () -> Unit, modifier: Modifier = Mo
         modifier = modifier.target(),
         enabled = enabled,
         shape = MaterialTheme.shapes.medium,
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.error,
+        ),
         border = BorderStroke(
             1.dp,
             if (enabled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outlineVariant,
         ),
     ) { Label(text) }
 }
+

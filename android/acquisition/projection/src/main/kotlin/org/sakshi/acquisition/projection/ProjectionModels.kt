@@ -7,13 +7,7 @@ public enum class FrameKind {
     /** Standard unblocked screen content containing readable visual UI. */
     NORMAL,
 
-    /**
-     * Screen content protected by Android OS policy (FLAG_SECURE or private space).
-     * The OS blanks the virtual display buffer, resulting in uniform zero luminosity.
-     */
-    SECURE_CONTENT_DETECTED,
-
-    /** Image buffer was empty or could not be decoded. */
+    /** The captured output is uniformly dark or empty; its cause is unknown. */
     BLANK,
 }
 
@@ -36,6 +30,9 @@ public data class BubbleBox(
  * Inferred direction of a message bubble based on spatial alignment.
  */
 public enum class MessageDirection {
+    /** OCR layout does not verify authorship or message direction. */
+    UNKNOWN,
+
     /** Contact message, typically left-aligned on screen. */
     INCOMING,
 
@@ -79,6 +76,7 @@ public data class CapturedFrame(
     public val imageBytes: ByteArray,
     public val sha256Hex: String,
     public val kind: FrameKind,
+    public val elapsedRealtimeMs: Long = 0,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -90,6 +88,7 @@ public data class CapturedFrame(
         if (!imageBytes.contentEquals(other.imageBytes)) return false
         if (sha256Hex != other.sha256Hex) return false
         if (kind != other.kind) return false
+        if (elapsedRealtimeMs != other.elapsedRealtimeMs) return false
         return true
     }
 
@@ -101,6 +100,7 @@ public data class CapturedFrame(
         result = 31 * result + imageBytes.contentHashCode()
         result = 31 * result + sha256Hex.hashCode()
         result = 31 * result + kind.hashCode()
+        result = 31 * result + elapsedRealtimeMs.hashCode()
         return result
     }
 }

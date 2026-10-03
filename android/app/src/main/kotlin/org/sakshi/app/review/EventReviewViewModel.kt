@@ -42,6 +42,7 @@ import org.sakshi.core.vault.ReviewResult
 import org.sakshi.core.vault.SenderSelector
 import org.sakshi.core.vault.StoredActor
 import org.sakshi.core.vault.Vault
+import org.sakshi.core.database.ThreatAnalysisRunEntity
 import org.sakshi.processing.analysis.EventText
 
 /** One category of the event with the cue words that make it a suggestion. */
@@ -72,6 +73,7 @@ data class EventReviewState(
     val categories: List<CategoryView> = emptyList(),
     val people: List<StoredActor> = emptyList(),
     val history: List<HistoryLine> = emptyList(),
+    val threatAnalysis: ThreatAnalysisRunEntity? = null,
     val notice: ReviewNotice? = null,
     val picture: PictureState = PictureState.None,
     /** How many recognised lines scored low, when the text came from a picture and that is known. */
@@ -191,8 +193,18 @@ class EventReviewViewModel(
         }
         val people = vault.actors.list(latest.caseId)
         val history = historyOf(latest)
+        val threatAnalysis = vault.threatAnalysisRuns.forEvent(latest.eventId.value).firstOrNull()
         mutableState.update {
-            it.copy(loaded = true, event = latest, body = body, marks = marks, categories = categories, people = people, history = history)
+            it.copy(
+                loaded = true,
+                event = latest,
+                body = body,
+                marks = marks,
+                categories = categories,
+                people = people,
+                history = history,
+                threatAnalysis = threatAnalysis,
+            )
         }
         if (latest.source.kind == SourceKind.SELECTED_IMAGE && !pictureRequested) {
             pictureRequested = true

@@ -117,6 +117,8 @@ class SettingsTest {
                 allowlist = PackageAllowlist.of(listOf(APP, "synthetic.second.app")),
                 lockScreenPreviewsOptIn = true,
                 includeActiveOnConnect = true,
+                backgroundObservationOptIn = true,
+                cueAlertsOptIn = true,
             )
         }
         val loaded = NotificationSettings(path).state.value
@@ -125,6 +127,8 @@ class SettingsTest {
         assertEquals(setOf(APP, "synthetic.second.app"), loaded.allowlist.names)
         assertTrue(loaded.lockScreenPreviewsOptIn)
         assertTrue(loaded.includeActiveOnConnect)
+        assertTrue(loaded.backgroundObservationOptIn)
+        assertTrue(loaded.cueAlertsOptIn)
     }
 
     @Test
@@ -134,7 +138,7 @@ class SettingsTest {
         val text = path.readText()
         assertTrue(text.contains(APP))
         assertEquals(
-            setOf("enabled", "paused", "lock_screen_previews_opt_in", "include_active_on_connect", "allowlist"),
+            setOf("enabled", "paused", "lock_screen_previews_opt_in", "include_active_on_connect", "allowlist", "background_observation_opt_in", "cue_alerts_opt_in"),
             text.lines().filter { it.isNotBlank() && !it.startsWith("#") }.map { it.substringBefore('=') }.toSet(),
         )
     }

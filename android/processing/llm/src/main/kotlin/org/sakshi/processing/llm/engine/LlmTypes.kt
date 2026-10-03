@@ -35,6 +35,7 @@ public enum class GenerationFailureReason {
     OUT_OF_MEMORY,
     ENGINE_ERROR,
     CANCELLED,
+    TRUNCATED,
 }
 
 public sealed interface GenerationOutcome {

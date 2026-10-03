@@ -404,7 +404,7 @@
     <string name="category_unknown">Not sure</string>
     <string name="category_basis_rule">Suggested because these words matched a list: %1$s. The list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.</string>
     <string name="category_basis_rule_no_words">Suggested because words matched a list. The list has not been reviewed by a native speaker. It cannot read context, jokes or quotes.</string>
-    <string name="category_basis_classifier">Suggested by a small classifier on this phone. It cannot read context, jokes or quotes.</string>
+    <string name="category_basis_classifier">Uncalibrated local model suggestion based on the quoted text. It can be wrong.</string>
     <string name="category_basis_llm">Suggested by a language model on this phone. It can be wrong and it cannot read context reliably.</string>
     <string name="category_basis_user">You added this tag yourself.</string>
     <string name="review_status_unreviewed">Waiting for your review</string>
@@ -448,6 +448,14 @@
     <string name="review_clear_wantedness">Clear the mark</string>
     <string name="review_signal_heading">Suggestions and tags</string>
     <string name="review_no_cue">No cue matched in this text. You can still add your own tag.</string>
+    <string name="review_possible_threat_language">Possible threat language - AI suggestion</string>
+    <string name="review_threat_no_signal_uncalibrated">The uncalibrated model returned no possible threat-language suggestion. This does not establish that the message is safe.</string>
+    <string name="review_threat_needs_review">The local model could not make a clear suggestion. Review the surrounding context.</string>
+    <string name="review_threat_unsupported_language">Local threat-language analysis was not run because this language is not qualified.</string>
+    <string name="review_threat_model_unavailable">The local Qwen model is unavailable. Your saved evidence and other suggestions remain available.</string>
+    <string name="review_threat_inference_failed">Local threat-language analysis failed. Review the message yourself or retry later.</string>
+    <string name="review_threat_cancelled">Local threat-language analysis was cancelled before completion.</string>
+    <string name="review_threat_truncated">The local model could not finish within its input or output limit. Review the message yourself.</string>
     <string name="review_your_tag">Your tag</string>
     <string name="review_agree">Agree</string>
     <string name="review_disagree">Disagree</string>
@@ -633,6 +641,13 @@
     <string name="catalog_field_label">A text field</string>
     <string name="catalog_open_form">Open form dialog</string>
     <string name="catalog_form_body">A form dialog holds any content, such as a list of choices.</string>
+    <string name="catalog_calm_sanctuary">Calm Sanctuary system</string>
+    <string name="catalog_badge_observed">Observed</string>
+    <string name="catalog_badge_inferred">AI Inferred</string>
+    <string name="catalog_badge_confirmed">User Confirmed</string>
+    <string name="catalog_timeline_anchors">Timeline progression anchors</string>
+    <string name="catalog_shield_preview">Shielded sensitive preview</string>
+    <string name="catalog_shield_sample_text">Confidential excerpt shielded behind local privacy gate.</string>
 
     <!-- Report and export -->
     <string name="detail_make_report">Make a report</string>

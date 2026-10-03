@@ -1,0 +1,23 @@
+actualVisibleWindowCaptureExcludesEditableAndPasswordAndSupportsReviewAndClear
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+
+Time: 3.111
+
+OK (1 test)
+
+restrictedSyntheticWindowStopsAndClearsWithoutRetainingText
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+
+Time: 3.087
+
+OK (1 test)
+
+frameworkSensitiveNodeStopsAndClearsOnSupportedAndroid
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+org.sakshi.acquisition.accessibility.SyntheticAccessibilityDeviceTest:
+
+Time: 3.088
+
+OK (1 test)

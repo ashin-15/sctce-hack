@@ -1,8 +1,11 @@
 package org.sakshi.app
 
 import android.content.ActivityNotFoundException
+import android.app.Activity
 import android.widget.Toast
 import android.net.Uri
+import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -10,11 +13,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import org.sakshi.acquisition.importer.ImportMechanism
+import org.sakshi.acquisition.projection.ProjectionCaptureMode
 import java.time.ZoneId
 import org.sakshi.app.aimodel.AiModelScreen
 import org.sakshi.app.aimodel.AiModelViewModel
@@ -24,6 +30,8 @@ import org.sakshi.app.analysis.AnalysisViewModel
 import org.sakshi.processing.llm.model.ModelManager
 import org.sakshi.app.cases.CaseListScreen
 import org.sakshi.app.cases.CaseListViewModel
+import org.sakshi.app.observation.NotificationObservationScreen
+import org.sakshi.app.capture.VisibleCaptureScreen
 import org.sakshi.app.deletion.DeleteEverythingScreen
 import org.sakshi.app.evidence.AddEvidenceCallbacks
 import org.sakshi.app.evidence.CaseDetailActions
@@ -67,11 +75,67 @@ import org.sakshi.app.timeline.TimelineViewModel
  */
 @Composable
 fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewModelStoreOwner) {
+    val context = LocalContext.current
+    val settingsUnavailable = stringResource(R.string.capture_settings_unavailable)
+    val projectionUnavailable = stringResource(R.string.projection_capture_failed)
+    val projectionNotificationsDisabled = stringResource(R.string.projection_notifications_disabled)
+    val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        container.pickerGrace.end()
+        org.sakshi.acquisition.notifications.NotificationObservation.from(context).refreshAccess()
+    }
+    val openSystemSettings: (android.content.Intent) -> Unit = { intent ->
+        container.pickerGrace.begin()
+        try {
+            settingsLauncher.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            container.pickerGrace.end()
+            Toast.makeText(context, settingsUnavailable, Toast.LENGTH_LONG).show()
+        }
+    }
+    var projectionMode by remember { mutableStateOf(ProjectionCaptureMode.SNAPSHOT) }
+    val projectionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        container.pickerGrace.end()
+        val data = result.data
+        if (result.resultCode == Activity.RESULT_OK && data != null) {
+            runCatching { container.projectionCapture.start(context, result.resultCode, data, projectionMode) }
+                .onFailure { Toast.makeText(context, projectionUnavailable, Toast.LENGTH_LONG).show() }
+        }
+    }
+    val requestProjection: (ProjectionCaptureMode) -> Unit = { mode ->
+        projectionMode = mode
+        if (!container.projectionCapture.notificationsEnabled()) {
+            Toast.makeText(context, projectionNotificationsDisabled, Toast.LENGTH_LONG).show()
+            openSystemSettings(
+                android.content.Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName),
+            )
+        } else {
+            container.pickerGrace.begin()
+            try {
+                projectionLauncher.launch(container.projectionCapture.consentIntent())
+            } catch (_: Exception) {
+                container.pickerGrace.end()
+                Toast.makeText(context, projectionUnavailable, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     val navigator = remember(services) { ViewModelProvider(owner)[SessionNavigator::class.java] }
+    LaunchedEffect(navigator) {
+        val activity = context as? android.app.Activity
+        if (activity?.intent?.getBooleanExtra("open_observation", false) == true) {
+            activity.intent.removeExtra("open_observation")
+            navigator.openObservation()
+        }
+    }
     val importModel = remember(services) { ViewModelProvider(owner, ImportViewModel.factory(services))[ImportViewModel::class.java] }
     val current by navigator.current.collectAsState()
+    val canGoBack by navigator.canGoBack.collectAsState()
     val importState by importModel.state.collectAsState()
     val sharePending by container.importCoordinator.hasPending.collectAsState()
+
+    BackHandler(enabled = canGoBack) {
+        navigator.back()
+    }
 
     LaunchedEffect(sharePending) {
         if (sharePending) container.importCoordinator.take()?.let(importModel::startShare)
@@ -114,8 +178,28 @@ fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewM
         is SessionScreen.ReportPreview -> ReportPreviewRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.ExportResult -> ExportResultRoute(screen.caseId, services, owner, navigator, container)
         SessionScreen.AiModel -> AiModelRoute(owner, navigator, container)
+        SessionScreen.Observation -> NotificationObservationScreen(
+            services, navigator::back,
+            onAnalyse = { caseId, evidenceId ->
+                navigator.openCase(caseId)
+                navigator.openAnalysis(caseId, evidenceId)
+            },
+            onOpenAccessSettings = openSystemSettings,
+        )
+        SessionScreen.VisibleCapture -> VisibleCaptureScreen(
+            services, navigator::back,
+            onAnalyse = { caseId, evidenceId ->
+                navigator.openCase(caseId)
+                navigator.openAnalysis(caseId, evidenceId)
+            },
+            onOpenAccessSettings = openSystemSettings,
+            projection = container.projectionCapture,
+            onRequestProjection = requestProjection,
+        )
         SessionScreen.DeleteEverything -> DeleteEverythingScreen(
             onConfirm = {
+                org.sakshi.acquisition.notifications.NotificationObservation.from(context).disable()
+                org.sakshi.acquisition.accessibility.AccessibleCapture.from(context).revoke()
                 // Everything that holds saved data is released first; the deletion then outlives this screen and session.
                 container.deletion.start {
                     services.exports.clearExports()
@@ -146,10 +230,19 @@ private fun CaseListRoute(
         onUnarchive = model::unarchive,
         onDelete = model::delete,
         onMessageShown = model::messageShown,
-        onLock = container.session::lock,
+        onLock = {
+            org.sakshi.acquisition.notifications.NotificationObservation.from(services.appContext).stopAndClear()
+            org.sakshi.acquisition.accessibility.AccessibleCapture.from(services.appContext).stopAndClear()
+            container.session.lock()
+        },
         onOpen = navigator::openCase,
         onDeleteEverything = navigator::openDeleteEverything,
         onOpenAiModel = navigator::openAiModel,
+        onOpenEvidence = navigator::openCase,
+        onOpenTimeline = { caseId -> navigator.openCase(caseId); navigator.openTimeline(caseId) },
+        onOpenReports = { caseId -> navigator.openCase(caseId); navigator.openReport(caseId) },
+        onObservationSettings = navigator::openObservation,
+        onCaptureSettings = navigator::openVisibleCapture,
     )
 }
 

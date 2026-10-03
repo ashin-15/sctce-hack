@@ -2,6 +2,8 @@ package org.sakshi.app
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.sakshi.core.vault.SenderSelector
 
 class SessionNavigatorTest {
@@ -94,5 +96,45 @@ class SessionNavigatorTest {
         assertEquals(SessionScreen.DeleteEverything, navigator.current.value)
         navigator.back()
         assertEquals(SessionScreen.CaseList, navigator.current.value)
+    }
+
+    @Test
+    fun aiModelOpensFromTheCaseListAndBackReturnsThere() {
+        val navigator = SessionNavigator()
+        assertFalse(navigator.canGoBack.value)
+        navigator.openAiModel()
+        assertEquals(SessionScreen.AiModel, navigator.current.value)
+        assertTrue(navigator.canGoBack.value)
+        navigator.back()
+        assertEquals(SessionScreen.CaseList, navigator.current.value)
+        assertFalse(navigator.canGoBack.value)
+    }
+
+    @Test
+    fun canGoBackReflectsWhetherBackPopsScreen() {
+        val navigator = SessionNavigator()
+        assertFalse(navigator.canGoBack.value)
+        navigator.openCase("synthetic-case")
+        assertTrue(navigator.canGoBack.value)
+        navigator.openTimeline("synthetic-case")
+        assertTrue(navigator.canGoBack.value)
+        navigator.back()
+        assertTrue(navigator.canGoBack.value)
+        navigator.back()
+        assertFalse(navigator.canGoBack.value)
+    }
+
+    @Test
+    fun openNoteOpensOnTopOfCaseDetailAndBackReturnsThere() {
+        val navigator = SessionNavigator()
+        navigator.openNote("synthetic-case")
+        assertEquals(SessionScreen.ManualNote("synthetic-case"), navigator.current.value)
+        assertTrue(navigator.canGoBack.value)
+        navigator.back()
+        assertEquals(SessionScreen.CaseDetail("synthetic-case"), navigator.current.value)
+        assertTrue(navigator.canGoBack.value)
+        navigator.back()
+        assertEquals(SessionScreen.CaseList, navigator.current.value)
+        assertFalse(navigator.canGoBack.value)
     }
 }

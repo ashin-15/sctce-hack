@@ -6,51 +6,29 @@ import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 
 /**
- * Handles frame sampling, perceptual difference gating, and FLAG_SECURE detection.
+ * Encodes captured frames and provides optional, non-authoritative visual similarity hints.
  */
 public object FrameSampler {
 
     private const val HASH_GRID_SIZE: Int = 8
-    private const val SAMPLE_GRID_STEPS: Int = 16
-
-    /**
-     * Inspects bitmap pixels to detect whether Android OS blanked the frame
-     * due to FLAG_SECURE (e.g. WhatsApp View Once, disappearing media, or secure chats).
-     */
+    private const val SAMPLE_GRID_SIZE: Int = 16
+    /** Uniformly dark frames have an unknown cause and are never treated as proof of protected content. */
     public fun detectFrameKind(bitmap: Bitmap): FrameKind {
         val width = bitmap.width
         val height = bitmap.height
         if (width <= 0 || height <= 0) return FrameKind.BLANK
 
-        var nonZeroPixels = 0
-        var totalSampled = 0
-
-        val stepX = (width / SAMPLE_GRID_STEPS).coerceAtLeast(1)
-        val stepY = (height / SAMPLE_GRID_STEPS).coerceAtLeast(1)
-
+        val stepX = (width / SAMPLE_GRID_SIZE).coerceAtLeast(1)
+        val stepY = (height / SAMPLE_GRID_SIZE).coerceAtLeast(1)
         for (y in 0 until height step stepY) {
             for (x in 0 until width step stepX) {
-                totalSampled++
                 val pixel = bitmap.getPixel(x, y)
-                val alpha = Color.alpha(pixel)
-                val red = Color.red(pixel)
-                val green = Color.green(pixel)
-                val blue = Color.blue(pixel)
-
-                // If pixel has alpha and non-black RGB, it's non-zero
-                if (alpha > 10 && (red > 5 || green > 5 || blue > 5)) {
-                    nonZeroPixels++
+                if (Color.alpha(pixel) > 10 && (Color.red(pixel) > 5 || Color.green(pixel) > 5 || Color.blue(pixel) > 5)) {
+                    return FrameKind.NORMAL
                 }
             }
         }
-
-        // If across the sampled grid every pixel is completely black or transparent,
-        // it indicates Android OS FLAG_SECURE interception.
-        return if (nonZeroPixels == 0) {
-            FrameKind.SECURE_CONTENT_DETECTED
-        } else {
-            FrameKind.NORMAL
-        }
+        return FrameKind.BLANK
     }
 
     /**

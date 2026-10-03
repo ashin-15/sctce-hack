@@ -33,6 +33,7 @@ class MainActivity : FragmentActivity() {
     private lateinit var gate: BiometricGate
     private val consumedShares = ConsumedIntentTracker()
     private var sessionOwner: SessionViewModelStoreOwner? = null
+    private var sessionServices: SessionServices? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +77,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onStart() {
         super.onStart()
+        (application as SakshiApplication).observationLifecycle.onForeground()
         container.pickerGrace.onStarted()
         container.session.refresh()
     }
@@ -129,10 +131,21 @@ class MainActivity : FragmentActivity() {
                 val services = remember(screen.vault) {
                     SessionServices(screen.vault, applicationContext, container.dispatchers.io)
                 }
-                DisposableEffect(services) { onDispose(services::close) }
+                DisposableEffect(services) {
+                    sessionServices = services
+                    onDispose {
+                        if (sessionServices === services) sessionServices = null
+                        services.close()
+                    }
+                }
                 SessionHost(services = services, container = container, owner = owner)
             }
         }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        sessionServices?.onTrimMemory(level)
     }
 
     override fun onDestroy() {

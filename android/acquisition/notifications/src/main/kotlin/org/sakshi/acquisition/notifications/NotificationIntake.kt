@@ -74,29 +74,45 @@ internal class NotificationIntake(
 
     fun onPosted(source: NotificationSource) = observe(source, SnapshotOrigin.LIVE)
 
-    /** The active notifications found when the listener connected, followed by the end-of-batch marker. */
-    fun onActiveSnapshot(sources: List<NotificationSource>) {
-        sources.forEach { observe(it, SnapshotOrigin.ACTIVE_SNAPSHOT) }
-        if (sessionActive && environment.isAvailable()) enqueue(IntakeItem.Reconciled(generation.get()))
+    /** A real active snapshot and its reconciliation marker always belong to the same collector generation. */
+    fun onActiveSnapshot(sources: List<NotificationSource>) = onActiveSnapshot { sources }
+
+    fun onActiveSnapshot(provider: () -> List<NotificationSource>?) {
+        val batchGeneration = synchronized(processLock) {
+            if (!sessionActive || !environment.isAvailable() || !settings().enabled) return
+            generation.get()
+        }
+        val sources = provider() ?: return
+        sources.forEach { observe(it, SnapshotOrigin.ACTIVE_SNAPSHOT, batchGeneration) }
+        enqueue(IntakeItem.Reconciled(batchGeneration))
     }
 
-    private fun observe(source: NotificationSource, origin: SnapshotOrigin) {
-        if (!admits(source.packageName)) return
+    private fun observe(source: NotificationSource, origin: SnapshotOrigin, expectedGeneration: Long? = null) {
+        val stamp = synchronized(processLock) {
+            if (!admits(source.packageName)) return
+            val currentGeneration = generation.get()
+            if (expectedGeneration != null && expectedGeneration != currentGeneration) return
+            currentGeneration to sessionId
+        }
         val locked = environment.isDeviceLocked()
         if (locked && !settings().lockScreenPreviewsOptIn) {
-            // Only the fact that an allowlisted notification occurred is kept. No text is read.
-            tracker.onLockedWithheld()
+            synchronized(processLock) {
+                if (sessionActive && stamp.first == generation.get()) tracker.onLockedWithheld()
+            }
             return
         }
         val snapshot = source.read(
-            SnapshotRequest(origin, locked, sessionId, environment.wallMs(), environment.elapsedRealtimeMs()),
+            SnapshotRequest(origin, locked, stamp.second, environment.wallMs(), environment.elapsedRealtimeMs()),
         )
-        enqueue(IntakeItem.Snapshot(generation.get(), snapshot))
+        enqueue(IntakeItem.Snapshot(stamp.first, snapshot))
     }
 
     /** Removal is lifecycle metadata. Nothing from the notification extras is read. */
     fun onRemoved(source: NotificationSource, reasonCode: Int) {
-        if (!admits(source.packageName)) return
+        val stamp = synchronized(processLock) {
+            if (!admits(source.packageName)) return
+            generation.get() to sessionId
+        }
         val snapshot = NotificationSnapshot(
             origin = SnapshotOrigin.REMOVAL,
             packageName = source.packageName,
@@ -119,11 +135,11 @@ internal class NotificationIntake(
             visibility = NotificationVisibility.UNKNOWN,
             removalReasonCode = reasonCode,
             deviceLocked = environment.isDeviceLocked(),
-            collectorSessionId = sessionId,
+            collectorSessionId = stamp.second,
             observedWallMs = environment.wallMs(),
             elapsedRealtimeMs = environment.elapsedRealtimeMs(),
         )
-        enqueue(IntakeItem.Snapshot(generation.get(), snapshot))
+        enqueue(IntakeItem.Snapshot(stamp.first, snapshot))
     }
 
     fun onConnected() {
@@ -134,20 +150,25 @@ internal class NotificationIntake(
         if (environment.isAvailable()) tracker.onDisconnected()
     }
 
-    private fun enqueue(item: IntakeItem) {
-        if (channel.trySend(item).isSuccess) pending.incrementAndGet() else tracker.onQueueOverflow()
+    private fun enqueue(item: IntakeItem) = synchronized(processLock) {
+        if (!sessionActive || item.generation != generation.get()) return@synchronized
+        pending.incrementAndGet()
+        if (!channel.trySend(item).isSuccess) {
+            pending.decrementAndGet()
+            tracker.onQueueOverflow()
+        }
     }
 
     private fun process(item: IntakeItem) {
-        pending.decrementAndGet()
         synchronized(processLock) {
-            if (item.generation != generation.get() || !sessionActive) return
+            pending.decrementAndGet()
+            if (item.generation != generation.get() || !sessionActive) return@synchronized
             when (item) {
                 is IntakeItem.Reconciled -> tracker.onReconciled()
                 is IntakeItem.Snapshot -> processSnapshot(item.value)
             }
+            if (pending.get() == 0) tracker.onQueueDrained()
         }
-        if (pending.get() == 0) tracker.onQueueDrained()
     }
 
     private fun processSnapshot(snapshot: NotificationSnapshot) {

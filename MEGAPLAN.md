@@ -34,7 +34,7 @@ The plan builds the app in this order, which follows `AGENTS.md` "Engineering Pr
 
 The three things that make the product defensible (research: `technical-differentiation-novelty-stack.md` Tier A) are engineered first-class, not bolted on: capture-aware temporal analysis, a correction-aware source-to-finding-to-pattern-to-report dependency graph, and selective export that verifies offline without Sakshi.
 
-MVP has no LLM, no Laya, no backend, no network permission, no accessibility service, no screen capture, no SMS permissions.
+MVP has no LLM, no Laya, no backend, no network permission, bounded optional Accessibility capture added by D-26, user-started capture added by D-25, no SMS permissions.
 
 Highest-risk assumptions (section 33): Keystore-gated key access versus background work; SQLCipher plus Room on current AGP with 16 KB pages; ML Kit bundled OCR working with no `INTERNET` permission; Indic text shaping in `PdfDocument`; whisper.cpp memory on a 6 GB phone; and the absence of any representative labelled data for English, Malayalam or Hindi.
 
@@ -86,7 +86,7 @@ Highest-risk assumptions (section 33): Keystore-gated key access versus backgrou
 4. **Hypothesised:** everything in `RECOMMENDATION.md`'s table.
 5. **Partially implemented:** nothing for Android. Bench adapters cover 16 of 1,514 inventory entries.
 6. **Production-ready:** nothing.
-7. **Explicitly deferred:** Laya; LLM; Accessibility; MediaProjection; SMS/MMS permissions; on-device training; emotion intensity; languages beyond English/Malayalam/Hindi; vector retrieval; Telegram/Meta service APIs.
+7. **Explicitly deferred:** Laya; LLM (superseded by D-24); Accessibility (bounded opt-in scope superseded by D-26); MediaProjection (superseded by D-25); SMS/MMS permissions; on-device training; emotion intensity; languages beyond English/Malayalam/Hindi; vector retrieval; Telegram/Meta service APIs.
 8. **Must be validated on a real device:** section 28.
 9. **Cannot be implemented (platform):** reading other apps' databases or private storage; recovering uncaptured or deleted messages; View Once payload capture; complete notification history; authenticated sender identity.
 10. **Needs legal/privacy/licence/policy review:** section 24 and 25 gates.
@@ -223,7 +223,7 @@ Preserve-only in MVP (saved, hashed, previewed where safe, **not analysed**): au
 
 ### Explicitly Rejected
 
-Silent third-party scraping; private database or backup extraction; key extraction; View Once or disappearing-content circumvention; FLAG_SECURE capture; AccessibilityService collection; MediaProjection collector in the default product (superseded by D-25 for a user-started, user-visible capture module); SMS/MMS permissions; always-on high-compute monitoring; cloud AI default; automatic reporting, replying, blocking or contacting anyone; guilt/innocence classification; violence prediction; numeric danger scores; court-admissibility claims; cross-app automatic identity matching; panic wipe; backend services; blockchain anchoring; models that do not fit a 6 GB phone.
+Silent third-party scraping; private database or backup extraction; key extraction; View Once or disappearing-content circumvention; FLAG_SECURE capture; AccessibilityService collection outside the bounded opt-in D-26 scope; MediaProjection collector in the default product (superseded by D-25 for a user-started, user-visible capture module); SMS/MMS permissions; always-on high-compute monitoring; cloud AI default; automatic reporting, replying, blocking or contacting anyone; guilt/innocence classification; violence prediction; numeric danger scores; court-admissibility claims; cross-app automatic identity matching; panic wipe; backend services; blockchain anchoring; models that do not fit a 6 GB phone.
 
 ## 7. Repository-to-Product Mapping
 
@@ -1218,6 +1218,8 @@ Probability and impact: L / M / H.
 | D-23 | Devanagari and Malayalam OCR deferred (ML Kit Devanagari, Tesseract `mal`); Hindi, Malayalam, Hinglish and Manglish **text** stays in scope | User decision 3 Oct 2026 | - | Build the script engines now | Screenshots in those scripts end in `NO_TEXT_RECOGNISED` with an honest message | Decided (3 Oct 2026) |
 | D-24 | On-device LLM module `:processing:llm` (llama.cpp bridge, deterministic fallback engine, GBNF-constrained prompts, substring quote validator, legal-claim filter, summary rubric validator) and an AI model screen are kept. Supersedes D-07 "No LLM in MVP" | Owner added the module on 3 Oct 2026 and chose to keep it | Commit `968b829` | Keep D-07 and remove the module | LLM output stays a suggestion behind the validators; candidate models listed in `ModelManager` are Qwen2.5-1.5B and SmolLM2-1.7B Instruct, q4_k_m GGUF. Open, not verified: the native library loaded by `NativeLlmBridge` is not built by any module yet; the app holds no `INTERNET` permission, so the listed download URLs cannot be fetched by the app as built (NFR-01 unchanged); model licences, quote faithfulness and device memory are unmeasured | Decided by owner (3 Oct 2026) |
 | D-25 | MediaProjection acquisition module `:acquisition:projection` (single-use consent token, frame sampler with difference gating and FLAG_SECURE detection, chat layout parser, vault and OCR integration) is kept. Supersedes the "MediaProjection collector in the default product" entry of the section 6 rejected list | Owner added the module on 3 Oct 2026 and chose to keep it | Commit `968b829` | Keep the rejection | User-started, user-visible capture only; FLAG_SECURE content must never be captured (AGENTS.md circumvention rule still binds). Open: not yet a dependency of `:app`; its manifest declares `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PROJECTION`, which `verifyManifestPermissions` will reject until the allowlist is changed deliberately; Play policy and user-safety review not done | Decided by owner (3 Oct 2026) |
+
+| D-26 | Integrate optional notification observation and independently implemented bounded user-started Accessibility visible text capture into the app; supersedes Accessibility deferral only for this consented scope | User requested capture planning and Stitch UI, then explicitly requested immediate app integration on 3 Oct 2026 | `docs/spec-driven/message-observation/` and current Android source | Keep library-only notification lane and deferred Accessibility | Separate disclosure/system grant, memory-only drafts, vault locks on app switch, screen lock clears, user-reviewed encrypted saving, uncertain snapshot attribution; no AgentHita code reuse, protected-content bypass, automatic interaction or validated threat prediction | Implementation authorised; device/app compatibility acceptance remains evidence-gated |
 
 Uncertain after resolution: SQLCipher viability (D-02), signature algorithm (D-09), minSdk (D-01), whether the hackathon judges expect a neural model in the demo (D-05).
 

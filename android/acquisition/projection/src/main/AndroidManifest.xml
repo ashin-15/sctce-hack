@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Media Projection Evidence Acquisition (user-initiated bounded screen capture session).
-        Android 14+ requires FOREGROUND_SERVICE and FOREGROUND_SERVICE_MEDIA_PROJECTION.
-    -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
-
+    <!-- Service permissions and declaration are owned by the consuming application. -->
 </manifest>

@@ -21,6 +21,11 @@ fun refusalText(reason: NotAnalysableReason): UiText = res(
         NotAnalysableReason.NO_TEXT_RECOGNISED -> R.string.analysis_refused_no_text_recognised
         NotAnalysableReason.IMAGE_NOT_DECODABLE -> R.string.analysis_refused_image_not_decodable
         NotAnalysableReason.RECOGNITION_FAILED -> R.string.analysis_refused_recognition_failed
+        NotAnalysableReason.NO_SPEECH -> R.string.analysis_refused_no_speech
+        NotAnalysableReason.AUDIO_TOO_LONG -> R.string.analysis_refused_audio_too_long
+        NotAnalysableReason.AUDIO_NOT_DECODABLE -> R.string.analysis_refused_audio_not_decodable
+        NotAnalysableReason.SPEECH_MODEL_UNAVAILABLE -> R.string.analysis_refused_speech_model_unavailable
+        NotAnalysableReason.TRANSCRIPTION_FAILED -> R.string.analysis_refused_transcription_failed
     },
 )
 
@@ -35,6 +40,8 @@ fun warningText(warning: AnalysisWarning, count: Int): UiText = when (warning) {
     AnalysisWarning.CUE_LIST_NOT_REVIEWED -> res(R.string.analysis_warn_cue_list)
     AnalysisWarning.OCR_LATIN_SCRIPT_ONLY -> res(R.string.analysis_warn_ocr_latin_only)
     AnalysisWarning.OCR_LOW_CONFIDENCE_LINES -> plural(R.plurals.analysis_warn_ocr_low_confidence, count, count)
+    AnalysisWarning.AUDIO_TRANSCRIPT_MAY_CONTAIN_ERRORS -> res(R.string.analysis_warn_audio_may_contain_errors)
+    AnalysisWarning.AUDIO_LOW_CONFIDENCE_SEGMENTS -> plural(R.plurals.analysis_warn_audio_low_confidence, count, count)
 }
 
 fun warningTexts(result: AnalysisOutcome.Analysed): List<UiText> =

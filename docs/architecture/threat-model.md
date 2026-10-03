@@ -186,33 +186,15 @@ Threats this adds:
 - Memory: the model is held in process memory, and prompt text (evidence excerpts) would be too once wired. `ModelManager.onTrimMemory` evicts the engine.
 - Policy lint: no `ForbiddenApiCheck` findings in this module at the last run.
 
-## 9. Added today by the owner: `acquisition/projection` (MediaProjection screen capture)
+## 9. `acquisition/projection` (MediaProjection screen capture)
 
-Facts only. Important state of the tree when read: the module exists on disk with a build file, but `include(":acquisition:projection")` is not present in `android/settings.gradle.kts` and `:app` does not depend on it, so it is not part of any build run here (verified by reading both files). Its tests were not run.
+Status as of 3 October 2026: integrated and build-verified, but not accepted on-device. The app requests Android's fresh screen-capture consent for each user-started session and runs a non-exported foreground service with a visible Stop action. The user can capture a screenshot or bounded burst, then unlock, preview, and explicitly save or discard encrypted temporary drafts. The ephemeral AES-GCM key stays in memory; process death loses it and startup removes orphan ciphertext. A screen-lock receiver clears pending drafts. Notifications must be enabled before capture so the foreground control remains available. See `docs/spec-driven/media-projection/` and `research/verification/android-mediaprojection-2026-10-03/` for implementation and evidence.
 
-What it reads:
+The service captures permitted rendered pixels through one `MediaProjection`, `VirtualDisplay`, and `ImageReader`. It does not read messaging-app databases, automate scrolling, or bypass OS restrictions. Android API 34+ may let the user select an app; older versions may capture the display, and unrelated visible content can be included. A blank/dark frame is recorded only as blank or unavailable, never as proof of protected or disappearing content. The capture does not establish which app, conversation, author, or message time the pixels represent. OCR and spatial parsing are derivatives/proposals; direction and sender remain unknown unless a person reviews them.
 
-- Screen content of whatever app is on screen, through `MediaProjection`, a `VirtualDisplay` (flag auto-mirror) and an `ImageReader` (`MediaProjectionFrameSource`). One frame at a time is converted to a PNG byte array in memory; `ProjectionSession.captureBurst` samples up to a bounded number of frames with a perceptual-hash filter.
-- It needs a consent token (`ProjectionToken`, single use, with revoked and stopped states). The consent screen and foreground service that would obtain the token are not in this module (no activity or service in its manifest or sources).
-- OCR of the frame via `processing/ocr`, then `ChatVisualParser` (spatial heuristics) to build parsed chat bubbles.
+Temporary PNGs and metadata are encrypted in app-private no-backup storage. On explicit save, selected frames are imported into the existing encrypted evidence vault with screen-observation provenance and are then passed to local image analysis. Export remains separate and explicit. Hashes support byte-integrity checks; they do not prove authenticity, completeness, identity, or legal admissibility.
 
-What it stores:
-
-- Each captured frame is stored through `EvidenceRepository.import` as `image/png`, with acquisition kind `SELECTED_VISUAL_MEDIA`, access class `USER_MEDIATED`, importer mechanism `media_projection` and claimed origin `MEDIA_PROJECTION`. The display name claim is `screen_capture_<n>.png`. So frames land in the encrypted blob store like any import.
-- A frame in which the sampled grid is all black or transparent is classified `SECURE_CONTENT_DETECTED` and is also stored, with claimed origin `FLAG_SECURE_ENCOUNTERED`, as a "proof of secure content interception". Parsed chat from OCR is returned to the caller; whether it is persisted is up to the caller, not done in this module (verified by reading the coordinator).
-
-Network reachability: searched `processing/llm` and `acquisition/projection` for `java.net`, `HttpURLConnection`, `DownloadManager`, `okhttp`, `URL(`, `openConnection`, `Socket`, `INTERNET`: no match in this module. It depends on `:processing:ocr`, which strips the network permissions in its manifest.
-
-Manifest permissions: `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PROJECTION`. No `INTERNET`. (If the module were merged into the app, `verifyManifestPermissions` would reject both unless the allowlist is changed.)
-
-Threats this adds:
-
-- Capture of other apps' content, including content from third parties and secure or disappearing content, with the user's consent but not the consent of the people shown. On Android 14 and later the system shows its own consent dialog and the token is single use (enforced in code by `ProjectionToken`).
-- `FLAG_SECURE` handling: the OS blanks protected windows in the capture. The code detects an all-black sampled grid and stores that frame as evidence of a blocked capture. It does not attempt to bypass `FLAG_SECURE`. A false positive is possible for a genuinely dark screen (the sample is a 16 by 16 grid, threshold alpha above 10 and a colour component above 5); the detection is a heuristic and was not tested on a device.
-- Frames and OCR text are stored without any proof that they came from a particular app or conversation; provenance is only the claimed origin string. A forged on-screen conversation produces an identical capture.
-- The plan (27.3, AGENTS.md "Do Not Build") lists `MediaProjection` as a forbidden API for lint and says "Silent third-party app scraping" and "Circumventing ... sandbox or access controls" are not to be built. `ForbiddenApiCheck` currently reports this module (13 findings). This is a statement of fact about what the policy test says, not a judgement of the decision.
-- Frame bytes are held in process memory and PNG-encoded; a burst keeps one frame at a time in the code read. Bitmap size is bounded by the display configuration passed to `ProjectionConfig`.
-- Foreground service lifetime, notification content (the plan requires neutral notifications) and the status-bar chip behaviour: not implemented in this module and not verified.
+Verification completed: projection JVM tests (16), app lint, debug assembly, merged-manifest permission checks, installation preserving app data, and app launch on CPH2695 / Android 16. No Android capture-consent grant was given, so actual consent, pixels, review/save, revocation, geometry changes, resource limits, lock handling, and device storage behavior remain unverified. These are release-blocking acceptance gaps. Video and audio are deferred. MediaProjection is narrowly allowlisted in `ForbiddenApiCheck` for this module; this exception does not allow silent scraping or access-control bypass.
 
 ## 10. What this document does not claim
 

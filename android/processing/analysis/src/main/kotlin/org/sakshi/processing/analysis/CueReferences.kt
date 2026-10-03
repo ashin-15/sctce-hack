@@ -32,6 +32,10 @@ internal class CueAssessment(
  * For text read from an image, [regionsOf] names the image regions a cue span came from. Each such region becomes
  * one more reference with an image-region locator, listed by the categories of the cues inside it, so a suggestion
  * can be traced to the place in the image as well as to the recognised text.
+ *
+ * For text transcribed from speech, [audioOf] gives the time range of the clip a cue span was heard in. Each cue then
+ * has a second reference with an audio-time locator, listed by the same category, so a suggestion can be traced to
+ * the moment in the recording as well as to the transcribed words.
  */
 internal object CueReferences {
     /** The schema allows 64 references per event: the body plus at most this many cue and region references. */
@@ -45,8 +49,12 @@ internal object CueReferences {
         sha256: String,
         representation: Representation = Representation.PRESERVED_IMPORT,
         regionsOf: (CodePointSpan) -> List<String> = { emptyList() },
+        audioOf: (CodePointSpan) -> Locator.AudioTime? = { null },
     ): CueAssessment {
-        val spans = signals.matches.map { it.span }.distinct().take(MAX_EXTRA_REFERENCES)
+        val allSpans = signals.matches.map { it.span }.distinct()
+        // A cue with an audio range needs two references, so fewer cues fit.
+        val perCue = if (allSpans.any { audioOf(it) != null }) 2 else 1
+        val spans = allSpans.take(MAX_EXTRA_REFERENCES / perCue)
         val ids = spans.withIndex().associate { (index, span) -> span to ReferenceId("cue-${index + 1}") }
         val cueReferences = spans.map { span ->
             EvidenceReference(
@@ -57,7 +65,18 @@ internal object CueReferences {
                 locator = Locator.Text(bodyOffset + span.start, bodyOffset + span.end),
             )
         }
-        val regionIds = spans.flatMap(regionsOf).distinct().take(MAX_EXTRA_REFERENCES - spans.size)
+        val audioRanges = spans.mapNotNull { span -> audioOf(span)?.let { span to it } }
+        val audioIds = audioRanges.withIndex().associate { (index, pair) -> pair.first to ReferenceId("audio-${index + 1}") }
+        val audioReferences = audioRanges.map { (span, range) ->
+            EvidenceReference(
+                referenceId = audioIds.getValue(span),
+                artifactId = artifact,
+                sha256 = sha256,
+                representation = representation,
+                locator = range,
+            )
+        }
+        val regionIds = spans.flatMap(regionsOf).distinct().take(MAX_EXTRA_REFERENCES - spans.size - audioReferences.size)
         val regionReferenceIds = regionIds.withIndex().associate { (index, region) -> region to ReferenceId("region-${index + 1}") }
         val regionReferences = regionIds.map { region ->
             EvidenceReference(
@@ -75,17 +94,18 @@ internal object CueReferences {
         }
         val categories = byLabel.map { (label, labelSpans) ->
             val cueRefs = labelSpans.distinct().map { ids.getValue(it) }
+            val audioRefs = labelSpans.distinct().mapNotNull { audioIds[it] }
             val regionRefs = labelSpans.flatMap(regionsOf).distinct().mapNotNull { regionReferenceIds[it] }
             CategoryAssessment(
                 label = label,
                 basis = CategoryBasis.RULE_SUGGESTION,
                 confidence = Confidence(null, ConfidenceSemantics.NOT_APPLICABLE, null),
                 producerVersion = ScopeId(signals.producerVersion),
-                evidenceReferenceIds = (cueRefs + regionRefs).ifEmpty { listOf(bodyReference) },
+                evidenceReferenceIds = (cueRefs + audioRefs + regionRefs).ifEmpty { listOf(bodyReference) },
                 reviewStatus = CategoryReviewStatus.UNREVIEWED,
             )
         }
-        return CueAssessment(categories, severity(categories), cueReferences + regionReferences)
+        return CueAssessment(categories, severity(categories), cueReferences + audioReferences + regionReferences)
     }
 
     fun severity(categories: List<CategoryAssessment>): SeverityAssessment =
