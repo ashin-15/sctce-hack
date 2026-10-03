@@ -236,3 +236,26 @@ Integrated optional NotificationObservation and independently implemented bounde
 - Integrated user-started screenshots and bounded screenshot bursts behind fresh Android screen-capture consent, a visible foreground-service Stop control, encrypted temporary drafts, and unlock/review/save/discard UI. Video and audio remain deferred.
 - Verification: projection JVM suite 16 passed; app unit suite 413 tests (56 opt-in skips), policy suite 36 tests; 0 failures/errors. `:app:lintDebug`, `:app:assembleDebug`, and `:app:verifyManifestPermissions` passed. Debug APK installed with `adb install -r` on CPH2695 / Android 16 (API 36), existing app data preserved, launch verified. APK SHA-256: `70a94254109e60bbfe625a2aa81ac2d5ea5fe555946e3516036bd26680d83e19`.
 - This is not a capture or performance measurement: Android's consent prompt was not approved, no screen pixels were collected, and the on-device capture/review/save lifecycle remains unverified. Blocking device acceptance criteria remain open; see `research/verification/android-mediaprojection-2026-10-03/README.md`.
+
+## Android local Qwen threat-language suggestions: first passing device run - 3 October 2026
+
+- Cause of the earlier `inference_failed`: the JNI loop called `llama_sampler_accept` after `llama_sampler_sample`, which already accepts the token in pinned llama.cpp b6500, so the JSON grammar advanced twice per token. Removing the duplicate call fixed grammar-constrained generation.
+- Classifier task changed: the model now sorts a message into one of six kinds (`threat_to_hurt_someone`, `insult_or_abuse`, `figure_of_speech`, `reported_or_fiction`, `ordinary`, `unclear`); the grammar permits a quote only for the threat kind. Kinds map to the three stored statuses. A deterministic guard sends a quote that sits inside quotation marks in the source to `needs_review`.
+- Device: CPH2695, Android 16 (API 36), arm64-v8a, CPU only, 4 threads, Qwen2.5 1.5B Instruct Q4_K_M, SHA-256 `6a1a2eb6...9407e` unchanged after the run. Isolated opt-in test `QwenThreatDeviceTest` with a separate synthetic vault: 1 test, passed, 296.8 s.
+- Nine synthetic English and Romanized Hindi messages, one run each (a smoke check, not an accuracy or calibration measurement):
+
+| Fixture | Stored status | Wall time (hash, load, inference, persistence) |
+|---|---|---|
+| direct threat with emoji | possible_threat_language | 34.7 s |
+| ordinary request | no_signal_uncalibrated | 32.6 s |
+| threat words inside quotation marks | needs_review (ambiguous_context, from the guard) | 33.8 s |
+| conditional threat | possible_threat_language | 34.7 s |
+| threat with location | possible_threat_language | 35.6 s |
+| greeting | no_signal_uncalibrated | 32.8 s |
+| insult without physical harm | no_signal_uncalibrated | 33.7 s |
+| idiom "I could kill for a cup of tea" | possible_threat_language (false positive, recorded and not gated) | 37.5 s |
+| Romanized Hindi threat | unsupported_language (abstained, model not run) | 4.7 s |
+
+- Earlier prompt variants on the same fixtures: a three-label prompt labelled the insult and the idiom as threats; adding two extra examples did not change that; the six-kind task fixed the insult only.
+- JVM: `./gradlew --continue test :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug :app:verifyManifestPermissions` passed; 1,603 tests, 56 opt-in skips, 0 failures. Lint 0 errors, 14 warnings. Fixed along the way: three stale `AiModelViewModelTest` cases and one review string that contained a forbidden word.
+- Not established: accuracy, calibration, false-negative rate, Malayalam and Hindi (native script and Romanized are refused, so threats in those languages are not flagged), the end-user unlock, import, analyse and review flow on the phone, cancellation, memory, battery and thermal behaviour. About 33 s per message is too slow for bulk use; the per-token grammar pass over the full vocabulary and the per-run 1.1 GB hash are the likely costs and are unmeasured.

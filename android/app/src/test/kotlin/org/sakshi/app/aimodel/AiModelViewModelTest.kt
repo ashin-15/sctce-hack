@@ -5,6 +5,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -48,47 +49,47 @@ class AiModelViewModelTest {
     }
 
     @Test
-    fun detectsInstalledPresetModel() {
-        val modelFile = File(tempDir, "qwen2.5-1.5b-instruct-q4_k_m.gguf")
-        modelFile.writeText("synthetic model data")
+    fun detectsInstalledPresetModel() = runTest(testDispatcher) {
+        File(tempDir, ModelManager.QWEN_2_5_1_5B.filename).writeText("synthetic model data")
 
         val viewModel = AiModelViewModel(modelManager, testDispatcher)
-        val state = viewModel.uiState.value
-        val installed = state.installedModel
+        advanceUntilIdle()
+        val installed = viewModel.uiState.value.installedModel
 
         assertNotNull(installed)
         assertEquals("qwen2.5-1.5b-instruct-q4_k_m.gguf", installed.filename)
         assertEquals("Qwen2.5 1.5B Instruct (Q4_K_M)", installed.displayName)
-        assertTrue(installed.isRunning)
-        assertTrue(installed.statusDescription.contains("Ready"))
+        assertFalse(installed.isRunning)
+        assertTrue(installed.statusDescription.contains("upstream provenance unverified"))
     }
 
     @Test
-    fun deletesModelAndResetsState() {
-        val modelFile = File(tempDir, "qwen2.5-1.5b-instruct-q4_k_m.gguf")
-        modelFile.writeText("synthetic model data")
+    fun deletesModelAndResetsState() = runTest(testDispatcher) {
+        File(tempDir, ModelManager.QWEN_2_5_1_5B.filename).writeText("synthetic model data")
 
         val viewModel = AiModelViewModel(modelManager, testDispatcher)
+        advanceUntilIdle()
         assertNotNull(viewModel.uiState.value.installedModel)
 
-        viewModel.deleteModel("qwen2.5-1.5b-instruct-q4_k_m.gguf")
+        viewModel.deleteModel(ModelManager.QWEN_2_5_1_5B.filename)
+        advanceUntilIdle()
         assertNull(viewModel.uiState.value.installedModel)
         assertEquals("Model file deleted.", viewModel.uiState.value.notice)
     }
 
     @Test
-    fun testInferenceExecutesAndProducesOutput() = runTest(testDispatcher) {
-        val modelFile = File(tempDir, "qwen2.5-1.5b-instruct-q4_k_m.gguf")
-        modelFile.writeText("synthetic model data")
+    fun testInferenceWithoutNativeRuntimeReportsFailureInsteadOfFallbackOutput() = runTest(testDispatcher) {
+        File(tempDir, ModelManager.QWEN_2_5_1_5B.filename).writeText("synthetic model data")
 
         val viewModel = AiModelViewModel(modelManager, testDispatcher)
+        advanceUntilIdle()
         viewModel.testInference()
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-        val output = state.testOutput
-        assertNotNull(output)
-        assertTrue(output.contains("harassment"))
+        assertFalse(state.isTestingInference)
+        assertNull(state.testOutput)
+        assertEquals("Test inference failed: RUNTIME_MISSING", state.error)
     }
 
     @Test
