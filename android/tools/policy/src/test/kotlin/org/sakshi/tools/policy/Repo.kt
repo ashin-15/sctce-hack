@@ -24,11 +24,12 @@ internal class RepoFile(val path: String, val text: String) {
 
 /**
  * Shared file walking for every policy test. The policy module itself is excluded from all scans in this one place
- * ([EXCLUDED_DIRECTORIES]) because its tests must be able to name the forbidden tokens they look for.
+ * ([EXCLUDED_DIRECTORIES]) because its tests must be able to name the forbidden tokens they look for. `third_party`
+ * holds unmodified upstream sources fetched by a preparation script (git-ignored); they are not this project's code.
  */
 internal object Repo {
     private val SKIPPED_DIRECTORY_NAMES = setOf("build", ".gradle", ".git", ".idea", ".kotlin", "node_modules")
-    private val EXCLUDED_DIRECTORIES = setOf("tools/policy")
+    private val EXCLUDED_DIRECTORIES = setOf("tools/policy", "third_party")
     private val TEXT_EXTENSIONS = setOf("kt", "java", "xml", "kts", "md", "toml", "properties", "pro")
 
     /** The `android/` directory: the nearest ancestor of the working directory that holds `settings.gradle.kts`. */

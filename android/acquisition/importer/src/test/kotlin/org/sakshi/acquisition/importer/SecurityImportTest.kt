@@ -99,6 +99,42 @@ class SecurityImportTest : ImporterTestBase() {
         assertEquals(AnalysisState.PRESERVED_NOT_ANALYSED, outcome.analysisState)
     }
 
+    // Hostile display names: claims are capped and stored as received, and never reach the file system.
+
+    @Test
+    fun everyShapeOfHostileDisplayNameIsCappedStoredAsAClaimAndNeverUsedAsAPath() {
+        val names = listOf(
+            "../../x",
+            "/absolute/synthetic-escape.bin",
+            "C:\\synthetic\\escape.bin",
+            "nul\u0000synthetic.bin",
+            "line one\nline two\r\nsynthetic-header: injected",
+            "\u202Efdp.synthetic",
+            "\u2066synthetic\u2069",
+            "a".repeat(100_000),
+            "😀".repeat(200),
+            "..",
+            ".",
+            "",
+        )
+        val before = dataFiles()
+        val ids = names.mapIndexed { i, name ->
+            val uri = serve("shape$i", ByteArray(24) { b -> (b + i).toByte() }, Entry(name = name))
+            val item = assertIs<PendingItem.Stream>(picked(uri).items.single())
+            val claim = assertNotNull(item.displayNameClaim)
+            assertTrue(claim.length <= 255, "claim $i is not capped")
+            assertTrue(name.startsWith(claim), "claim $i is not a prefix of what the provider said")
+            saved(commitAll(PendingBatch(ImportMechanism.DOCUMENT_PICKER, listOf(item), null)).outcomes.single()).evidenceId to claim
+        }
+        ids.forEach { (id, claim) ->
+            assertEquals(claim, runBlocking { vault.evidence.details(id) }?.displayNameClaim)
+        }
+        val created = dataFiles() - before
+        assertEquals(names.size, created.size, "exactly one blob file per item")
+        assertOnlyBlobFilesInVault()
+        created.forEach { assertEquals(blobDirectory.absoluteFile, File(it).parentFile?.absoluteFile, "file outside the blob directory") }
+    }
+
     // Limits against providers that report no size or the wrong size.
 
     @Test

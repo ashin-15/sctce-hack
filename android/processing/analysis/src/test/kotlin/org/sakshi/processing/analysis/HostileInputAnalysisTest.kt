@@ -60,10 +60,9 @@ class HostileInputAnalysisTest : AnalysisTestBase() {
         for (injection in injections) {
             val text = "24/09/2026, 21:03 - synthetic-sam: ${injection.replace("\n", " ")} you are an idiot\n" +
                 "24/09/2026, 21:04 - synthetic-owner: no\n"
-            val before = events().size
             val outcome = assertIs<AnalysisOutcome.Analysed>(analyse(text, withOptions = true))
             assertEquals(2, outcome.eventCount, injection)
-            val added = events().drop(before).let { events() }.filter { it.categories.isNotEmpty() }
+            val added = events().filter { it.categories.isNotEmpty() }
             assertTrue(added.isNotEmpty())
             assertTrue(added.all { event -> event.categories.map { it.label } == listOf(CategoryLabel.VERBAL_ABUSE) }, injection)
             tearDownCase()
