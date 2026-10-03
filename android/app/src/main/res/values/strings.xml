@@ -39,16 +39,16 @@
     <string name="cases_archived_heading">Archived (%1$d)</string>
     <string name="cases_archived_expand">Show archived cases</string>
     <string name="cases_archived_collapse">Hide archived cases</string>
-    <string name="case_created_on">Created %1$s</string>
-    <string name="case_created_unknown">Creation date unknown</string>
+    <string name="case_meta">%1$s · %2$s</string>
+    <string name="case_created_unknown">Date unknown</string>
     <string name="case_options">Options for case %1$s</string>
     <string name="case_rename">Rename</string>
     <string name="case_archive">Archive</string>
     <string name="case_unarchive">Move back to active</string>
     <string name="case_delete">Delete</string>
     <plurals name="evidence_count">
-        <item quantity="one">%1$d evidence item</item>
-        <item quantity="other">%1$d evidence items</item>
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
     </plurals>
 
     <string name="dialog_new_title">New case</string>
@@ -108,9 +108,10 @@
     <!-- Case detail -->
     <string name="action_back">Back</string>
     <string name="detail_missing">This case is no longer available.</string>
-    <string name="detail_archived">This case is archived. Move it back to active in the case list to add evidence.</string>
-    <string name="detail_add_files">Add files</string>
-    <string name="detail_add_media">Add photos or videos</string>
+    <string name="detail_archived">Archived. Move it back to active to add evidence.</string>
+    <string name="detail_add_evidence">Add evidence</string>
+    <string name="detail_add_files">Files</string>
+    <string name="detail_add_media">Photos or videos</string>
     <string name="detail_paste">Paste text</string>
     <string name="detail_write_note">Write a note</string>
     <string name="detail_date_unknown">date unknown</string>
@@ -123,17 +124,26 @@
     <string name="kind_archive">Archive</string>
     <string name="kind_note">Note</string>
     <string name="kind_file">File</string>
-    <string name="analysis_waiting">Saved. Waiting for text analysis.</string>
-    <string name="analysis_not_analysed">Saved. Not analysed in this version.</string>
+    <string name="chip_analysed">Analysed</string>
+    <string name="chip_analysed_part">Partly analysed</string>
+    <string name="chip_ready">Ready to analyse</string>
+    <string name="chip_stored">Stored only</string>
+    <string name="chip_integrity_intact">Intact</string>
+    <string name="chip_integrity_checking">Checking…</string>
+    <string name="chip_integrity_changed">Mismatch</string>
+    <string name="chip_integrity_missing">File missing</string>
+    <string name="chip_integrity_not_verified">Not verified</string>
+    <string name="chip_integrity_key_unavailable">Key unavailable</string>
+    <string name="chip_integrity_failed">Check failed</string>
+    <string name="detail_integrity_about">About integrity checks</string>
+    <string name="detail_integrity_caveat">A matching fingerprint shows the stored file is unchanged since it was saved. It does not show where the file came from or who made it.</string>
     <string name="evidence_options">Options for %1$s received %2$s</string>
     <string name="evidence_check">Check integrity</string>
     <string name="evidence_delete">Delete</string>
-    <string name="integrity_checking">Checking the stored file.</string>
-    <string name="integrity_intact">Intact. The stored file matches the fingerprint recorded when it was saved. This check compares those two things and nothing more.</string>
-    <string name="integrity_changed">Does not match. The stored file differs from the fingerprint recorded when it was saved.</string>
-    <string name="integrity_missing">File missing. The stored file could not be found, so it could not be compared with the fingerprint recorded when it was saved.</string>
-    <string name="integrity_not_authenticated">Could not be authenticated. The stored file failed its encryption check, so it could not be compared with the fingerprint recorded when it was saved.</string>
-    <string name="integrity_key_unavailable">Key unavailable. The device key could not be used, so the stored file could not be compared with the fingerprint recorded when it was saved.</string>
+    <string name="integrity_changed">The stored file differs from the fingerprint recorded when it was saved.</string>
+    <string name="integrity_missing">The stored file could not be found, so it could not be compared with its recorded fingerprint.</string>
+    <string name="integrity_not_authenticated">The stored file failed its encryption check, so it could not be compared with its recorded fingerprint.</string>
+    <string name="integrity_key_unavailable">The device key could not be used, so the file could not be compared with its recorded fingerprint.</string>
     <string name="integrity_not_completed">The check could not be completed. Try again.</string>
     <string name="delete_item_title">Delete this evidence item?</string>
     <string name="delete_item_body">This removes the item and its stored file from this device. This cannot be undone. Physical erasure from the phone\'s storage cannot be promised.</string>
@@ -229,7 +239,6 @@
         <item quantity="other">Saved %1$d of %2$d selected items.</item>
     </plurals>
     <!-- Design system -->
-    <string name="status_label_info">Note</string>
     <string name="status_label_caution">Caution</string>
     <string name="status_label_problem">Problem</string>
     <string name="epistemic_observed">Observed</string>
@@ -244,18 +253,16 @@
     <string name="detail_empty_title">Nothing added yet</string>
     <string name="detail_empty_body">Add files, photos, text or a note.</string>
     <string name="detail_evidence_heading">Evidence</string>
-    <string name="evidence_size_date">%1$s, received %2$s</string>
+    <string name="evidence_size_date">%1$s · %2$s</string>
     <string name="import_reported_group">Reported by the sending app</string>
     <string name="import_label_name">Reported name</string>
     <string name="import_label_type">Reported type</string>
     <string name="import_label_size">Reported size</string>
 
     <!-- Analysis -->
-    <string name="evidence_analyse">Analyse text</string>
-    <string name="evidence_read_image">Read text in image</string>
+    <string name="evidence_analyse">Analyse</string>
+    <string name="evidence_read_image">Read image</string>
     <string name="result_analyse_now">Analyse now</string>
-    <string name="analysis_done_label">Saved. Analysed, the messages are on the timeline.</string>
-    <string name="analysis_done_in_part_label">Saved. Analysed in part, see the timeline.</string>
     <string name="detail_timeline">Timeline</string>
     <string name="detail_patterns">Patterns</string>
     <string name="analysis_title">Analyse text</string>
@@ -650,7 +657,7 @@
     <string name="catalog_shield_sample_text">Confidential excerpt shielded behind local privacy gate.</string>
 
     <!-- Report and export -->
-    <string name="detail_make_report">Make a report</string>
+    <string name="detail_make_report">Report</string>
     <string name="report_select_title">Choose what to include</string>
     <string name="report_select_intro">The report is a document Sakshi made from the records you selected. Nothing is shared until you choose to share the file.</string>
     <string name="report_messages_heading">Messages and notes to include</string>

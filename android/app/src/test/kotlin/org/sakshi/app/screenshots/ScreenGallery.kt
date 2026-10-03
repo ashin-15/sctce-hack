@@ -153,10 +153,10 @@ class ScreenGallery {
                 assertEquals("$route:${case.id}", opened.last())
             }
             rule.onNode(hasText("Home") and hasClickAction()).performClick()
-            rule.onNodeWithText("Notification collection").performScrollTo().performClick()
-            rule.onNodeWithText("Visible message capture").performScrollTo().performClick()
+            rule.onNodeWithText("Notifications").performScrollTo().performClick()
+            rule.onNodeWithText("Screen capture").performScrollTo().performClick()
             assertEquals(listOf("evidence:c1", "timeline:c1", "report:c1", "case:c1", "notifications", "capture"), opened)
-            rule.onNodeWithText("Your private workspace").performScrollTo()
+            rule.onNodeWithText("Active cases").performScrollTo()
         }) {
             CaseListScreen(
                 CaseListUiState(active = SampleState.activeCases), {}, { _, _ -> }, {}, {}, {}, {}, {},
@@ -168,6 +168,13 @@ class ScreenGallery {
                 onCaptureSettings = { opened += "capture" },
             )
         }
+    }
+
+    @Test
+    fun workspaceVault() = harness.shoot("workspace-vault", before = { rule ->
+        rule.onNode(hasText("Vault") and hasClickAction()).performClick()
+    }) {
+        CaseListScreen(CaseListUiState(active = SampleState.activeCases), {}, { _, _ -> }, {}, {}, {}, {}, {}, {}, {}, {})
     }
 
     @Test
@@ -221,7 +228,10 @@ class ScreenGallery {
 
     @Test
     fun addEvidenceChoices() = harness.shoot("add-evidence-choices") {
-        androidx.compose.foundation.layout.Column { AddEvidenceActions(enabled = true, callbacks = noPickers, onPaste = {}) }
+        androidx.compose.foundation.layout.Column {
+            org.sakshi.app.evidence.AddEvidenceChoices(onFiles = {}, onMedia = {}, onPaste = {}, onNote = {})
+            AddEvidenceActions(enabled = true, callbacks = noPickers, onPaste = {})
+        }
     }
 
     @Test

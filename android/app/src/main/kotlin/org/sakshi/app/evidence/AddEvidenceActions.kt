@@ -4,24 +4,38 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.Role
 import org.sakshi.acquisition.importer.ImportLimits
 import org.sakshi.app.R
-import org.sakshi.app.ui.components.SecondaryButton
+import org.sakshi.app.ui.components.IconTile
+import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.theme.Spacing
 
 /** Callbacks for adding evidence to a case other than pasting, which the screen handles with a dialog. */
@@ -34,16 +48,12 @@ class AddEvidenceCallbacks(
     val onPickerClosed: () -> Unit,
 )
 
-/** Font scale from which the four buttons stack in one column instead of two rows of two. */
-private const val STACK_FROM_FONT_SCALE = 1.3f
-
-/** A fraction of the screen height above which the panel scrolls instead of growing. */
-private const val MAX_PANEL_FRACTION = 0.45f
-
 /**
- * The four ways to add evidence, as a panel pinned to the bottom of the screen where a thumb reaches it. Two rows of two
- * at normal text size, one stacked column at large text size. The panel scrolls if it would take over the screen.
+ * One "Add evidence" button pinned to the bottom of the screen where a thumb reaches it. It opens a sheet with the four
+ * ways to add evidence. The picker launchers live here, outside the sheet, so their results still arrive after the sheet
+ * has closed.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEvidenceActions(enabled: Boolean, callbacks: AddEvidenceCallbacks, onPaste: () -> Unit, modifier: Modifier = Modifier) {
     val documents = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
@@ -54,44 +64,69 @@ fun AddEvidenceActions(enabled: Boolean, callbacks: AddEvidenceCallbacks, onPast
         callbacks.onPickerClosed()
         callbacks.onMedia(uris)
     }
-    val density = LocalDensity.current
-    val stacked = density.fontScale >= STACK_FROM_FONT_SCALE
-    val maxHeight = with(density) { (LocalWindowInfo.current.containerSize.height * MAX_PANEL_FRACTION).toDp() }
-    val openFiles = {
-        callbacks.onPickerOpening()
-        documents.launch(arrayOf("*/*"))
-    }
-    val openMedia = {
-        callbacks.onPickerOpening()
-        media.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+    var sheetOpen by remember { mutableStateOf(false) }
+    val choose = { action: () -> Unit ->
+        sheetOpen = false
+        action()
     }
     Column(modifier.fillMaxWidth()) {
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Column(
-            Modifier.heightIn(max = maxHeight).verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.gutter, vertical = Spacing.md),
-            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        PrimaryButton(
+            stringResource(R.string.detail_add_evidence),
+            { sheetOpen = true },
+            Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.md),
+            enabled = enabled,
+            icon = Icons.Default.Add,
+        )
+    }
+    if (sheetOpen) {
+        ModalBottomSheet(
+            onDismissRequest = { sheetOpen = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
-            if (stacked) {
-                ActionButton(R.string.detail_add_files, enabled, Modifier.fillMaxWidth(), openFiles)
-                ActionButton(R.string.detail_add_media, enabled, Modifier.fillMaxWidth(), openMedia)
-                ActionButton(R.string.detail_paste, enabled, Modifier.fillMaxWidth(), onPaste)
-                ActionButton(R.string.detail_write_note, enabled, Modifier.fillMaxWidth(), callbacks.onNote)
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    ActionButton(R.string.detail_add_files, enabled, Modifier.weight(1f), openFiles)
-                    ActionButton(R.string.detail_add_media, enabled, Modifier.weight(1f), openMedia)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    ActionButton(R.string.detail_paste, enabled, Modifier.weight(1f), onPaste)
-                    ActionButton(R.string.detail_write_note, enabled, Modifier.weight(1f), callbacks.onNote)
-                }
-            }
+            AddEvidenceChoices(
+                onFiles = {
+                    choose {
+                        callbacks.onPickerOpening()
+                        documents.launch(arrayOf("*/*"))
+                    }
+                },
+                onMedia = {
+                    choose {
+                        callbacks.onPickerOpening()
+                        media.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                    }
+                },
+                onPaste = { choose(onPaste) },
+                onNote = { choose(callbacks.onNote) },
+            )
         }
     }
 }
 
+/** The four rows of the add-evidence sheet: an icon tile and a short label each. */
 @Composable
-private fun ActionButton(label: Int, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    SecondaryButton(stringResource(label), onClick, modifier, enabled)
+internal fun AddEvidenceChoices(onFiles: () -> Unit, onMedia: () -> Unit, onPaste: () -> Unit, onNote: () -> Unit) {
+    Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = Spacing.gutter, vertical = Spacing.sm)) {
+        ChoiceRow(ImageVector.vectorResource(R.drawable.ic_folder), R.string.detail_add_files, onFiles)
+        ChoiceRow(ImageVector.vectorResource(R.drawable.ic_image), R.string.detail_add_media, onMedia)
+        ChoiceRow(ImageVector.vectorResource(R.drawable.ic_clipboard), R.string.detail_paste, onPaste)
+        ChoiceRow(Icons.Default.Edit, R.string.detail_write_note, onNote)
+    }
+}
+
+@Composable
+private fun ChoiceRow(icon: ImageVector, label: Int, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .heightIn(min = Spacing.touchTarget + Spacing.md)
+            .padding(vertical = Spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        IconTile(icon)
+        Text(stringResource(label), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+    }
 }

@@ -19,25 +19,40 @@ fun kindText(kind: EvidenceKind): String = stringResource(
     },
 )
 
+/** The one or two word analysis state shown as a chip. [canAnalyse] separates "ready" from "kept as received". */
 @Composable
-fun analysisText(label: AnalysisLabel): String = stringResource(
+fun analysisChipText(label: AnalysisLabel, canAnalyse: Boolean): String = stringResource(
     when (label) {
-        AnalysisLabel.WAITING_FOR_TEXT -> R.string.analysis_waiting
-        AnalysisLabel.NOT_ANALYSED -> R.string.analysis_not_analysed
-        AnalysisLabel.ANALYSED -> R.string.analysis_done_label
-        AnalysisLabel.ANALYSED_IN_PART -> R.string.analysis_done_in_part_label
+        AnalysisLabel.WAITING_FOR_TEXT -> if (canAnalyse) R.string.chip_ready else R.string.chip_stored
+        AnalysisLabel.NOT_ANALYSED -> R.string.chip_stored
+        AnalysisLabel.ANALYSED -> R.string.chip_analysed
+        AnalysisLabel.ANALYSED_IN_PART -> R.string.chip_analysed_part
     },
 )
 
 @Composable
-fun integrityText(status: IntegrityStatus): String = stringResource(
+fun integrityChipText(status: IntegrityStatus): String = stringResource(
     when (status) {
-        IntegrityStatus.CHECKING -> R.string.integrity_checking
-        IntegrityStatus.INTACT -> R.string.integrity_intact
+        IntegrityStatus.CHECKING -> R.string.chip_integrity_checking
+        IntegrityStatus.INTACT -> R.string.chip_integrity_intact
+        IntegrityStatus.CHANGED -> R.string.chip_integrity_changed
+        IntegrityStatus.FILE_MISSING -> R.string.chip_integrity_missing
+        IntegrityStatus.NOT_AUTHENTICATED -> R.string.chip_integrity_not_verified
+        IntegrityStatus.KEY_UNAVAILABLE -> R.string.chip_integrity_key_unavailable
+        IntegrityStatus.NOT_COMPLETED -> R.string.chip_integrity_failed
+    },
+)
+
+/** The one-sentence explanation of a result that is neither intact nor still checking, or null for those two. */
+@Composable
+fun integritySentence(status: IntegrityStatus): String? {
+    val sentence = when (status) {
+        IntegrityStatus.CHECKING, IntegrityStatus.INTACT -> return null
         IntegrityStatus.CHANGED -> R.string.integrity_changed
         IntegrityStatus.FILE_MISSING -> R.string.integrity_missing
         IntegrityStatus.NOT_AUTHENTICATED -> R.string.integrity_not_authenticated
         IntegrityStatus.KEY_UNAVAILABLE -> R.string.integrity_key_unavailable
         IntegrityStatus.NOT_COMPLETED -> R.string.integrity_not_completed
-    },
-)
+    }
+    return stringResource(sentence)
+}

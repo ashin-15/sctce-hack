@@ -2,16 +2,21 @@ package org.sakshi.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.sakshi.app.ui.theme.Spacing
@@ -21,9 +26,9 @@ private fun Modifier.target(): Modifier = heightIn(min = Spacing.touchTarget).wi
 @Composable
 private fun Label(text: String) = Text(text, textAlign = TextAlign.Center)
 
-/** The one main action of a screen: filled with deep teal (#0F766E), full width by default. */
+/** The one main action of a screen: filled with deep teal (#0F766E), full width by default. [icon] leads the label. */
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, icon: ImageVector? = null) {
     Button(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().target(),
@@ -33,7 +38,13 @@ fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifi
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
-    ) { Label(text) }
+    ) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+        }
+        Label(text)
+    }
 }
 
 /** An alternative action: outlined, 1px border with primary teal text. */

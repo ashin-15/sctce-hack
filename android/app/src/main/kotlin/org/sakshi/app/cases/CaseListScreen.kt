@@ -3,6 +3,13 @@ package org.sakshi.app.cases
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +19,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -26,12 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import java.time.ZoneId
 import org.sakshi.app.BuildConfig
 import org.sakshi.app.R
@@ -39,12 +54,14 @@ import org.sakshi.app.ui.catalog.DesignCatalog
 import org.sakshi.app.ui.components.Workspace
 import org.sakshi.app.ui.components.WorkspaceNavigation
 import org.sakshi.app.ui.components.SectionHeader
-import org.sakshi.app.ui.components.LocalVaultBadge
-import org.sakshi.app.ui.components.SakshiBrandLogo
+import org.sakshi.app.ui.components.ActionTile
+import org.sakshi.app.ui.components.IconTile
+import org.sakshi.app.ui.components.StatTile
+import org.sakshi.app.ui.components.StatusChip
+import org.sakshi.app.ui.components.Tone
 import org.sakshi.app.ui.components.EmptyState
 import org.sakshi.app.ui.components.MenuAction
 import org.sakshi.app.ui.components.OverflowMenuButton
-import org.sakshi.app.ui.components.PrimaryButton
 import org.sakshi.app.ui.components.SakshiCard
 import org.sakshi.app.ui.components.SakshiScaffold
 import org.sakshi.app.ui.components.SupportingText
@@ -116,7 +133,9 @@ fun CaseListScreen(
     SakshiScaffold(
         title = stringResource(R.string.app_name),
         modifier = modifier,
-        actions = listOf(TopAction(stringResource(R.string.action_lock), onLock)),
+        subtitle = stringResource(workspace.title),
+        brand = true,
+        actions = listOf(TopAction(stringResource(R.string.action_lock), onLock, icon = Icons.Default.Lock)),
         menuDescription = stringResource(R.string.cases_menu_options),
         menu = listOf(
             MenuAction(stringResource(R.string.ai_model_menu), onClick = onOpenAiModel),
@@ -124,37 +143,38 @@ fun CaseListScreen(
         ),
         onTitleLongPress = if (BuildConfig.DEBUG) ({ catalogOpen = true }) else null,
         snackbarHostState = snackbar,
-        bottomBar = {
-            Column {
-                PrimaryButton(
-                    stringResource(R.string.cases_new),
-                    { dialog = Dialog.Create },
-                    Modifier.padding(horizontal = Spacing.gutter, vertical = Spacing.sm),
-                )
-                WorkspaceNavigation(workspace, { workspace = it })
-            }
-        },
+        bottomBar = { WorkspaceNavigation(workspace, { workspace = it }) },
     ) {
-        CaseList(
-            state = state,
-            archivedExpanded = archivedExpanded,
-            onToggleArchived = { archivedExpanded = !archivedExpanded },
-            onRename = { dialog = Dialog.Rename(it) },
-            onArchive = onArchive,
-            onUnarchive = onUnarchive,
-            onDelete = { dialog = Dialog.Delete(it) },
-            onOpen = when (workspace) {
-                Workspace.Evidence -> onOpenEvidence
-                Workspace.Incidents -> onOpenTimeline
-                Workspace.Reports -> onOpenReports
-                Workspace.Home, Workspace.Vault -> onOpen
-            },
-            workspace = workspace,
-            onObservationSettings = onObservationSettings,
-            onCaptureSettings = onCaptureSettings,
-        )
+        Box(Modifier.fillMaxSize()) {
+            CaseList(
+                state = state,
+                archivedExpanded = archivedExpanded,
+                onToggleArchived = { archivedExpanded = !archivedExpanded },
+                onRename = { dialog = Dialog.Rename(it) },
+                onArchive = onArchive,
+                onUnarchive = onUnarchive,
+                onDelete = { dialog = Dialog.Delete(it) },
+                onOpen = when (workspace) {
+                    Workspace.Evidence -> onOpenEvidence
+                    Workspace.Incidents -> onOpenTimeline
+                    Workspace.Reports -> onOpenReports
+                    Workspace.Home, Workspace.Vault -> onOpen
+                },
+                workspace = workspace,
+                onObservationSettings = onObservationSettings,
+                onCaptureSettings = onCaptureSettings,
+            )
+            ExtendedFloatingActionButton(
+                onClick = { dialog = Dialog.Create },
+                modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.gutter),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.cases_new)) },
+            )
+        }
     }
-
     when (val current = dialog) {
         Dialog.Create -> TitleDialog(
             heading = R.string.dialog_new_title,
@@ -186,6 +206,9 @@ private fun messageText(message: CaseMessage): String = when (message) {
     CaseMessage.SAVE_FAILED -> stringResource(R.string.message_save_failed)
 }
 
+/** Room left under the last list row so the "New case" button never covers it. */
+private val FAB_CLEARANCE = Spacing.touchTarget + Spacing.xxl + Spacing.lg
+
 @Composable
 private fun CaseList(
     state: CaseListUiState,
@@ -202,7 +225,7 @@ private fun CaseList(
 ) {
     LazyColumn(
         Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = Spacing.gutter, vertical = Spacing.sm),
+        contentPadding = PaddingValues(start = Spacing.gutter, end = Spacing.gutter, top = Spacing.sm, bottom = FAB_CLEARANCE),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         item(key = "workspace-header") {
@@ -260,19 +283,27 @@ private fun CaseRow(
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val created = formatCreatedDate(case.createdAt, locale, ZoneId.systemDefault())
-        ?.let { stringResource(R.string.case_created_on, it) }
         ?: stringResource(R.string.case_created_unknown)
+    val meta = stringResource(
+        R.string.case_meta,
+        pluralStringResource(R.plurals.evidence_count, case.evidenceCount, case.evidenceCount),
+        created,
+    )
     SakshiCard(quiet = archived) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(
+            Row(
                 Modifier.weight(1f)
                     .clickable(onClickLabel = stringResource(R.string.case_open), role = Role.Button) { onOpen(case.id) }
                     .heightIn(min = Spacing.touchTarget + Spacing.lg)
                     .padding(start = Spacing.lg, top = Spacing.md, bottom = Spacing.md),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                Text(case.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                SupportingText(pluralStringResource(R.plurals.evidence_count, case.evidenceCount, case.evidenceCount) + " - " + created)
+                IconTile(ImageVector.vectorResource(R.drawable.ic_folder), tone = if (archived) Tone.Neutral else Tone.Brand)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    Text(case.title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    SupportingText(meta)
+                }
             }
             OverflowMenuButton(
                 contentDescription = stringResource(R.string.case_options, case.title),
@@ -289,6 +320,7 @@ private fun CaseRow(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun WorkspaceHeader(
     workspace: Workspace,
@@ -296,49 +328,44 @@ private fun WorkspaceHeader(
     onObservationSettings: (() -> Unit)?,
     onCaptureSettings: (() -> Unit)?,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.lg), modifier = Modifier.padding(vertical = Spacing.sm)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
-            SakshiBrandLogo(size = 40.dp)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                Text(stringResource(workspace.title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
-                LocalVaultBadge(text = stringResource(R.string.stitch_local))
-            }
-        }
+    if (workspace != Workspace.Home && workspace != Workspace.Vault) return
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.md), modifier = Modifier.padding(bottom = Spacing.sm)) {
+        VaultSummary(state)
         when (workspace) {
             Workspace.Home -> {
-                SectionHeader(stringResource(R.string.stitch_welcome))
-                SupportingText(stringResource(R.string.stitch_welcome_body))
-                VaultSummary(state)
                 if (onObservationSettings != null || onCaptureSettings != null) {
-                    SectionHeader(stringResource(R.string.stitch_collection_heading))
-                    SupportingText(stringResource(R.string.stitch_collection_body))
-                    onObservationSettings?.let { PrimaryButton(stringResource(R.string.stitch_notifications), it) }
-                    onCaptureSettings?.let { PrimaryButton(stringResource(R.string.stitch_capture), it) }
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                        val tile = Modifier.weight(1f).fillMaxHeight()
+                        onObservationSettings?.let {
+                            ActionTile(Icons.Default.Notifications, stringResource(R.string.stitch_notifications), it, tile)
+                        }
+                        onCaptureSettings?.let {
+                            ActionTile(ImageVector.vectorResource(R.drawable.ic_screen_capture), stringResource(R.string.stitch_capture), it, tile)
+                        }
+                        if (onObservationSettings == null || onCaptureSettings == null) Spacer(Modifier.weight(1f))
+                    }
                 }
+                SectionHeader(stringResource(R.string.stitch_cases_heading), Modifier.padding(top = Spacing.sm))
             }
-            Workspace.Vault -> VaultSummary(state)
-            Workspace.Evidence -> SupportingText(stringResource(R.string.stitch_evidence_body))
-            Workspace.Incidents -> SupportingText(stringResource(R.string.stitch_incidents_body))
-            Workspace.Reports -> SupportingText(stringResource(R.string.stitch_reports_body))
+            Workspace.Vault -> FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                StatusChip(stringResource(R.string.stitch_vault_cipher), tone = Tone.Brand)
+                StatusChip(stringResource(R.string.stitch_vault_keystore), tone = Tone.Brand)
+                StatusChip(stringResource(R.string.stitch_vault_database), tone = Tone.Brand)
+            }
+            Workspace.Evidence, Workspace.Incidents, Workspace.Reports -> Unit
         }
-        SectionHeader(stringResource(R.string.stitch_cases_heading))
     }
 }
 
+/** The two headline numbers: active cases and the evidence items inside them. */
 @Composable
 private fun VaultSummary(state: CaseListUiState) {
-    SakshiCard {
-        Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            SectionHeader(stringResource(R.string.stitch_vault_title))
-            SupportingText(stringResource(R.string.stitch_vault_body))
-            val evidenceCount = state.active.sumOf { it.evidenceCount }
-            SupportingText(
-                stringResource(
-                    R.string.stitch_cases_summary,
-                    pluralStringResource(R.plurals.stitch_active_cases, state.active.size, state.active.size),
-                    pluralStringResource(R.plurals.stitch_evidence_items, evidenceCount, evidenceCount),
-                ),
-            )
-        }
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        val tile = Modifier.weight(1f).fillMaxHeight()
+        StatTile(state.active.size.toString(), stringResource(R.string.stitch_stat_cases), tile)
+        StatTile(state.active.sumOf { it.evidenceCount }.toString(), stringResource(R.string.stitch_stat_evidence), tile)
     }
 }

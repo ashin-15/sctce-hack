@@ -2,14 +2,18 @@ package org.sakshi.app.evidence
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -19,13 +23,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import org.sakshi.app.R
+import org.sakshi.app.ui.components.ActionTile
 import org.sakshi.app.ui.components.ConfirmDialog
 import org.sakshi.app.ui.components.EmptyState
+import org.sakshi.app.ui.components.MoreInfo
 import org.sakshi.app.ui.components.NoteKind
 import org.sakshi.app.ui.components.SakshiScaffold
-import org.sakshi.app.ui.components.SecondaryButton
 import org.sakshi.app.ui.components.SectionHeader
 import org.sakshi.app.ui.components.StatusNote
 import org.sakshi.app.ui.components.SupportingText
@@ -81,7 +88,7 @@ fun CaseDetailScreen(state: CaseDetailUiState, actions: CaseDetailActions, modif
         onBack = actions.back,
         actions = listOf(
             TopAction(stringResource(R.string.action_search), actions.openSearch, icon = Icons.Default.Search),
-            TopAction(stringResource(R.string.action_lock), actions.lock),
+            TopAction(stringResource(R.string.action_lock), actions.lock, icon = Icons.Default.Lock),
         ),
         snackbarHostState = snackbar,
         bottomBar = if (canAdd) {
@@ -119,13 +126,12 @@ private fun Content(state: CaseDetailUiState, actions: CaseDetailActions, onDele
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
         item(key = "views") {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                SecondaryButton(stringResource(R.string.detail_timeline), actions.openTimeline, Modifier.weight(1f))
-                SecondaryButton(stringResource(R.string.detail_patterns), actions.openPatterns, Modifier.weight(1f))
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                val tile = Modifier.weight(1f).fillMaxHeight()
+                ActionTile(ImageVector.vectorResource(R.drawable.ic_timeline), stringResource(R.string.detail_timeline), actions.openTimeline, tile)
+                ActionTile(ImageVector.vectorResource(R.drawable.ic_pattern), stringResource(R.string.detail_patterns), actions.openPatterns, tile)
+                ActionTile(ImageVector.vectorResource(R.drawable.ic_document), stringResource(R.string.detail_make_report), actions.openReport, tile)
             }
-        }
-        item(key = "report") {
-            SecondaryButton(stringResource(R.string.detail_make_report), actions.openReport, Modifier.fillMaxWidth())
         }
         if (state.archived) {
             item(key = "archived") { StatusNote(NoteKind.Info, stringResource(R.string.detail_archived)) }
@@ -145,6 +151,13 @@ private fun Content(state: CaseDetailUiState, actions: CaseDetailActions, onDele
                 onDelete = { onDelete(row.id) },
                 onAnalyse = { actions.analyse(row.id) },
             )
+        }
+        if (state.items.isNotEmpty()) {
+            item(key = "integrity-about") {
+                MoreInfo(stringResource(R.string.detail_integrity_about)) {
+                    SupportingText(stringResource(R.string.detail_integrity_caveat))
+                }
+            }
         }
     }
 }
