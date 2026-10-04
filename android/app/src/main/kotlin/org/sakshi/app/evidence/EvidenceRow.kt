@@ -25,15 +25,16 @@ data class EvidenceRow(
             else -> analysisOf(kind)
         }
 
-    /** True for a text item or image that has not been turned into events yet, so "Analyse text" is offered. */
+    /** True for a text item, image or recording that has not been turned into events yet, so analysis is offered. */
     val canAnalyse: Boolean get() = kind.readsAsText && !analysed
 }
 
 /**
- * The kinds the text analysis reads. Images are read by on-device text recognition (Latin script only); an image
- * type the recogniser cannot open is refused with a reason when the user asks.
+ * The kinds the text analysis reads. Images are read by on-device text recognition (Latin script only) and recordings
+ * by on-device speech recognition; a file the recogniser cannot open is refused with a reason when the user asks.
  */
-val EvidenceKind.readsAsText: Boolean get() = this == EvidenceKind.TEXT || this == EvidenceKind.TEXT_FILE || this == EvidenceKind.IMAGE
+val EvidenceKind.readsAsText: Boolean
+    get() = this == EvidenceKind.TEXT || this == EvidenceKind.TEXT_FILE || this == EvidenceKind.IMAGE || this == EvidenceKind.AUDIO
 
 private val ARCHIVE_TYPES = setOf(
     "application/zip",
@@ -52,9 +53,12 @@ fun evidenceKindOf(acquisitionKind: String, detectedMime: String?, declaredMime:
         AcquisitionKind.SHARED_TEXT, AcquisitionKind.PASTED_TEXT -> return EvidenceKind.TEXT
         AcquisitionKind.MANUAL_NOTE -> return EvidenceKind.NOTE
     }
-    val mime = (detectedMime ?: declaredMime)?.substringBefore(';')?.trim()?.lowercase()
+    val declared = declaredMime?.substringBefore(';')?.trim()?.lowercase()
+    val mime = detectedMime?.substringBefore(';')?.trim()?.lowercase() ?: declared
     return when {
         mime == null -> EvidenceKind.FILE
+        // The leading bytes of an MP4 file do not say whether it holds sound only, so the provider's claim decides.
+        mime == "video/mp4" && declared?.startsWith("audio/") == true -> EvidenceKind.AUDIO
         mime.startsWith("image/") -> EvidenceKind.IMAGE
         mime.startsWith("audio/") -> EvidenceKind.AUDIO
         mime.startsWith("video/") -> EvidenceKind.VIDEO
@@ -66,7 +70,8 @@ fun evidenceKindOf(acquisitionKind: String, detectedMime: String?, declaredMime:
 }
 
 fun analysisOf(kind: EvidenceKind): AnalysisLabel = when (kind) {
-    EvidenceKind.TEXT, EvidenceKind.TEXT_FILE, EvidenceKind.IMAGE, EvidenceKind.NOTE -> AnalysisLabel.WAITING_FOR_TEXT
-    EvidenceKind.AUDIO, EvidenceKind.VIDEO, EvidenceKind.PDF, EvidenceKind.ARCHIVE, EvidenceKind.FILE ->
+    EvidenceKind.TEXT, EvidenceKind.TEXT_FILE, EvidenceKind.IMAGE, EvidenceKind.AUDIO, EvidenceKind.NOTE ->
+        AnalysisLabel.WAITING_FOR_TEXT
+    EvidenceKind.VIDEO, EvidenceKind.PDF, EvidenceKind.ARCHIVE, EvidenceKind.FILE ->
         AnalysisLabel.NOT_ANALYSED
 }

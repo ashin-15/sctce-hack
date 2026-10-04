@@ -23,6 +23,9 @@ class EvidenceRowTest {
         assertEquals(EvidenceKind.IMAGE, kind(AcquisitionKind.SHARED_STREAM, "image/png", "application/pdf"))
         assertEquals(EvidenceKind.AUDIO, kind(AcquisitionKind.SHARED_STREAM, null, "audio/ogg"))
         assertEquals(EvidenceKind.VIDEO, kind(AcquisitionKind.SELECTED_VISUAL_MEDIA, "video/mp4"))
+        assertEquals(EvidenceKind.VIDEO, kind(AcquisitionKind.SELECTED_VISUAL_MEDIA, "video/mp4", "video/mp4"))
+        assertEquals(EvidenceKind.AUDIO, kind(AcquisitionKind.SELECTED_DOCUMENT, "video/mp4", "Audio/MP4; codecs=mp4a"))
+        assertEquals(EvidenceKind.PDF, kind(AcquisitionKind.SELECTED_DOCUMENT, "application/pdf", "audio/mpeg"))
         assertEquals(EvidenceKind.PDF, kind(AcquisitionKind.SELECTED_DOCUMENT, "application/pdf"))
         assertEquals(EvidenceKind.ARCHIVE, kind(AcquisitionKind.SELECTED_DOCUMENT, "application/zip"))
         assertEquals(EvidenceKind.TEXT_FILE, kind(AcquisitionKind.SELECTED_DOCUMENT, null, "text/csv; charset=utf-8"))
@@ -32,7 +35,7 @@ class EvidenceRowTest {
 
     @Test
     fun analysisLabelsFollowTheBrief() {
-        val waiting = listOf(EvidenceKind.TEXT, EvidenceKind.TEXT_FILE, EvidenceKind.IMAGE, EvidenceKind.NOTE)
+        val waiting = listOf(EvidenceKind.TEXT, EvidenceKind.TEXT_FILE, EvidenceKind.IMAGE, EvidenceKind.AUDIO, EvidenceKind.NOTE)
         EvidenceKind.entries.forEach {
             val expected = if (it in waiting) AnalysisLabel.WAITING_FOR_TEXT else AnalysisLabel.NOT_ANALYSED
             assertEquals(expected, analysisOf(it), it.name)
@@ -42,14 +45,17 @@ class EvidenceRowTest {
     private fun row(kind: EvidenceKind, state: String) = EvidenceRow("synthetic-id", "2026-10-02T10:00:00Z", 10, kind, state)
 
     @Test
-    fun onlyUnanalysedTextAndImagesOfferAnalysis() {
+    fun onlyUnanalysedTextImagesAndRecordingsOfferAnalysis() {
         assertTrue(row(EvidenceKind.TEXT, SupportState.SAVED).canAnalyse)
         assertTrue(row(EvidenceKind.TEXT_FILE, SupportState.SAVED).canAnalyse)
         assertTrue(row(EvidenceKind.IMAGE, SupportState.SAVED).canAnalyse)
         assertFalse(row(EvidenceKind.TEXT, SupportState.ANALYZED).canAnalyse)
         assertFalse(row(EvidenceKind.TEXT, SupportState.PARTIAL).canAnalyse)
         assertFalse(row(EvidenceKind.IMAGE, SupportState.ANALYZED).canAnalyse)
-        listOf(EvidenceKind.NOTE, EvidenceKind.PDF, EvidenceKind.AUDIO, EvidenceKind.FILE).forEach {
+        assertTrue(row(EvidenceKind.AUDIO, SupportState.SAVED).canAnalyse)
+        assertFalse(row(EvidenceKind.AUDIO, SupportState.ANALYZED).canAnalyse)
+        assertFalse(row(EvidenceKind.AUDIO, SupportState.PARTIAL).canAnalyse)
+        listOf(EvidenceKind.NOTE, EvidenceKind.PDF, EvidenceKind.VIDEO, EvidenceKind.FILE).forEach {
             assertFalse(row(it, SupportState.SAVED).canAnalyse, it.name)
         }
     }
@@ -61,6 +67,9 @@ class EvidenceRowTest {
         assertEquals(AnalysisLabel.ANALYSED_IN_PART, row(EvidenceKind.TEXT_FILE, SupportState.PARTIAL).analysis)
         assertEquals(AnalysisLabel.ANALYSED, row(EvidenceKind.IMAGE, SupportState.ANALYZED).analysis)
         assertEquals(AnalysisLabel.ANALYSED_IN_PART, row(EvidenceKind.IMAGE, SupportState.PARTIAL).analysis)
+        assertEquals(AnalysisLabel.WAITING_FOR_TEXT, row(EvidenceKind.AUDIO, SupportState.SAVED).analysis)
+        assertEquals(AnalysisLabel.ANALYSED, row(EvidenceKind.AUDIO, SupportState.ANALYZED).analysis)
+        assertEquals(AnalysisLabel.ANALYSED_IN_PART, row(EvidenceKind.AUDIO, SupportState.PARTIAL).analysis)
         assertEquals(AnalysisLabel.WAITING_FOR_TEXT, row(EvidenceKind.NOTE, SupportState.ANALYZED).analysis)
     }
 }

@@ -254,6 +254,7 @@
     <!-- Analysis -->
     <string name="evidence_analyse">Analyse</string>
     <string name="evidence_read_image">Read image</string>
+    <string name="evidence_read_audio">Transcribe</string>
     <string name="result_analyse_now">Analyse now</string>
     <string name="detail_timeline">Timeline</string>
     <string name="detail_patterns">Patterns</string>

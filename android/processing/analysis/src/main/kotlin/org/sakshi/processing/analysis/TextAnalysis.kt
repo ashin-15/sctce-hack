@@ -51,9 +51,10 @@ import org.sakshi.processing.text.RulesEngine
  * whose suggestions point at both the recognised text and the image regions. Without one, images are kept as
  * received and not analysed.
  *
- * With an [stt] processor, a recording (detected type `audio/...`, not a note) is transcribed on this phone from the
- * encrypted original, read in memory only. The words become one transcript derivative and one event; its suggestions
- * point at both the transcribed words and the time range of the recording. Silence, a recording that is too long or
+ * With an [stt] processor, a recording (an audio type by its bytes or, where the bytes cannot say, by the provider's
+ * claim; not a note) is transcribed on this phone from the encrypted original, read in memory only. The words become
+ * one transcript derivative and one event; its suggestions point at both the transcribed words and the time range of
+ * the recording. Silence, a recording that is too long or
  * cannot be decoded, a missing model and a failed run are refusals that write nothing, and a refusal for silence
  * never says nothing was said. Video stays kept as received. Without [stt], recordings are not analysed.
  *
@@ -120,7 +121,7 @@ public class TextAnalysis internal constructor(
             ?: return AnalysisOutcome.NotAnalysable(NotAnalysableReason.EVIDENCE_MISSING)
         val recogniser = ocr?.takeIf { details.detectedMime in OCR_IMAGE_TYPES && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
         if (recogniser != null) return analyseImage(details, recogniser)
-        val transcriber = stt?.takeIf { details.detectedMime?.startsWith(AUDIO_PREFIX) == true && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
+        val transcriber = stt?.takeIf { isRecording(details) && details.acquisitionKind != AcquisitionKind.MANUAL_NOTE }
         if (transcriber != null) return analyseAudio(details, transcriber)
         eligibility(details)?.let { return AnalysisOutcome.NotAnalysable(it) }
         val claims = if (details.acquisitionKind == AcquisitionKind.NOTIFICATION_EXCERPT) {
@@ -446,6 +447,18 @@ public class TextAnalysis internal constructor(
         }
     }
 
+    /**
+     * A recording is a file whose leading bytes are an audio type, or one the provider called audio whose leading bytes
+     * cannot say: an unrecognised audio format, or an MP4 container, which looks the same with sound only or with
+     * video. The claim only opens the speech lane; the decoder still refuses a file that holds no audio it can read.
+     */
+    private fun isRecording(details: EvidenceDetails): Boolean {
+        val detected = details.detectedMime
+        if (detected?.startsWith(AUDIO_PREFIX) == true) return true
+        val declaredAudio = details.declaredMime?.trim()?.lowercase()?.startsWith(AUDIO_PREFIX) == true
+        return declaredAudio && (detected == null || detected == MP4_CONTAINER)
+    }
+
     private fun eligibility(details: EvidenceDetails): NotAnalysableReason? {
         val declaredText = details.declaredMime?.trim()?.lowercase()?.startsWith(TEXT_PREFIX) == true
         val sharedText = details.acquisitionKind == AcquisitionKind.SHARED_TEXT ||
@@ -519,6 +532,7 @@ public class TextAnalysis internal constructor(
         )
         const val TEXT_PREFIX: String = "text/"
         const val AUDIO_PREFIX: String = "audio/"
+        const val MP4_CONTAINER: String = "video/mp4"
 
         /** Detected types the image path reads; other images stay preserve-only. */
         val OCR_IMAGE_TYPES: Set<String> = setOf("image/jpeg", "image/png", "image/webp")

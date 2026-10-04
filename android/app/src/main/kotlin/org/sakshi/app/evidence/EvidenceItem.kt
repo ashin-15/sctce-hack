@@ -73,7 +73,11 @@ fun EvidenceItem(
                     }
                     integrity?.let { status -> integritySentence(status)?.let { StatusNote(integrityKind(status), it) } }
                     if (row.canAnalyse) {
-                        val label = if (row.kind == EvidenceKind.IMAGE) R.string.evidence_read_image else R.string.evidence_analyse
+                        val label = when (row.kind) {
+                            EvidenceKind.IMAGE -> R.string.evidence_read_image
+                            EvidenceKind.AUDIO -> R.string.evidence_read_audio
+                            else -> R.string.evidence_analyse
+                        }
                         SecondaryButton(stringResource(label), onAnalyse, Modifier.padding(top = Spacing.xs))
                     }
                 }

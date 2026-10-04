@@ -168,6 +168,66 @@ class AudioAnalysisTest : AnalysisTestBase() {
         assertTrue(engine.models.single().closed, "the model is released")
     }
 
+    /** The words the base model wrote for a synthetic spoken clip on a laptop; scripted here, not transcribed. */
+    @Test
+    fun severalKindsOfHarmfulSpeechAreEachSuggestedAtTheMomentTheyWereHeard() = runBlocking<Unit> {
+        val id = importAudio()
+        val heard = EngineRun.Done(
+            listOf(
+                segment("Please stop messaging me, you are an idiot.", 0, 3_160),
+                segment("I will hurt you if you tell anyone of me your password or I will publish your photos.", 3_160, 8_080),
+            ),
+            "en",
+        )
+        val nineSeconds = PcmAudioSource(FloatArray(9 * MODEL_SAMPLE_RATE_HZ) { speechLike[it % speechLike.size] })
+        assertIs<AnalysisOutcome.Analysed>(analyser(processor(ScriptedEngine(heard)), nineSeconds).analyse(id))
+        val event = events().single()
+        assertSchemaValid(listOf(event))
+        val heardAt = event.categories.associate { category ->
+            val referenced = event.evidenceReferences.filter { it.referenceId in category.evidenceReferenceIds }
+            category.label to (referenced.single { it.locator is Locator.AudioTime }.locator as Locator.AudioTime)
+        }
+        assertEquals(
+            setOf(
+                CategoryLabel.VERBAL_ABUSE,
+                CategoryLabel.EXPLICIT_THREAT,
+                CategoryLabel.CONTROLLING_REQUEST,
+                CategoryLabel.PRIVACY_EXPOSURE_INDICATOR,
+            ),
+            heardAt.keys,
+        )
+        assertEquals(Locator.AudioTime(0, 3_160), heardAt[CategoryLabel.VERBAL_ABUSE])
+        (heardAt - CategoryLabel.VERBAL_ABUSE).values.forEach { assertEquals(Locator.AudioTime(3_160, 8_080), it) }
+    }
+
+    @Test
+    fun aRecordingTheBytesCannotNameIsReadWhenTheProviderCalledItAudio() = runBlocking<Unit> {
+        val mp4 = byteArrayOf(0, 0, 0, 24) + "ftypmp42".toByteArray() + ByteArray(64) { 5 }
+        val amr = "#!AMR\n".toByteArray() + ByteArray(64) { 7 }
+        val analyser = analyser(processor(ScriptedEngine(speech)))
+        listOf(mp4 to "audio/mp4", amr to "Audio/AMR ").forEach { (bytes, declared) ->
+            val id = importBytes(bytes, declaredMime = declared, kind = AcquisitionKind.SELECTED_DOCUMENT)
+            val outcome = assertIs<AnalysisOutcome.Analysed>(analyser.analyse(id), declared)
+            assertEquals(InputKind.AUDIO_TRANSCRIPT, outcome.kind)
+            assertEquals(SupportState.ANALYZED, vault.evidence.details(id)?.supportState)
+        }
+        assertEquals(2, events().size)
+        assertTrue(events().all { event -> event.categories.single().label == CategoryLabel.VERBAL_ABUSE })
+    }
+
+    @Test
+    fun aVideoAndAFileOfAnotherTypeAreNotTreatedAsRecordings() {
+        val mp4 = byteArrayOf(0, 0, 0, 24) + "ftypmp42".toByteArray() + ByteArray(64) { 5 }
+        val pdf = "%PDF-1.7".toByteArray() + ByteArray(64) { 5 }
+        val analyser = analyser(processor(ScriptedEngine(speech)))
+        val video = importBytes(mp4, declaredMime = "video/mp4", kind = AcquisitionKind.SELECTED_VISUAL_MEDIA)
+        val mislabelled = importBytes(pdf, declaredMime = "audio/mpeg", kind = AcquisitionKind.SELECTED_DOCUMENT)
+        assertEquals(NotAnalysableReason.PRESERVE_ONLY_TYPE, refusal(analyser, video))
+        assertEquals(NotAnalysableReason.PRESERVE_ONLY_TYPE, refusal(analyser, mislabelled))
+        assertTrue(sources.isEmpty(), "neither original was opened for the decoder")
+        assertTrue(events().isEmpty())
+    }
+
     @Test
     fun transcriptTextIsNotSentToThreatClassifier() = runBlocking<Unit> {
         val id = importAudio()

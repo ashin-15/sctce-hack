@@ -168,7 +168,7 @@ fun SessionHost(services: SessionServices, container: AppContainer, owner: ViewM
             ImportScreen(importState, cases, actions)
         }
         is SessionScreen.ManualNote -> NoteRoute(screen.caseId, services, owner, navigator)
-        is SessionScreen.Analysis -> AnalysisRoute(screen, services, owner, navigator)
+        is SessionScreen.Analysis -> AnalysisRoute(screen, services, owner, navigator, container)
         is SessionScreen.Timeline -> TimelineRoute(screen.caseId, services, owner, navigator)
         is SessionScreen.EventReview -> EventReviewRoute(screen, services, owner, navigator)
         is SessionScreen.WhoIsWho -> WhoIsWhoRoute(screen, services, owner, navigator)
@@ -350,12 +350,13 @@ private fun AnalysisRoute(
     services: SessionServices,
     owner: ViewModelStoreOwner,
     navigator: SessionNavigator,
+    container: AppContainer,
 ) {
     val model = remember(services, screen) {
         ViewModelProvider(owner, AnalysisViewModel.factory(screen.evidenceId, services))["analysis-${screen.evidenceId}", AnalysisViewModel::class.java]
     }
     val state by model.state.collectAsState()
-    val actions = remember(model, navigator, screen) {
+    val actions = remember(model, navigator, screen, container) {
         AnalysisActions(
             back = {
                 model.cancel()
@@ -369,6 +370,9 @@ private fun AnalysisRoute(
             continueWithAnswers = model::continueWithAnswers,
             openTimeline = { navigator.replaceTopWithTimeline(screen.caseId) },
             startOnce = model::startOnce,
+            importSpeechModel = model::importSpeechModel,
+            onPickerOpening = container.pickerGrace::begin,
+            onPickerClosed = container.pickerGrace::end,
         )
     }
     AnalysisScreen(state, actions)

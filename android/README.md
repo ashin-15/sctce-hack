@@ -15,7 +15,7 @@ Implementation follows `../MEGAPLAN.md`. This directory contains the complete fo
 | `:acquisition:importer` | Android library | Share intent, picker and paste readers, streaming limits, manual note codec |
 | `:processing:text` | Kotlin/JVM | Script and language hints, rules cue engine, label mapping, WhatsApp text-export parser |
 | `:processing:ocr` | Android library | Bundled ML Kit Latin text recognition (no download), line regions with engine scores, EXIF rotation, decode bounds. Its manifest removes the `INTERNET` and `ACCESS_NETWORK_STATE` permissions that ML Kit's telemetry library adds |
-| `:processing:stt` | Android library (arm64 native) | whisper.cpp base q5_1 speech to text: `SttProcessor`, `ModelSessionManager` (hash-pinned model, one heavy model at a time, unloads), `ModelProvisioner`, in-memory `MediaCodec` decoding over the vault's random-access reader, transcript with time ranges, silence as an explicit result. Library only: no screen yet. See "Speech to text (phase 11)" |
+| `:processing:stt` | Android library (arm64 native) | whisper.cpp base q5_1 speech to text: `SttProcessor`, `ModelSessionManager` (hash-pinned model, one heavy model at a time, unloads), `ModelProvisioner`, in-memory `MediaCodec` decoding over the vault's random-access reader, transcript with time ranges, silence as an explicit result. The app uses it from a recording's "Transcribe" action on the case screen. See "Speech to text (phase 11)" |
 | `:processing:analysis` | Android library | Text analysis pipeline, screenshot text (OCR derivative with regions, one event per image, cues anchored to text span and image region), derivative storage, single-pass code-point body and quote extraction (`EventText`), on-demand pattern engine with supporting events |
 | `:export:bundle` | Kotlin/JVM | Bundle writer, offline verifier, command-line tool (`./gradlew :export:bundle:run --args="verify <dir>"`) |
 | `:export:report` | Android library | Report model, PDF renderer, Keystore signer (ECDSA P-256), export service, export audit records |
@@ -66,7 +66,7 @@ Instrumented tests on one Samsung SM-S928B (Android 16) cover the SQLCipher data
 
 ## Speech to text (phase 11)
 
-`:processing:stt` is a library and device-test deliverable only; it has no screen and the app does not call it yet. It runs whisper.cpp (multilingual base, 5-bit `q5_1`) on the CPU, offline. There is no network code in the module and the model is not in the APK.
+`:processing:stt` is the speech library. The app calls it from a recording's "Transcribe" action; the first use asks for the model file. It runs whisper.cpp (multilingual base, 5-bit `q5_1`) on the CPU, offline. There is no network code in the module and the model is not in the APK.
 
 Preparation steps (the only network steps; the Gradle build never downloads and fails with a pointer to the script if the source is missing):
 
